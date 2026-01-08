@@ -1,0 +1,19 @@
+/* User Profile Styles Update */
+.user-phone-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
+    background: rgba(34, 197, 94, 0.1);
+    color: #22c55e;
+    padding: 0.25rem 0.65rem;
+    border-radius: 9999px;
+    font-size: 0.75rem;
+    font-weight: 600;
+    margin-top: 0.5rem;
+    border: 1px solid rgba(34, 197, 94, 0.2);
+}
+
+.user-phone-badge svg {
+    width: 12px;
+    height: 12px;
+}

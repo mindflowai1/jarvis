@@ -1,0 +1,134 @@
+import { useState } from 'react'
+import { supabase } from '../supabaseClient'
+import './PhoneNumberModal.css'
+
+const PhoneNumberModal = ({ session, onSave }) => {
+    const [phone, setPhone] = useState('')
+    const [loading, setLoading] = useState(false)
+    const [error, setError] = useState(null)
+
+    // Formata o telefone conforme digita: (XX) XXXXX-XXXX
+    const formatPhone = (value) => {
+        const numbers = value.replace(/\D/g, '')
+
+        if (numbers.length <= 2) return numbers
+        if (numbers.length <= 6) return `(${numbers.slice(0, 2)}) ${numbers.slice(2)}`
+        if (numbers.length <= 10) return `(${numbers.slice(0, 2)}) ${numbers.slice(2, 7)}-${numbers.slice(7)}`
+
+        return `(${numbers.slice(0, 2)}) ${numbers.slice(2, 7)}-${numbers.slice(7, 11)}`
+    }
+
+    const handleChange = (e) => {
+        const value = e.target.value
+        // Limita a 15 caracteres: (XX) XXXXX-XXXX
+        if (value.length <= 15) {
+            setPhone(formatPhone(value))
+            setError(null)
+        }
+    }
+
+    const validatePhone = (phone) => {
+        const numbers = phone.replace(/\D/g, '')
+        return numbers.length === 11 // DDD + 9 dígitos
+    }
+
+    const handleSave = async () => {
+        if (!validatePhone(phone)) {
+            setError('Por favor, digite um número de celular válido com DDD')
+            return
+        }
+
+        setLoading(true)
+        setError(null)
+
+        try {
+            // Remove formatação e adiciona código do país (+55)
+            const rawPhone = phone.replace(/\D/g, '')
+            const phoneWithCountryCode = `55${rawPhone}` // +55 (Brasil)
+            
+            // Pega o nome do usuário dos metadados
+            const userName = session.user.user_metadata?.full_name || session.user.email?.split('@')[0] || 'Usuário'
+            
+            const { error: dbError } = await supabase
+                .from('user_profiles')
+                .insert([
+                    {
+                        user_id: session.user.id,
+                        name: userName,
+                        phone_number: phoneWithCountryCode,
+                        whatsapp_number: phoneWithCountryCode // Por padrão usamos o mesmo para WhatsApp
+                    }
+                ])
+
+            if (dbError) throw dbError
+
+            if (onSave) onSave()
+
+        } catch (err) {
+            console.error('Error saving phone:', err)
+            setError('Erro ao salvar número. Tente novamente.')
+        } finally {
+            setLoading(false)
+        }
+    }
+
+    return (
+        <div className="phone-modal-overlay">
+            <div className="phone-modal">
+                <div className="phone-modal-icon">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor">
+                        <path strokeLinecap="round" strokeLinejoin="round" d="M10.5 1.5H8.25A2.25 2.25 0 006 3.75v16.5a2.25 2.25 0 002.25 2.25h7.5A2.25 2.25 0 0018 20.25V3.75a2.25 2.25 0 00-2.25-2.25H13.5m-3 0V3h3V1.5m-3 0h3m-3 18.75h3" />
+                    </svg>
+                </div>
+
+                <h2>Cadastro de Celular</h2>
+                <p>Para continuar, precisamos que você vincule seu número de WhatsApp à sua conta.</p>
+
+                <div className="phone-input-group">
+                    <label className="phone-input-label">Seu número de WhatsApp</label>
+                    <div className="phone-input-wrapper">
+                        <div className="country-code">
+                            🇧🇷 +55
+                        </div>
+                        <input
+                            type="tel"
+                            className={`phone-input ${error ? 'error' : ''}`}
+                            placeholder="(11) 99999-9999"
+                            value={phone}
+                            onChange={handleChange}
+                            disabled={loading}
+                        />
+                    </div>
+                    {error && (
+                        <div className="error-message">
+                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" width="16" height="16">
+                                <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
+                            </svg>
+                            {error}
+                        </div>
+                    )}
+                </div>
+
+                <button
+                    className="save-btn"
+                    onClick={handleSave}
+                    disabled={loading || phone.length < 15}
+                >
+                    {loading ? (
+                        <>
+                            <svg className="animate-spin -ml-1 mr-3 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                                <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                                <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                            </svg>
+                            Salvando...
+                        </>
+                    ) : (
+                        'Confirmar e Continuar'
+                    )}
+                </button>
+            </div>
+        </div>
+    )
+}
+
+export default PhoneNumberModal
