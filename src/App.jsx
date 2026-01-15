@@ -4,6 +4,7 @@ import './index.css'
 import CalendarAgenda from './components/CalendarAgenda'
 import PhoneNumberModal from './components/PhoneNumberModal'
 import VoiceAssistant from './components/VoiceAssistant/VoiceAssistant'
+import FinancialDashboard from './components/FinancialDashboard'
 
 function App() {
     const [session, setSession] = useState(null)
@@ -16,7 +17,7 @@ function App() {
     const formatPhoneDisplay = (phone) => {
         if (!phone) return ''
         const numbers = phone.replace(/\D/g, '')
-        
+
         // Se tem 13 dígitos, assume que tem código do país (55)
         if (numbers.length === 13 && numbers.startsWith('55')) {
             const ddd = numbers.slice(2, 4)
@@ -24,12 +25,12 @@ function App() {
             const secondPart = numbers.slice(9, 13)
             return `+55 (${ddd}) ${firstPart}-${secondPart}`
         }
-        
+
         // Se tem 11 dígitos, formato sem código do país
         if (numbers.length === 11) {
             return `(${numbers.slice(0, 2)}) ${numbers.slice(2, 7)}-${numbers.slice(7, 11)}`
         }
-        
+
         // Retorna o número original se não corresponder aos formatos esperados
         return phone
     }
@@ -148,11 +149,7 @@ function App() {
 
                 <div className={`login-card ${loaded ? 'fade-in' : ''}`}>
                     <div className="logo-area">
-                        <div className="logo-circle">
-                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="lock-icon">
-                                <path strokeLinecap="round" strokeLinejoin="round" d="M16.5 10.5V6.75a4.5 4.5 0 10-9 0v3.75m-.75 11.25h10.5a2.25 2.25 0 002.25-2.25v-6.75a2.25 2.25 0 00-2.25-2.25H6.75a2.25 2.25 0 00-2.25 2.25v6.75a2.25 2.25 0 002.25 2.25z" />
-                            </svg>
-                        </div>
+                        <img src="/logo.png" alt="Jarvis Logo" className="login-logo" />
                     </div>
 
                     <div className="text-content">
@@ -184,9 +181,10 @@ function App() {
                 <PhoneNumberModal session={session} onSave={onPhoneSaved} />
             )}
 
+            {/* Desktop Sidebar */}
             <aside className="sidebar">
                 <div className="sidebar-header">
-                    <h2>Jarvis</h2>
+                    <img src="/logo.png" alt="Jarvis Logo" className="sidebar-logo" />
                 </div>
 
                 <div className="user-profile">
@@ -210,8 +208,8 @@ function App() {
                 </div>
 
                 <nav className="sidebar-nav">
-                    <a 
-                        href="#" 
+                    <a
+                        href="#"
                         className={`nav-item ${activeTab === 'assistant' ? 'active' : ''}`}
                         onClick={(e) => { e.preventDefault(); setActiveTab('assistant'); }}
                     >
@@ -220,8 +218,8 @@ function App() {
                         </svg>
                         Assistente
                     </a>
-                    <a 
-                        href="#" 
+                    <a
+                        href="#"
                         className={`nav-item ${activeTab === 'calendar' ? 'active' : ''}`}
                         onClick={(e) => { e.preventDefault(); setActiveTab('calendar'); }}
                     >
@@ -230,8 +228,18 @@ function App() {
                         </svg>
                         Agenda
                     </a>
-                    <a 
-                        href="#" 
+                    <a
+                        href="#"
+                        className={`nav-item ${activeTab === 'finance' ? 'active' : ''}`}
+                        onClick={(e) => { e.preventDefault(); setActiveTab('finance'); }}
+                    >
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor">
+                            <path strokeLinecap="round" strokeLinejoin="round" d="M12 6v12m-3-2.818l.879.659c1.171.879 3.07.879 4.242 0 1.172-.879 1.172-2.303 0-3.182C13.536 12.219 12.768 12 12 12c-.725 0-1.45-.22-2.003-.659-1.106-.879-1.106-2.303 0-3.182s2.9-.879 4.006 0l.415.33M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                        </svg>
+                        Financeiro
+                    </a>
+                    <a
+                        href="#"
                         className={`nav-item ${activeTab === 'email' ? 'active' : ''}`}
                         onClick={(e) => { e.preventDefault(); setActiveTab('email'); }}
                     >
@@ -250,9 +258,54 @@ function App() {
                 </button>
             </aside>
 
+            {/* Mobile Bottom Navigation */}
+            <nav className="mobile-nav">
+                <a
+                    href="#"
+                    className={`mobile-nav-item ${activeTab === 'assistant' ? 'active' : ''}`}
+                    onClick={(e) => { e.preventDefault(); setActiveTab('assistant'); }}
+                >
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor">
+                        <path strokeLinecap="round" strokeLinejoin="round" d="M12 18.75a6 6 0 006-6v-1.5m-6 7.5a6 6 0 01-6-6v-1.5m6 7.5v3.75m-3.75 0h7.5M12 15.75a3 3 0 01-3-3V4.5a3 3 0 116 0v8.25a3 3 0 01-3 3z" />
+                    </svg>
+                    <span>Assistente</span>
+                </a>
+                <a
+                    href="#"
+                    className={`mobile-nav-item ${activeTab === 'calendar' ? 'active' : ''}`}
+                    onClick={(e) => { e.preventDefault(); setActiveTab('calendar'); }}
+                >
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor">
+                        <path strokeLinecap="round" strokeLinejoin="round" d="M6.75 3v2.25M17.25 3v2.25M3 18.75V7.5a2.25 2.25 0 012.25-2.25h13.5A2.25 2.25 0 0121 7.5v11.25m-18 0A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75m-18 0v-7.5A2.25 2.25 0 015.25 9h13.5A2.25 2.25 0 0121 11.25v7.5" />
+                    </svg>
+                    <span>Agenda</span>
+                </a>
+                <a
+                    href="#"
+                    className={`mobile-nav-item ${activeTab === 'finance' ? 'active' : ''}`}
+                    onClick={(e) => { e.preventDefault(); setActiveTab('finance'); }}
+                >
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor">
+                        <path strokeLinecap="round" strokeLinejoin="round" d="M12 6v12m-3-2.818l.879.659c1.171.879 3.07.879 4.242 0 1.172-.879 1.172-2.303 0-3.182C13.536 12.219 12.768 12 12 12c-.725 0-1.45-.22-2.003-.659-1.106-.879-1.106-2.303 0-3.182s2.9-.879 4.006 0l.415.33M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    </svg>
+                    <span>Financeiro</span>
+                </a>
+                <a
+                    href="#"
+                    className={`mobile-nav-item ${activeTab === 'email' ? 'active' : ''}`}
+                    onClick={(e) => { e.preventDefault(); setActiveTab('email'); }}
+                >
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor">
+                        <path strokeLinecap="round" strokeLinejoin="round" d="M21.75 6.75v10.5a2.25 2.25 0 01-2.25 2.25h-15a2.25 2.25 0 01-2.25-2.25V6.75m19.5 0A2.25 2.25 0 0019.5 4.5h-15a2.25 2.25 0 00-2.25 2.25m19.5 0v.243a2.25 2.25 0 01-1.07 1.916l-7.5 4.615a2.25 2.25 0 01-2.36 0L3.32 8.91a2.25 2.25 0 01-1.07-1.916V6.75" />
+                    </svg>
+                    <span>Email</span>
+                </a>
+            </nav>
+
             <main className="main-content">
                 {activeTab === 'assistant' && <VoiceAssistant session={session} />}
                 {activeTab === 'calendar' && <CalendarAgenda session={session} />}
+                {activeTab === 'finance' && <FinancialDashboard />}
                 {activeTab === 'email' && (
                     <div className="coming-soon">
                         <h2>Email</h2>
