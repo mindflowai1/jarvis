@@ -45,28 +45,37 @@ const PhoneNumberModal = ({ session, onSave }) => {
             // Remove formatação e adiciona código do país (+55)
             const rawPhone = phone.replace(/\D/g, '')
             const phoneWithCountryCode = `55${rawPhone}` // +55 (Brasil)
-            
+
             // Pega o nome do usuário dos metadados
             const userName = session.user.user_metadata?.full_name || session.user.email?.split('@')[0] || 'Usuário'
-            
+
+            // Usa upsert para atualizar o registro que já foi criado pelo trigger
             const { error: dbError } = await supabase
                 .from('user_profiles')
-                .insert([
+                .upsert(
                     {
                         user_id: session.user.id,
                         name: userName,
                         phone_number: phoneWithCountryCode,
-                        whatsapp_number: phoneWithCountryCode // Por padrão usamos o mesmo para WhatsApp
+                        whatsapp_number: phoneWithCountryCode, // Por padrão usamos o mesmo para WhatsApp
+                        updated_at: new Date().toISOString()
+                    },
+                    {
+                        onConflict: 'user_id',
+                        ignoreDuplicates: false
                     }
-                ])
+                )
 
-            if (dbError) throw dbError
+            if (dbError) {
+                console.error('Database error details:', dbError)
+                throw dbError
+            }
 
             if (onSave) onSave()
 
         } catch (err) {
             console.error('Error saving phone:', err)
-            setError('Erro ao salvar número. Tente novamente.')
+            setError(err.message || 'Erro ao salvar número. Tente novamente.')
         } finally {
             setLoading(false)
         }
