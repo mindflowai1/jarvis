@@ -179,7 +179,11 @@ function App() {
     return (
         <div className="dashboard-container">
             {showPhoneModal && (
-                <PhoneNumberModal session={session} onSave={onPhoneSaved} />
+                <PhoneNumberModal
+                    session={session}
+                    onSave={onPhoneSaved}
+                    onClose={() => setShowPhoneModal(false)}
+                />
             )}
 
             {/* Desktop Sidebar */}
