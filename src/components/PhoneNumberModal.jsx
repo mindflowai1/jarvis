@@ -49,32 +49,36 @@ const PhoneNumberModal = ({ session, onSave }) => {
             // Pega o nome do usuário dos metadados
             const userName = session.user.user_metadata?.full_name || session.user.email?.split('@')[0] || 'Usuário'
 
-            // Usa upsert para atualizar o registro que já foi criado pelo trigger
-            const { error: dbError } = await supabase
+            console.log('💾 Updating phone for user:', session.user.id)
+
+            // Usa UPDATE direto, pois o trigger já criou o registro
+            const { data, error: dbError } = await supabase
                 .from('user_profiles')
-                .upsert(
-                    {
-                        user_id: session.user.id,
-                        name: userName,
-                        phone_number: phoneWithCountryCode,
-                        whatsapp_number: phoneWithCountryCode, // Por padrão usamos o mesmo para WhatsApp
-                        updated_at: new Date().toISOString()
-                    },
-                    {
-                        onConflict: 'user_id',
-                        ignoreDuplicates: false
-                    }
-                )
+                .update({
+                    name: userName,
+                    phone_number: phoneWithCountryCode,
+                    whatsapp_number: phoneWithCountryCode,
+                    updated_at: new Date().toISOString()
+                })
+                .eq('user_id', session.user.id)
+                .select()
 
             if (dbError) {
-                console.error('Database error details:', dbError)
-                throw dbError
+                console.error('❌ Database error:', dbError)
+                throw new Error(dbError.message || 'Erro ao salvar no banco de dados')
             }
+
+            if (!data || data.length === 0) {
+                console.error('❌ No record was updated')
+                throw new Error('Registro não encontrado. Por favor, faça logout e login novamente.')
+            }
+
+            console.log('✅ Phone saved successfully:', data[0])
 
             if (onSave) onSave()
 
         } catch (err) {
-            console.error('Error saving phone:', err)
+            console.error('❌ Error saving phone:', err)
             setError(err.message || 'Erro ao salvar número. Tente novamente.')
         } finally {
             setLoading(false)
