@@ -240,37 +240,11 @@ export const useVoiceAssistant = (session) => {
                     setResponseItems([])
                 }
 
-                // Gerar áudio com OpenAI TTS
-                console.log('🎵 Generating audio with OpenAI TTS...')
+                // Se o webhook retornou áudio, usar ele
+                if (response.audioUrl) {
+                    console.log('🎵 Playing audio from webhook:', response.audioUrl)
 
-                const OPENAI_API_KEY = import.meta.env.VITE_OPENAI_API_KEY
-
-                if (!OPENAI_API_KEY) {
-                    console.error('❌ OPENAI_API_KEY not configured')
-                    throw new Error('API key não configurada')
-                }
-
-                const ttsResponse = await fetch('https://api.openai.com/v1/audio/speech', {
-                    method: 'POST',
-                    headers: {
-                        'Authorization': `Bearer ${OPENAI_API_KEY}`,
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify({
-                        model: 'tts-1', // tts-1 é mais rápido, tts-1-hd é melhor qualidade
-                        voice: 'alloy', // alloy, echo, fable, onyx, nova, shimmer
-                        input: response.text,
-                        speed: 1.1 // 0.25 a 4.0 (1.1 = 10% mais rápido)
-                    })
-                })
-
-                if (ttsResponse.ok) {
-                    const audioBlob = await ttsResponse.blob()
-                    const audioUrl = URL.createObjectURL(audioBlob)
-
-                    console.log('🎵 OpenAI TTS audio generated')
-
-                    const audio = new Audio(audioUrl)
+                    const audio = new Audio(response.audioUrl)
 
                     audio.onplay = () => {
                         setIsPlaying(true)
@@ -286,26 +260,66 @@ export const useVoiceAssistant = (session) => {
                         }, 3000)
                     }
 
-                    await audio.play()
-                } else {
-                    console.error('❌ OpenAI TTS error:', await ttsResponse.text())
-                    // Fallback para Web Speech API
-                    const utterance = new SpeechSynthesisUtterance(response.text)
-                    utterance.lang = 'pt-BR'
-                    utterance.rate = 1.2 // Mais rápido
-
-                    utterance.onend = () => {
-                        setState('IDLE')
-                        setTimeout(() => setResponseText(''), 3000)
+                    audio.onerror = (err) => {
+                        console.error('❌ Audio playback error:', err)
+                        // Fallback para Web Speech API
+                        useSpeechSynthesis(response.text)
                     }
 
-                    window.speechSynthesis.speak(utterance)
+                    await audio.play()
+                } else {
+                    // Usar Web Speech API nativa (gratuita)
+                    console.log('🎵 Using Web Speech API (free)')
+                    useSpeechSynthesis(response.text)
                 }
             }
         } catch (err) {
             console.error('❌ Error playing response:', err)
-            setState('IDLE')
-            setResponseText('')
+            // Fallback para Web Speech API
+            if (response.text) {
+                useSpeechSynthesis(response.text)
+            } else {
+                setState('IDLE')
+                setResponseText('')
+            }
+        }
+
+        // Função auxiliar para Web Speech API
+        function useSpeechSynthesis(text) {
+            const utterance = new SpeechSynthesisUtterance(text)
+            utterance.lang = 'pt-BR'
+            utterance.rate = 1.2 // Mais rápido
+            utterance.pitch = 1.0
+
+            // Tentar usar voz brasileira se disponível
+            const voices = window.speechSynthesis.getVoices()
+            const brazilianVoice = voices.find(voice =>
+                voice.lang.includes('pt-BR') || voice.lang.includes('pt_BR')
+            )
+            if (brazilianVoice) {
+                utterance.voice = brazilianVoice
+                console.log('🎵 Using Brazilian voice:', brazilianVoice.name)
+            }
+
+            utterance.onstart = () => {
+                setIsPlaying(true)
+                console.log('🎵 Speech synthesis started')
+            }
+
+            utterance.onend = () => {
+                console.log('✅ Speech synthesis finished')
+                setIsPlaying(false)
+                setState('IDLE')
+                setTimeout(() => setResponseText(''), 3000)
+            }
+
+            utterance.onerror = (err) => {
+                console.error('❌ Speech synthesis error:', err)
+                setIsPlaying(false)
+                setState('IDLE')
+            }
+
+            window.speechSynthesis.speak(utterance)
         }
     }, [])
 
