@@ -35,6 +35,15 @@ const CalendarAgenda = ({ session }) => {
     const getValidAccessToken = async () => {
         if (accessTokenCache.current) return accessTokenCache.current
 
+        const clientId = import.meta.env.VITE_GOOGLE_CLIENT_ID
+        const clientSecret = import.meta.env.VITE_GOOGLE_CLIENT_SECRET
+
+        if (!clientId || !clientSecret) {
+            console.error('❌ Missing Google OAuth environment variables directly in client code.')
+            console.error('Please ensure VITE_GOOGLE_CLIENT_ID and VITE_GOOGLE_CLIENT_SECRET are set in your environment.')
+            throw new Error('Configuration error: Missing Google OAuth credentials.')
+        }
+
         const { data: integration, error: dbError } = await supabase
             .from('user_integrations')
             .select('refresh_token')
@@ -46,22 +55,31 @@ const CalendarAgenda = ({ session }) => {
             throw new Error('No refresh token found. Please re-login with Google.')
         }
 
-        const response = await fetch('https://oauth2.googleapis.com/token', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-            body: new URLSearchParams({
-                client_id: import.meta.env.VITE_GOOGLE_CLIENT_ID || '',
-                client_secret: import.meta.env.VITE_GOOGLE_CLIENT_SECRET || '',
-                refresh_token: integration.refresh_token,
-                grant_type: 'refresh_token'
+        try {
+            const response = await fetch('https://oauth2.googleapis.com/token', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                body: new URLSearchParams({
+                    client_id: clientId,
+                    client_secret: clientSecret,
+                    refresh_token: integration.refresh_token,
+                    grant_type: 'refresh_token'
+                })
             })
-        })
 
-        if (!response.ok) throw new Error('Failed to refresh access token.')
+            if (!response.ok) {
+                const errorData = await response.json().catch(() => ({})) // Try to parse error body
+                console.error('❌ Failed to refresh access token. Status:', response.status, 'Response:', errorData)
+                throw new Error(`Failed to refresh access token properties. Google API returned ${response.status}.`)
+            }
 
-        const data = await response.json()
-        accessTokenCache.current = data.access_token
-        return data.access_token
+            const data = await response.json()
+            accessTokenCache.current = data.access_token
+            return data.access_token
+        } catch (error) {
+            console.error('❌ Error refreshing token:', error)
+            throw error
+        }
     }
 
     const fetchEvents = async () => {
