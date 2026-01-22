@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef } from 'react'
 import { supabase } from '../supabaseClient'
 import EventList from './EventList'
+import EventModal from './EventModal'
 import './CalendarAgenda.css'
 
 const CalendarAgenda = ({ session }) => {
@@ -9,6 +10,11 @@ const CalendarAgenda = ({ session }) => {
     const [error, setError] = useState(null)
     const [weekStart, setWeekStart] = useState(getStartOfWeek(new Date()))
     const [viewMode, setViewMode] = useState('grid') // 'grid' or 'list'
+
+    // CRUD State
+    const [isModalOpen, setIsModalOpen] = useState(false)
+    const [selectedEvent, setSelectedEvent] = useState(null)
+
     const accessTokenCache = useRef(null)
     const timeGridRef = useRef(null)
     const HOUR_HEIGHT = 120 // Altura em pixels de cada hora
@@ -27,15 +33,8 @@ const CalendarAgenda = ({ session }) => {
     }
 
     const getValidAccessToken = async () => {
-        console.log('🔑 [getValidAccessToken] Starting...')
-        
-        if (accessTokenCache.current) {
-            console.log('✅ [getValidAccessToken] Using cached token')
-            return accessTokenCache.current
-        }
+        if (accessTokenCache.current) return accessTokenCache.current
 
-        console.log('🔄 [getValidAccessToken] No cached token, fetching refresh token from DB')
-        
         const { data: integration, error: dbError } = await supabase
             .from('user_integrations')
             .select('refresh_token')
@@ -47,8 +46,6 @@ const CalendarAgenda = ({ session }) => {
             throw new Error('No refresh token found. Please re-login with Google.')
         }
 
-        console.log('🔄 [getValidAccessToken] Requesting new access token from Google')
-        
         const response = await fetch('https://oauth2.googleapis.com/token', {
             method: 'POST',
             headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
@@ -60,109 +57,133 @@ const CalendarAgenda = ({ session }) => {
             })
         })
 
-        if (!response.ok) {
-            const errorData = await response.json()
-            console.error('❌ [getValidAccessToken] Failed to refresh token:', errorData)
-            throw new Error('Failed to refresh access token. Please re-login.')
-        }
+        if (!response.ok) throw new Error('Failed to refresh access token.')
 
         const data = await response.json()
         accessTokenCache.current = data.access_token
-        
-        console.log('✅ [getValidAccessToken] New access token obtained and cached')
         return data.access_token
     }
 
-    useEffect(() => {
-        const fetchEvents = async () => {
-            console.log('🔍 [CalendarAgenda] Starting fetchEvents...')
+    const fetchEvents = async () => {
+        if (!session?.user) return
 
-            if (!session?.user) {
-                console.warn('⚠️ [CalendarAgenda] No user in session, aborting fetch')
-                return
-            }
+        setLoading(true)
+        try {
+            const accessToken = await getValidAccessToken()
+            const start = weekStart
+            start.setHours(0, 0, 0, 0)
+            const end = addDays(weekStart, 7)
+            end.setHours(23, 59, 59, 999)
 
-            setLoading(true)
+            const url = `https://www.googleapis.com/calendar/v3/calendars/primary/events?timeMin=${start.toISOString()}&timeMax=${end.toISOString()}&singleEvents=true&orderBy=startTime`
 
-            try {
-                const accessToken = await getValidAccessToken()
+            let response = await fetch(url, {
+                headers: { Authorization: `Bearer ${accessToken}` }
+            })
 
-                const start = weekStart
-                start.setHours(0, 0, 0, 0)
-
-                const end = addDays(weekStart, 7)
-                end.setHours(23, 59, 59, 999)
-
-                const url = `https://www.googleapis.com/calendar/v3/calendars/primary/events?timeMin=${start.toISOString()}&timeMax=${end.toISOString()}&singleEvents=true&orderBy=startTime`
-                console.log('🔍 [CalendarAgenda] Fetching URL:', url)
-
-                let response = await fetch(url, {
-                    headers: {
-                        Authorization: `Bearer ${accessToken}`,
-                    },
+            if (response.status === 401) {
+                accessTokenCache.current = null
+                const newAccessToken = await getValidAccessToken()
+                response = await fetch(url, {
+                    headers: { Authorization: `Bearer ${newAccessToken}` }
                 })
-
-                console.log('🔍 [CalendarAgenda] Response status:', response.status)
-
-                if (response.status === 401) {
-                    console.log('⚠️ [CalendarAgenda] Token expired (401), refreshing and retrying...')
-                    accessTokenCache.current = null
-                    const newAccessToken = await getValidAccessToken()
-                    
-                    response = await fetch(url, {
-                        headers: {
-                            Authorization: `Bearer ${newAccessToken}`,
-                        },
-                    })
-                    
-                    console.log('🔍 [CalendarAgenda] Retry response status:', response.status)
-                }
-
-                if (!response.ok) {
-                    const errorText = await response.text()
-                    console.error('❌ [CalendarAgenda] API Error:', errorText)
-                    throw new Error('Failed to fetch events from Google Calendar')
-                }
-
-                const data = await response.json()
-                console.log('🔍 [CalendarAgenda] Events received:', data.items?.length || 0)
-
-                const filtered = (data.items || []).filter(e => e.eventType !== 'birthday')
-                console.log('🔍 [CalendarAgenda] Events after filtering:', filtered.length)
-
-                setEvents(filtered)
-                setError(null)
-                console.log('✅ [CalendarAgenda] Events set successfully')
-            } catch (err) {
-                console.error('❌ [CalendarAgenda] Fetch error:', err)
-                setError(err.message || 'Não foi possível carregar a agenda.')
-            } finally {
-                setLoading(false)
             }
-        }
 
+            if (!response.ok) throw new Error('Failed to fetch events from Google Calendar')
+
+            const data = await response.json()
+            setEvents((data.items || []).filter(e => e.eventType !== 'birthday'))
+            setError(null)
+        } catch (err) {
+            console.error('Fetch error:', err)
+            setError(err.message || 'Não foi possível carregar a agenda.')
+        } finally {
+            setLoading(false)
+        }
+    }
+
+    useEffect(() => {
         fetchEvents()
     }, [session, weekStart])
+
+    // CRUD Operations
+    const handleCreateEvent = async (eventData) => {
+        try {
+            const accessToken = await getValidAccessToken()
+            const response = await fetch('https://www.googleapis.com/calendar/v3/calendars/primary/events', {
+                method: 'POST',
+                headers: {
+                    'Authorization': `Bearer ${accessToken}`,
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(eventData)
+            })
+
+            if (!response.ok) throw new Error('Failed to create event')
+
+            setIsModalOpen(false)
+            fetchEvents() // Refresh list
+        } catch (error) {
+            console.error('Error creating event:', error)
+            alert('Erro ao criar evento')
+        }
+    }
+
+    const handleUpdateEvent = async (eventData) => {
+        if (!selectedEvent) return
+
+        try {
+            const accessToken = await getValidAccessToken()
+            const response = await fetch(`https://www.googleapis.com/calendar/v3/calendars/primary/events/${selectedEvent.id}`, {
+                method: 'PUT',
+                headers: {
+                    'Authorization': `Bearer ${accessToken}`,
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(eventData)
+            })
+
+            if (!response.ok) throw new Error('Failed to update event')
+
+            setIsModalOpen(false)
+            setSelectedEvent(null)
+            fetchEvents() // Refresh list
+        } catch (error) {
+            console.error('Error updating event:', error)
+            alert('Erro ao atualizar evento')
+        }
+    }
+
+    const handleDeleteEvent = async () => {
+        if (!selectedEvent || !confirm('Deseja excluir este evento?')) return
+
+        try {
+            const accessToken = await getValidAccessToken()
+            const response = await fetch(`https://www.googleapis.com/calendar/v3/calendars/primary/events/${selectedEvent.id}`, {
+                method: 'DELETE',
+                headers: { 'Authorization': `Bearer ${accessToken}` }
+            })
+
+            if (!response.ok) throw new Error('Failed to delete event')
+
+            setIsModalOpen(false)
+            setSelectedEvent(null)
+            fetchEvents() // Refresh list
+        } catch (error) {
+            console.error('Error deleting event:', error)
+            alert('Erro ao excluir evento')
+        }
+    }
 
     useEffect(() => {
         if (!loading && timeGridRef.current && viewMode === 'grid') {
             setTimeout(() => {
                 const now = new Date()
                 const currentHour = now.getHours()
-                const currentMinutes = now.getMinutes()
-                
-                const currentTimePosition = (currentHour * HOUR_HEIGHT) + (currentMinutes * HOUR_HEIGHT / 60)
+                const currentTimePosition = (currentHour * HOUR_HEIGHT)
                 const containerHeight = timeGridRef.current.clientHeight
                 const scrollPosition = currentTimePosition - (containerHeight / 2)
-                
-                console.log('🕐 Scroll to current time:', {
-                    currentHour,
-                    currentMinutes,
-                    currentTimePosition,
-                    containerHeight,
-                    scrollPosition: Math.max(0, scrollPosition)
-                })
-                
+
                 timeGridRef.current.scrollTo({
                     top: Math.max(0, scrollPosition),
                     behavior: 'smooth'
@@ -174,7 +195,6 @@ const CalendarAgenda = ({ session }) => {
     const weekDays = Array.from({ length: 7 }, (_, i) => addDays(weekStart, i))
     const hours = Array.from({ length: 24 }, (_, i) => i)
 
-    // Calculate event position using absolute positioning
     const getEventPosition = (event) => {
         const start = new Date(event.start.dateTime || event.start.date)
         const end = new Date(event.end.dateTime || event.end.date)
@@ -185,14 +205,10 @@ const CalendarAgenda = ({ session }) => {
         const endHour = end.getHours()
         const endMin = end.getMinutes()
 
-        // Calculate position
-        const dayWidth = 100 / 7 // Each day is 1/7 of the width
+        const dayWidth = 100 / 7
         const left = dayOfWeek * dayWidth
-
-        // Calculate top position (HOUR_HEIGHT px per hour)
         const top = (startHour * HOUR_HEIGHT) + (startMin * HOUR_HEIGHT / 60)
 
-        // Calculate height
         const durationMinutes = (endHour * 60 + endMin) - (startHour * 60 + startMin)
         const height = Math.max(durationMinutes * HOUR_HEIGHT / 60, 40) // Minimum 40px
 
@@ -209,19 +225,11 @@ const CalendarAgenda = ({ session }) => {
     }
 
     if (loading && events.length === 0) {
-        return (
-            <div className="calendar-wrapper">
-                <div className="calendar-loading">Carregando agenda...</div>
-            </div>
-        )
+        return <div className="calendar-wrapper"><div className="calendar-loading">Carregando agenda...</div></div>
     }
 
     if (error) {
-        return (
-            <div className="calendar-wrapper">
-                <div className="calendar-error">{error}</div>
-            </div>
-        )
+        return <div className="calendar-wrapper"><div className="calendar-error">{error}</div></div>
     }
 
     return (
@@ -235,9 +243,21 @@ const CalendarAgenda = ({ session }) => {
 
                 <div className="control-buttons">
                     <button
+                        className="primary-action-btn"
+                        onClick={() => {
+                            setSelectedEvent(null)
+                            setIsModalOpen(true)
+                        }}
+                    >
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor">
+                            <path strokeLinecap="round" strokeLinejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
+                        </svg>
+                        Novo Agendamento
+                    </button>
+
+                    <button
                         onClick={() => setViewMode(viewMode === 'grid' ? 'list' : 'grid')}
-                        className="view-toggle-btn"
-                        title={viewMode === 'grid' ? 'Visualização em Lista' : 'Visualização em Grade'}
+                        className="view-toggle-btn secondary-action-btn"
                     >
                         {viewMode === 'grid' ? (
                             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor">
@@ -253,10 +273,8 @@ const CalendarAgenda = ({ session }) => {
                 </div>
             </div>
 
-
             {viewMode === 'grid' ? (
                 <div className="calendar-grid-container">
-                    {/* Header */}
                     <div className="calendar-header">
                         <div className="time-column-header"></div>
                         {weekDays.map((d, i) => (
@@ -267,7 +285,6 @@ const CalendarAgenda = ({ session }) => {
                         ))}
                     </div>
 
-                    {/* Time grid */}
                     <div className="calendar-time-grid" ref={timeGridRef}>
                         <div className="time-column">
                             {hours.map(h => (
@@ -286,11 +303,18 @@ const CalendarAgenda = ({ session }) => {
                                 </div>
                             ))}
 
-                            {/* Events overlay */}
                             {events.map(event => {
                                 const pos = getEventPosition(event)
                                 return (
-                                    <div key={event.id} className="calendar-event" style={pos}>
+                                    <div
+                                        key={event.id}
+                                        className="calendar-event"
+                                        style={pos}
+                                        onClick={() => {
+                                            setSelectedEvent(event)
+                                            setIsModalOpen(true)
+                                        }}
+                                    >
                                         <div className="event-title">{event.summary}</div>
                                         {event.start.dateTime && (
                                             <div className="event-time">
@@ -306,6 +330,14 @@ const CalendarAgenda = ({ session }) => {
             ) : (
                 <EventList events={events} />
             )}
+
+            <EventModal
+                isOpen={isModalOpen}
+                onClose={() => setIsModalOpen(false)}
+                onSave={selectedEvent ? handleUpdateEvent : handleCreateEvent}
+                onDelete={selectedEvent ? handleDeleteEvent : null}
+                initialEvent={selectedEvent}
+            />
         </div>
     )
 }
