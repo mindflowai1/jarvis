@@ -1,0 +1,145 @@
+.settings-container {
+    max-width: 800px;
+    margin: 0 auto;
+    animation: fadeIn 0.5s ease-out;
+}
+
+.settings-title {
+    font-size: 28px;
+    font-weight: 700;
+    margin-bottom: var(--space-lg);
+    background: linear-gradient(to right, #fff, #cbd5e1);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+}
+
+.settings-card {
+    background: var(--glass-bg);
+    border: 1px solid var(--glass-border);
+    backdrop-filter: blur(12px);
+    border-radius: 20px;
+    padding: var(--space-lg);
+}
+
+.section-title {
+    font-size: 18px;
+    font-weight: 600;
+    color: #e2e8f0;
+    margin-bottom: var(--space-md);
+    padding-bottom: var(--space-sm);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.input-group {
+    margin-bottom: var(--space-md);
+}
+
+.input-group label {
+    display: block;
+    margin-bottom: 8px;
+    color: var(--text-muted);
+    font-size: 14px;
+    font-weight: 500;
+}
+
+.phone-input-wrapper-settings {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.country-code-badge {
+    height: 48px;
+    padding: 0 16px;
+    background: rgba(15, 23, 42, 0.6);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    color: #94a3b8;
+    font-weight: 500;
+    font-family: monospace;
+    font-size: 15px;
+}
+
+.settings-input {
+    flex: 1;
+    height: 48px;
+    background: rgba(15, 23, 42, 0.6);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 12px;
+    padding: 0 16px;
+    color: white;
+    font-size: 16px;
+    font-family: monospace;
+    transition: all 0.2s;
+}
+
+.settings-input:focus {
+    outline: none;
+    border-color: var(--primary-blue);
+    background: rgba(15, 23, 42, 0.8);
+    box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.1);
+}
+
+.input-error {
+    border-color: #ef4444;
+}
+
+.helper-text {
+    font-size: 13px;
+    color: #64748b;
+    margin-top: 8px;
+}
+
+.save-settings-btn {
+    background: var(--primary-blue);
+    color: white;
+    border: none;
+    padding: 12px 24px;
+    border-radius: 12px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s;
+    font-size: 15px;
+}
+
+.save-settings-btn:hover:not(:disabled) {
+    background: #2563eb;
+    transform: translateY(-1px);
+}
+
+.save-settings-btn:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+.error-message-settings {
+    color: #f87171;
+    background: rgba(239, 68, 68, 0.1);
+    padding: 12px;
+    border-radius: 8px;
+    margin-bottom: 20px;
+    font-size: 14px;
+}
+
+.success-message-settings {
+    color: #4ade80;
+    background: rgba(74, 222, 128, 0.1);
+    padding: 12px;
+    border-radius: 8px;
+    margin-bottom: 20px;
+    font-size: 14px;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}

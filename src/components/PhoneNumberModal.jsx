@@ -46,6 +46,14 @@ const PhoneNumberModal = ({ session, onSave, onClose }) => {
             const rawPhone = phone.replace(/\D/g, '')
             const phoneWithCountryCode = `55${rawPhone}` // +55 (Brasil)
 
+            // Logic to remove the extra '9' for whatsapp_number
+            let whatsappNumber = phoneWithCountryCode
+            if (rawPhone.length === 11 && rawPhone[2] === '9') {
+                const ddd = rawPhone.slice(0, 2)
+                const numberWithoutNine = rawPhone.slice(3)
+                whatsappNumber = `55${ddd}${numberWithoutNine}`
+            }
+
             // Pega o nome do usuário dos metadados
             const userName = session.user.user_metadata?.full_name || session.user.email?.split('@')[0] || 'Usuário'
 
@@ -57,7 +65,7 @@ const PhoneNumberModal = ({ session, onSave, onClose }) => {
                 .update({
                     name: userName,
                     phone_number: phoneWithCountryCode,
-                    whatsapp_number: phoneWithCountryCode,
+                    whatsapp_number: whatsappNumber,
                     updated_at: new Date().toISOString()
                 })
                 .eq('user_id', session.user.id)

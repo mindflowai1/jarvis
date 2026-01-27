@@ -120,6 +120,12 @@
     align-items: center;
 }
 
+.column-header-left {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
 .column-header h3 {
     font-size: 16px;
     font-weight: 600;
@@ -127,6 +133,32 @@
     display: flex;
     align-items: center;
     gap: 8px;
+}
+
+.clear-completed-btn {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 6px 12px;
+    background: rgba(239, 68, 68, 0.1);
+    border: 1px solid rgba(239, 68, 68, 0.2);
+    border-radius: 8px;
+    color: #ef4444;
+    font-size: 12px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.clear-completed-btn:hover {
+    background: rgba(239, 68, 68, 0.2);
+    border-color: rgba(239, 68, 68, 0.4);
+    transform: translateY(-1px);
+}
+
+.clear-completed-btn svg {
+    width: 14px;
+    height: 14px;
 }
 
 .todo-column .column-header h3::before {
