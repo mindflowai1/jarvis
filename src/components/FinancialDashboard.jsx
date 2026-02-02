@@ -2,6 +2,8 @@ import { useState, useEffect, useCallback } from 'react'
 import { supabase } from '../supabaseClient'
 import './FinancialDashboard.css'
 import TransactionModal from './TransactionModal'
+import RecurringReminders from './RecurringReminders'
+import ExpensePieChart from './ExpensePieChart'
 
 const FinancialDashboard = () => {
     const [loading, setLoading] = useState(true)
@@ -23,6 +25,9 @@ const FinancialDashboard = () => {
     // Modal State
     const [isModalOpen, setIsModalOpen] = useState(false)
     const [editingTransaction, setEditingTransaction] = useState(null)
+
+    // Reminders Drawer State
+    const [isRemindersOpen, setIsRemindersOpen] = useState(false)
 
     // Debounce search
     const [debouncedSearch, setDebouncedSearch] = useState('')
@@ -200,14 +205,38 @@ const FinancialDashboard = () => {
 
     return (
         <div className="financial-dashboard">
-            <header className="dashboard-header">
-                <h1>Financeiro</h1>
-                <button
-                    className="add-btn"
-                    onClick={() => { setEditingTransaction(null); setIsModalOpen(true); }}
-                >
-                    + Nova Transação
-                </button>
+            <header style={{
+                display: 'flex',
+                justifyContent: 'space-between',
+                alignItems: 'center',
+                width: '100%',
+                marginBottom: '24px',
+                gap: '20px'
+            }}>
+                <h1 style={{ margin: 0, flex: '0 0 auto' }}>Financeiro</h1>
+                <div style={{ display: 'flex', gap: '12px', marginLeft: 'auto' }}>
+                    <button
+                        onClick={() => setIsRemindersOpen(true)}
+                        style={{ display: 'flex', alignItems: 'center', gap: '8px' }}
+                        className="add-btn"
+                        title="Lembretes Recorrentes"
+                    >
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" style={{ width: '20px', height: '20px' }}>
+                            <path strokeLinecap="round" strokeLinejoin="round" d="M6.75 3v2.25M17.25 3v2.25M3 18.75V7.5a2.25 2.25 0 012.25-2.25h13.5A2.25 2.25 0 0121 7.5v11.25m-18 0A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75m-18 0v-7.5A2.25 2.25 0 015.25 9h13.5A2.25 2.25 0 0121 11.25v7.5" />
+                        </svg>
+                        Lembretes
+                    </button>
+                    <button
+                        onClick={() => { setEditingTransaction(null); setIsModalOpen(true); }}
+                        style={{ display: 'flex', alignItems: 'center', gap: '8px' }}
+                        className="add-btn"
+                    >
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" style={{ width: '20px', height: '20px' }}>
+                            <path strokeLinecap="round" strokeLinejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
+                        </svg>
+                        Nova Transação
+                    </button>
+                </div>
             </header>
 
             <section className="summary-cards">
@@ -239,6 +268,9 @@ const FinancialDashboard = () => {
                     <span className="card-value">{formatCurrency(stats.expense)}</span>
                 </div>
             </section>
+
+            {/* Gráfico de Gastos por Categoria */}
+            <ExpensePieChart transactions={transactions} />
 
             <section className="filters-bar">
                 <div className="search-input-wrapper">
@@ -349,6 +381,11 @@ const FinancialDashboard = () => {
                 onSave={handleSaveTransaction}
                 transaction={editingTransaction}
                 categories={categories}
+            />
+
+            <RecurringReminders
+                isOpen={isRemindersOpen}
+                onClose={() => setIsRemindersOpen(false)}
             />
         </div>
     )

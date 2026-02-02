@@ -1,16 +1,17 @@
 import { useState, useEffect, useRef } from 'react'
 import { supabase } from '../supabaseClient'
 import { motion, AnimatePresence } from 'framer-motion'
+import TaskModal from './TaskModal'
+import '../Tasks.css'
 
 export default function Tasks({ session }) {
     const [notes, setNotes] = useState([])
     const [loading, setLoading] = useState(true)
     const [error, setError] = useState(null)
     const [draggingId, setDraggingId] = useState(null)
-
-    // CRUD State
     const [isModalOpen, setIsModalOpen] = useState(false)
-    const [currentTask, setCurrentTask] = useState(null) // null = new, object = edit
+    const [editingTask, setEditingTask] = useState(null)
+    const [filterDate, setFilterDate] = useState('')
 
     useEffect(() => {
         fetchNotes()
@@ -19,10 +20,14 @@ export default function Tasks({ session }) {
     const fetchNotes = async () => {
         try {
             setLoading(true)
-            const { data, error } = await supabase
+            let query = supabase
                 .from('notes')
                 .select('*')
+                // Always order by deadline (prazo) closest first, then Created most recent
+                .order('prazo', { ascending: true, nullsFirst: false })
                 .order('created_at', { ascending: false })
+
+            const { data, error } = await query
 
             if (error) throw error
 
@@ -32,6 +37,44 @@ export default function Tasks({ session }) {
             setError('Erro ao carregar notas. Tente novamente mais tarde.')
         } finally {
             setLoading(false)
+        }
+    }
+
+    const handleSaveTask = async (taskData) => {
+        try {
+            const user = session?.user
+
+            if (editingTask) {
+                // Update
+                const { error } = await supabase
+                    .from('notes')
+                    .update({
+                        content: taskData.text,
+                        prazo: taskData.prazo
+                    })
+                    .eq('id', editingTask.id)
+
+                if (error) throw error
+            } else {
+                // Insert
+                const { error } = await supabase
+                    .from('notes')
+                    .insert({
+                        user_id: user?.id,
+                        content: taskData.text,
+                        is_completed: false,
+                        prazo: taskData.prazo
+                    })
+
+                if (error) throw error
+            }
+            fetchNotes()
+            setIsModalOpen(false)
+            setEditingTask(null)
+        } catch (error) {
+            console.error('Error saving task:', error)
+            alert('Erro ao salvar tarefa')
+            throw error
         }
     }
 
@@ -54,44 +97,6 @@ export default function Tasks({ session }) {
         }
     }
 
-    const handleSaveTask = async (taskText) => {
-        if (!taskText.trim()) return
-
-        try {
-            if (currentTask) {
-                // Update existing
-                const { error } = await supabase
-                    .from('notes')
-                    .update({ content: taskText, updated_at: new Date() })
-                    .eq('id', currentTask.id)
-
-                if (error) throw error
-
-                setNotes(prev => prev.map(n =>
-                    n.id === currentTask.id ? { ...n, content: taskText, text: taskText } : n
-                ))
-            } else {
-                // Create new
-                const { data, error } = await supabase
-                    .from('notes')
-                    .insert([{
-                        user_id: session?.user?.id,
-                        content: taskText,
-                        is_completed: false
-                    }])
-                    .select()
-
-                if (error) throw error
-
-                if (data) setNotes(prev => [data[0], ...prev])
-            }
-            setIsModalOpen(false)
-            setCurrentTask(null)
-        } catch (error) {
-            console.error('Error saving task:', error)
-            alert('Erro ao salvar tarefa')
-        }
-    }
 
     const handleDeleteTask = async (id) => {
         if (!confirm('Tem certeza que deseja excluir esta tarefa?')) return
@@ -139,25 +144,20 @@ export default function Tasks({ session }) {
         }
     }
 
-    const openModal = (task = null) => {
-        setCurrentTask(task)
-        setIsModalOpen(true)
-    }
-
     const formatDate = (dateString) => {
         if (!dateString) return ''
-        return new Date(dateString).toLocaleDateString('pt-BR', {
-            day: '2-digit',
-            month: '2-digit',
-            year: 'numeric',
-            hour: '2-digit',
-            minute: '2-digit'
-        })
+        const [year, month, day] = dateString.toString().split('T')[0].split('-')
+        return `${day}/${month}/${year}`
     }
 
+    // Filter notes locally
+    const filteredNotes = filterDate
+        ? notes.filter(n => n.prazo === filterDate)
+        : notes
+
     // Separate notes into columns
-    const todoNotes = notes.filter(n => !n.is_completed)
-    const doneNotes = notes.filter(n => n.is_completed)
+    const todoNotes = filteredNotes.filter(n => !n.is_completed)
+    const doneNotes = filteredNotes.filter(n => n.is_completed)
 
     if (loading) {
         return (
@@ -175,7 +175,37 @@ export default function Tasks({ session }) {
             <div className="tasks-header">
                 <h2>Meus Afazeres</h2>
                 <div className="tasks-actions">
-                    <button className="add-btn" onClick={() => openModal()}>
+                    <div className="filter-container">
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="filter-icon">
+                            <path strokeLinecap="round" strokeLinejoin="round" d="M6.75 3v2.25M17.25 3v2.25M3 18.75V7.5a2.25 2.25 0 012.25-2.25h13.5A2.25 2.25 0 0121 7.5v11.25m-18 0A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75m-18 0v-7.5A2.25 2.25 0 015.25 9h13.5A2.25 2.25 0 0121 11.25v7.5" />
+                        </svg>
+                        <div className="filter-input-wrapper">
+                            {!filterDate && <span className="filter-placeholder">Todos</span>}
+                            <input
+                                type="date"
+                                className={`filter-date-input ${!filterDate ? 'transparent-input' : ''}`}
+                                value={filterDate}
+                                onChange={(e) => setFilterDate(e.target.value)}
+                                title="Filtrar por data"
+                            />
+                        </div>
+                        {filterDate && (
+                            <button
+                                className="clear-filter-btn"
+                                onClick={() => setFilterDate('')}
+                                title="Mostrar Todos"
+                            >
+                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor">
+                                    <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
+                                </svg>
+                            </button>
+                        )}
+                    </div>
+
+                    <button className="add-btn" onClick={() => {
+                        setEditingTask(null)
+                        setIsModalOpen(true)
+                    }}>
                         <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor">
                             <path strokeLinecap="round" strokeLinejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
                         </svg>
@@ -209,7 +239,10 @@ export default function Tasks({ session }) {
                                     note={note}
                                     formatDate={formatDate}
                                     setDraggingId={setDraggingId}
-                                    onEdit={() => openModal(note)}
+                                    onEdit={() => {
+                                        setEditingTask(note)
+                                        setIsModalOpen(true)
+                                    }}
                                     onDelete={() => handleDeleteTask(note.id)}
                                     onDragEnd={(e, info) => {
                                         if (info.offset.x > 100) updateTaskStatus(note.id, true)
@@ -219,7 +252,7 @@ export default function Tasks({ session }) {
                         </AnimatePresence>
                         {todoNotes.length === 0 && (
                             <div className="empty-column-state">
-                                <p>Tudo feito! 🎉</p>
+                                <p>{filterDate ? 'Nenhuma tarefa para esta data' : 'Tudo feito! 🎉'}</p>
                             </div>
                         )}
                     </motion.div>
@@ -257,7 +290,10 @@ export default function Tasks({ session }) {
                                     formatDate={formatDate}
                                     isDone={true}
                                     setDraggingId={setDraggingId}
-                                    onEdit={() => openModal(note)}
+                                    onEdit={() => {
+                                        setEditingTask(note)
+                                        setIsModalOpen(true)
+                                    }}
                                     onDelete={() => handleDeleteTask(note.id)}
                                     onDragEnd={(e, info) => {
                                         if (info.offset.x < -100) updateTaskStatus(note.id, false)
@@ -267,7 +303,7 @@ export default function Tasks({ session }) {
                         </AnimatePresence>
                         {doneNotes.length === 0 && (
                             <div className="empty-column-state">
-                                <p>Nenhuma tarefa concluída</p>
+                                <p>{filterDate ? 'Nenhuma tarefa concluída nesta data' : 'Nenhuma tarefa concluída'}</p>
                             </div>
                         )}
                     </motion.div>
@@ -278,7 +314,7 @@ export default function Tasks({ session }) {
                 isOpen={isModalOpen}
                 onClose={() => setIsModalOpen(false)}
                 onSave={handleSaveTask}
-                initialTask={currentTask}
+                task={editingTask}
             />
         </div>
     )
@@ -323,8 +359,13 @@ function KanbanCard({ note, formatDate, isDone, onDragEnd, setDraggingId, onEdit
                 <p>{note.text || note.content || 'Sem conteúdo'}</p>
             </div>
             <div className="note-footer">
-                <span className="note-date">
-                    {formatDate(note.created_at || note.date)}
+                <span className="note-date" title="Prazo">
+                    {note.prazo && (
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" style={{ width: '14px', height: '14px', marginRight: '4px', display: 'inline-block', verticalAlign: 'text-bottom' }}>
+                            <path fillRule="evenodd" d="M6.75 2.25A.75.75 0 017.5 3v1.5h9V3A.75.75 0 0118 3v1.5h.75a3 3 0 013 3v11.25a3 3 0 01-3 3H5.25a3 3 0 01-3-3V7.5a3 3 0 013-3H6V3a.75.75 0 01.75-.75zm13.5 9a1.5 1.5 0 00-1.5-1.5H5.25a1.5 1.5 0 00-1.5 1.5v7.5a1.5 1.5 0 001.5 1.5h13.5a1.5 1.5 0 001.5-1.5v-7.5z" clipRule="evenodd" />
+                        </svg>
+                    )}
+                    {note.prazo ? formatDate(note.prazo) : 'Sem prazo'}
                 </span>
                 <div className="card-actions">
                     <button className="icon-btn delete-btn" onClick={(e) => {
@@ -338,61 +379,5 @@ function KanbanCard({ note, formatDate, isDone, onDragEnd, setDraggingId, onEdit
                 </div>
             </div>
         </motion.div>
-    )
-}
-
-function TaskModal({ isOpen, onClose, onSave, initialTask }) {
-    const [content, setContent] = useState('')
-
-    useEffect(() => {
-        if (isOpen) {
-            setContent(initialTask ? (initialTask.content || initialTask.text || '') : '')
-        }
-    }, [isOpen, initialTask])
-
-    const handleSubmit = (e) => {
-        e.preventDefault()
-        onSave(content)
-    }
-
-    return (
-        <AnimatePresence>
-            {isOpen && (
-                <>
-                    <motion.div
-                        className="modal-backdrop"
-                        initial={{ opacity: 0 }}
-                        animate={{ opacity: 1 }}
-                        exit={{ opacity: 0 }}
-                        onClick={onClose}
-                    />
-                    <motion.div
-                        className="modal-container"
-                        initial={{ opacity: 0, scale: 0.9, y: 20 }}
-                        animate={{ opacity: 1, scale: 1, y: 0 }}
-                        exit={{ opacity: 0, scale: 0.9, y: 20 }}
-                    >
-                        <h3>{initialTask ? 'Editar Tarefa' : 'Nova Tarefa'}</h3>
-                        <form onSubmit={handleSubmit}>
-                            <textarea
-                                autoFocus
-                                value={content}
-                                onChange={(e) => setContent(e.target.value)}
-                                placeholder="O que precisa ser feito?"
-                                maxLength={500}
-                            />
-                            <div className="modal-actions">
-                                <button type="button" className="cancel-btn" onClick={onClose}>
-                                    Cancelar
-                                </button>
-                                <button type="submit" className="save-btn" disabled={!content.trim()}>
-                                    Salvar
-                                </button>
-                            </div>
-                        </form>
-                    </motion.div>
-                </>
-            )}
-        </AnimatePresence>
     )
 }

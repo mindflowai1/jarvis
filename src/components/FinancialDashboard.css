@@ -15,6 +15,8 @@
     display: flex;
     justify-content: space-between;
     align-items: center;
+    margin-bottom: 8px;
+    /* Added spacing */
 }
 
 .dashboard-header h1 {
@@ -27,21 +29,36 @@
     -webkit-text-fill-color: transparent;
 }
 
+.dashboard-actions {
+    display: flex;
+    gap: 12px;
+}
+
 .add-btn {
+    display: flex;
+    align-items: center;
+    gap: 8px;
     background: linear-gradient(135deg, #3b82f6, #2563eb);
     color: white;
     border: none;
-    padding: 8px 16px;
-    border-radius: 8px;
+    padding: 10px 20px;
+    border-radius: 12px;
     font-weight: 600;
     cursor: pointer;
     transition: all 0.2s;
     font-size: 14px;
+    box-shadow: 0 4px 6px -1px rgba(59, 130, 246, 0.2);
+}
+
+.add-btn svg {
+    width: 20px;
+    height: 20px;
 }
 
 .add-btn:hover {
-    transform: translateY(-1px);
-    box-shadow: 0 4px 12px rgba(37, 99, 235, 0.3);
+    transform: translateY(-2px);
+    box-shadow: 0 8px 12px -1px rgba(37, 99, 235, 0.3);
+    background: linear-gradient(135deg, #2563eb, #1d4ed8);
 }
 
 .summary-cards {

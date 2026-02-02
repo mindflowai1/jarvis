@@ -1,0 +1,394 @@
+/* RecurringReminders.css */
+
+/* Backdrop */
+.reminders-backdrop {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.6);
+    backdrop-filter: blur(4px);
+    z-index: 999;
+}
+
+/* Drawer */
+.reminders-drawer {
+    position: fixed;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    width: 90%;
+    max-width: 500px;
+    background: linear-gradient(180deg, #1e293b 0%, #0f172a 100%);
+    border-left: 1px solid rgba(255, 255, 255, 0.1);
+    box-shadow: -10px 0 40px rgba(0, 0, 0, 0.5);
+    z-index: 1000;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+}
+
+/* Header */
+.reminders-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    padding: 32px 24px 24px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    background: rgba(30, 41, 59, 0.5);
+}
+
+.reminders-header h2 {
+    margin: 0 0 8px 0;
+    font-size: 24px;
+    font-weight: 600;
+    color: #f8fafc;
+}
+
+.reminders-header p {
+    margin: 0;
+    font-size: 14px;
+    color: #94a3b8;
+}
+
+.close-btn {
+    background: rgba(148, 163, 184, 0.1);
+    border: none;
+    padding: 8px;
+    border-radius: 8px;
+    cursor: pointer;
+    color: #94a3b8;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s;
+}
+
+.close-btn svg {
+    width: 24px;
+    height: 24px;
+}
+
+.close-btn:hover {
+    background: rgba(148, 163, 184, 0.2);
+    color: #f8fafc;
+}
+
+/* Content */
+.reminders-content {
+    flex: 1;
+    overflow-y: auto;
+    padding: 24px;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+/* Add Reminder Button */
+.add-reminder-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    width: 100%;
+    padding: 16px;
+    background: rgba(59, 130, 246, 0.1);
+    border: 2px dashed rgba(59, 130, 246, 0.3);
+    border-radius: 12px;
+    color: #60a5fa;
+    font-size: 15px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.add-reminder-btn svg {
+    width: 20px;
+    height: 20px;
+}
+
+.add-reminder-btn:hover {
+    background: rgba(59, 130, 246, 0.15);
+    border-color: rgba(59, 130, 246, 0.5);
+    transform: translateY(-2px);
+}
+
+/* Form */
+.reminder-form {
+    background: rgba(30, 41, 59, 0.4);
+    border: 1px solid rgba(148, 163, 184, 0.1);
+    border-radius: 12px;
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    overflow: hidden;
+}
+
+.reminder-form input[type="text"] {
+    width: 100%;
+    background: rgba(15, 23, 42, 0.6);
+    border: 1px solid rgba(148, 163, 184, 0.2);
+    padding: 12px 16px;
+    border-radius: 8px;
+    color: #fff;
+    font-size: 15px;
+    outline: none;
+    transition: all 0.2s;
+}
+
+.reminder-form input[type="text"]:focus {
+    border-color: #3b82f6;
+    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+}
+
+.day-selector {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.day-selector label {
+    color: #94a3b8;
+    font-size: 14px;
+    font-weight: 500;
+}
+
+.day-selector input[type="number"] {
+    width: 80px;
+    background: rgba(15, 23, 42, 0.6);
+    border: 1px solid rgba(148, 163, 184, 0.2);
+    padding: 8px 12px;
+    border-radius: 8px;
+    color: #fff;
+    font-size: 18px;
+    font-weight: 600;
+    text-align: center;
+    outline: none;
+    transition: all 0.2s;
+}
+
+.day-selector input[type="number"]:focus {
+    border-color: #3b82f6;
+    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+}
+
+.form-actions {
+    display: flex;
+    gap: 12px;
+    justify-content: flex-end;
+}
+
+.form-actions .cancel-btn {
+    padding: 10px 20px;
+    background: rgba(148, 163, 184, 0.1);
+    border: none;
+    border-radius: 8px;
+    color: #94a3b8;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.form-actions .cancel-btn:hover {
+    background: rgba(148, 163, 184, 0.2);
+}
+
+.form-actions .save-btn {
+    padding: 10px 20px;
+    background: linear-gradient(135deg, #3b82f6, #2563eb);
+    border: none;
+    border-radius: 8px;
+    color: white;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.form-actions .save-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(37, 99, 235, 0.3);
+}
+
+/* Empty State */
+.empty-state {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 60px 20px;
+    text-align: center;
+    gap: 12px;
+}
+
+.empty-state svg {
+    width: 64px;
+    height: 64px;
+    color: #475569;
+    margin-bottom: 8px;
+}
+
+.empty-state p {
+    margin: 0;
+    font-size: 16px;
+    font-weight: 500;
+    color: #cbd5e1;
+}
+
+.empty-state span {
+    font-size: 14px;
+    color: #64748b;
+}
+
+.loading-state {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 60px 20px;
+    color: #94a3b8;
+    font-size: 16px;
+}
+
+/* Reminders List */
+.reminders-list {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+/* Reminder Card */
+.reminder-card {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    background: rgba(30, 41, 59, 0.4);
+    border: 1px solid rgba(148, 163, 184, 0.1);
+    padding: 16px;
+    border-radius: 12px;
+    transition: all 0.2s;
+}
+
+.reminder-card:hover {
+    background: rgba(30, 41, 59, 0.6);
+    border-color: rgba(148, 163, 184, 0.2);
+    transform: translateY(-2px);
+}
+
+.reminder-day {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    width: 60px;
+    height: 60px;
+    background: linear-gradient(135deg, rgba(59, 130, 246, 0.2), rgba(37, 99, 235, 0.1));
+    border: 2px solid rgba(59, 130, 246, 0.3);
+    border-radius: 12px;
+    flex-shrink: 0;
+}
+
+.reminder-day .day-number {
+    font-size: 24px;
+    font-weight: 700;
+    color: #60a5fa;
+    line-height: 1;
+}
+
+.reminder-day .day-label {
+    font-size: 11px;
+    color: #60a5fa;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin-top: 2px;
+}
+
+.reminder-info {
+    flex: 1;
+    min-width: 0;
+}
+
+.reminder-info h3 {
+    margin: 0 0 4px 0;
+    font-size: 15px;
+    font-weight: 600;
+    color: #e2e8f0;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.reminder-info p {
+    margin: 0;
+    font-size: 13px;
+    color: #94a3b8;
+}
+
+.reminder-actions {
+    display: flex;
+    gap: 8px;
+    flex-shrink: 0;
+}
+
+.reminder-actions button {
+    background: rgba(148, 163, 184, 0.1);
+    border: none;
+    padding: 8px;
+    border-radius: 8px;
+    cursor: pointer;
+    color: #94a3b8;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s;
+}
+
+.reminder-actions button svg {
+    width: 18px;
+    height: 18px;
+}
+
+.reminder-actions .edit-btn:hover {
+    background: rgba(59, 130, 246, 0.15);
+    color: #60a5fa;
+}
+
+.reminder-actions .delete-btn:hover {
+    background: rgba(239, 68, 68, 0.15);
+    color: #f87171;
+}
+
+/* Mobile Responsive */
+@media (max-width: 768px) {
+    .reminders-drawer {
+        width: 100%;
+        max-width: 100%;
+    }
+
+    .reminders-header {
+        padding: 24px 20px 20px;
+    }
+
+    .reminders-header h2 {
+        font-size: 20px;
+    }
+
+    .reminders-content {
+        padding: 20px;
+    }
+
+    .reminder-card {
+        padding: 12px;
+    }
+
+    .reminder-day {
+        width: 50px;
+        height: 50px;
+    }
+
+    .reminder-day .day-number {
+        font-size: 20px;
+    }
+}
