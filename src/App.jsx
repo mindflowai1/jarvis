@@ -13,8 +13,9 @@ function App() {
     useEffect(() => {
         supabase.auth.getSession().then(({ data: { session } }) => {
             setSession(session)
-            if (session) {
-                saveTokens(session)
+            // Salvar tokens se houver provider_token (OAuth do Google)
+            if (session?.provider_token) {
+                saveGoogleTokens(session)
             }
             setLoading(false)
         })
@@ -23,8 +24,9 @@ function App() {
             data: { subscription },
         } = supabase.auth.onAuthStateChange((_event, session) => {
             setSession(session)
-            if (session) {
-                saveTokens(session)
+            // Salvar tokens se houver provider_token (OAuth do Google)
+            if (session?.provider_token) {
+                saveGoogleTokens(session)
             }
             setLoading(false)
         })
@@ -32,30 +34,28 @@ function App() {
         return () => subscription.unsubscribe()
     }, [])
 
-    const saveTokens = async (session) => {
-        if (session?.provider_token) {
-            const { user, provider_token, provider_refresh_token } = session
+    const saveGoogleTokens = async (session) => {
+        const { user, provider_token, provider_refresh_token } = session
 
-            const updates = {
-                user_id: user.id,
-                provider: 'google',
-                access_token: provider_token,
-                updated_at: new Date(),
-            }
+        const updates = {
+            user_id: user.id,
+            provider: 'google',
+            access_token: provider_token,
+            updated_at: new Date(),
+        }
 
-            if (provider_refresh_token) {
-                updates.refresh_token = provider_refresh_token
-            }
+        if (provider_refresh_token) {
+            updates.refresh_token = provider_refresh_token
+        }
 
-            const { error } = await supabase
-                .from('user_integrations')
-                .upsert(updates, { onConflict: 'user_id, provider' })
+        const { error } = await supabase
+            .from('user_integrations')
+            .upsert(updates, { onConflict: 'user_id,provider' })
 
-            if (error) {
-                console.error('Error saving tokens:', error.message)
-            } else {
-                console.log('Tokens saved successfully to database!')
-            }
+        if (error) {
+            console.error('Error saving Google tokens:', error)
+        } else {
+            console.log('✅ Google Calendar tokens saved successfully!')
         }
     }
 

@@ -485,3 +485,122 @@
         font-size: 14px;
     }
 }
+
+/* Calendar Connection Screen */
+.calendar-connection-card {
+    max-width: 600px;
+    margin: 60px auto;
+    padding: 48px 40px;
+    background: var(--glass-bg);
+    border: 1px solid var(--glass-border);
+    backdrop-filter: blur(12px);
+    border-radius: 20px;
+    text-align: center;
+    animation: fadeInScale 0.4s ease-out;
+}
+
+@keyframes fadeInScale {
+    from {
+        opacity: 0;
+        transform: scale(0.95);
+    }
+
+    to {
+        opacity: 1;
+        transform: scale(1);
+    }
+}
+
+.connection-icon {
+    font-size: 64px;
+    margin-bottom: 24px;
+    animation: bounce 2s infinite;
+}
+
+@keyframes bounce {
+
+    0%,
+    100% {
+        transform: translateY(0);
+    }
+
+    50% {
+        transform: translateY(-10px);
+    }
+}
+
+.connection-title {
+    font-size: 28px;
+    font-weight: 700;
+    color: #e2e8f0;
+    margin-bottom: 16px;
+}
+
+.connection-description {
+    font-size: 15px;
+    color: var(--text-muted);
+    line-height: 1.6;
+    margin-bottom: 32px;
+}
+
+.connect-google-btn-calendar {
+    width: 100%;
+    padding: 16px 24px;
+    background: linear-gradient(135deg, #4285f4, #34a853);
+    border: none;
+    border-radius: 12px;
+    color: white;
+    font-size: 16px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+    margin-bottom: 32px;
+}
+
+.connect-google-btn-calendar:hover:not(:disabled) {
+    transform: translateY(-2px);
+    box-shadow: 0 12px 24px rgba(66, 133, 244, 0.4);
+}
+
+.connect-google-btn-calendar:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+}
+
+.google-icon-calendar {
+    width: 24px;
+    height: 24px;
+}
+
+.connection-features {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    padding-top: 24px;
+    border-top: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.feature-item {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    color: var(--text-muted);
+    font-size: 14px;
+}
+
+.feature-icon {
+    width: 20px;
+    height: 20px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: rgba(74, 222, 128, 0.1);
+    border-radius: 50%;
+    color: #4ade80;
+    font-size: 12px;
+    font-weight: 700;
+}

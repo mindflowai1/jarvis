@@ -29,6 +29,10 @@
     /* transition handled by framer */
     overflow: hidden;
     cursor: pointer;
+
+    /* Otimização para touch */
+    touch-action: manipulation;
+    -webkit-tap-highlight-color: transparent;
 }
 
 .modern-navbar:hover {
@@ -51,6 +55,8 @@
     color: #fff;
     letter-spacing: 2px;
     text-shadow: 0 0 15px rgba(255, 255, 255, 0.3);
+    user-select: none;
+    -webkit-user-select: none;
 }
 
 .nav-actions {
@@ -69,6 +75,15 @@
     transition: all 0.3s ease;
     background: rgba(255, 255, 255, 0.05);
     border: 1px solid rgba(255, 255, 255, 0.1);
+
+    /* Touch optimization */
+    touch-action: manipulation;
+    -webkit-tap-highlight-color: transparent;
+    min-width: 44px;
+    min-height: 44px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
 
 .btn-text {
@@ -118,11 +133,35 @@
     }
 }
 
-@media (max-width: 600px) {
+/* Mobile styles */
+@media (max-width: 768px) {
     .modern-navbar {
-        width: 85%;
-        padding: 10px 20px;
         top: 20px;
+        height: 56px;
+        padding: 0 16px;
+    }
+
+    .logo-text {
+        font-size: 1.3rem;
+        letter-spacing: 1.5px;
+    }
+
+    .nav-login-btn {
+        padding: 10px 18px;
+        margin-left: 12px;
+    }
+
+    .btn-text {
+        font-size: 0.875rem;
+    }
+}
+
+/* Small mobile */
+@media (max-width: 480px) {
+    .modern-navbar {
+        top: 15px;
+        height: 52px;
+        padding: 0 14px;
     }
 
     .logo-text {
@@ -130,7 +169,7 @@
     }
 
     .nav-login-btn {
-        padding: 6px 16px;
+        padding: 8px 16px;
     }
 
     .btn-text {

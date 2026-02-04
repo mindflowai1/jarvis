@@ -4,24 +4,101 @@ import '../index.css'
 
 const Login = () => {
     const [loaded, setLoaded] = useState(false)
+    const [isSignUp, setIsSignUp] = useState(false)
+    const [loading, setLoading] = useState(false)
+    const [error, setError] = useState('')
+    const [emailSent, setEmailSent] = useState(false)
+    const [registeredEmail, setRegisteredEmail] = useState('')
+
+    // Form fields
+    const [name, setName] = useState('')
+    const [email, setEmail] = useState('')
+    const [password, setPassword] = useState('')
 
     useEffect(() => {
         setLoaded(true)
     }, [])
 
-    const handleGoogleLogin = async () => {
-        const { error } = await supabase.auth.signInWithOAuth({
-            provider: 'google',
-            options: {
-                redirectTo: window.location.origin,
-                scopes: 'https://www.googleapis.com/auth/calendar https://www.googleapis.com/auth/gmail.readonly',
-                queryParams: {
-                    access_type: 'offline',
-                    prompt: 'consent',
-                },
-            },
-        })
-        if (error) console.error('Error logging in:', error.message)
+    // Validações
+    const validateEmail = (email) => {
+        return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)
+    }
+
+    const validateForm = () => {
+        if (isSignUp && !name.trim()) {
+            setError('Por favor, informe seu nome')
+            return false
+        }
+        if (!email.trim()) {
+            setError('Por favor, informe seu email')
+            return false
+        }
+        if (!validateEmail(email)) {
+            setError('Email inválido')
+            return false
+        }
+        if (!password || password.length < 6) {
+            setError('A senha deve ter no mínimo 6 caracteres')
+            return false
+        }
+        return true
+    }
+
+    const handleSignUp = async (e) => {
+        e.preventDefault()
+        setError('')
+
+        if (!validateForm()) return
+
+        setLoading(true)
+        try {
+            const { data, error } = await supabase.auth.signUp({
+                email,
+                password,
+                options: {
+                    data: {
+                        name: name.trim()
+                    }
+                }
+            })
+
+            if (error) throw error
+
+            // Mostrar mensagem de confirmação de email
+            setRegisteredEmail(email)
+            setEmailSent(true)
+        } catch (err) {
+            console.error('Signup error:', err)
+            setError(err.message || 'Erro ao criar conta')
+        } finally {
+            setLoading(false)
+        }
+    }
+
+    const handleSignIn = async (e) => {
+        e.preventDefault()
+        setError('')
+
+        if (!validateForm()) return
+
+        setLoading(true)
+        try {
+            const { data, error } = await supabase.auth.signInWithPassword({
+                email,
+                password
+            })
+
+            if (error) throw error
+
+            // Sucesso - usuário será redirecionado automaticamente pelo App.jsx
+        } catch (err) {
+            console.error('Login error:', err)
+            setError(err.message === 'Invalid login credentials'
+                ? 'Email ou senha incorretos'
+                : err.message || 'Erro ao fazer login')
+        } finally {
+            setLoading(false)
+        }
     }
 
     return (
@@ -29,29 +106,125 @@ const Login = () => {
             <div className="bg-glow top-left"></div>
             <div className="bg-glow bottom-right"></div>
 
-            <div className={`login-card ${loaded ? 'fade-in' : ''}`}>
-                <div className="logo-area">
-                    <img src="/logo.png" alt="Jarvis Logo" className="login-logo" />
-                </div>
-
-                <div className="text-content">
-                    <h1>Bem-vindo de volta</h1>
-                    <p>Acesse sua conta para continuar</p>
-                </div>
-
-                <button onClick={handleGoogleLogin} className="google-btn">
-                    <div className="icon-wrapper">
-                        <svg className="google-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48">
-                            <path fill="#FFC107" d="M43.611,20.083H42V20H24v8h11.303c-1.649,4.657-6.08,8-11.303,8c-6.627,0-12-5.373-12-12c0-6.627,5.373-12,12-12c3.059,0,5.842,1.154,7.961,3.039l5.657-5.657C34.046,6.053,29.268,4,24,4C12.955,4,4,12.955,4,24c0,11.045,8.955,20,20,20c11.045,0,20-8.955,20-20C44,22.659,43.862,21.35,43.611,20.083z" /><path fill="#FF3D00" d="M6.306,14.691l6.571,4.819C14.655,15.108,18.961,12,24,12c3.059,0,5.842,1.154,7.961,3.039l5.657-5.657C34.046,6.053,29.268,4,24,4C16.318,4,9.656,8.337,6.306,14.691z" /><path fill="#4CAF50" d="M24,44c5.166,0,9.86-1.977,13.409-5.192l-6.19-5.238C29.211,35.091,26.715,36,24,36c-5.202,0-9.619-3.317-11.283-7.946l-6.522,5.025C9.505,39.556,16.227,44,24,44z" /><path fill="#1976D2" d="M43.611,20.083H42V20H24v8h11.303c-0.792,2.237-2.231,4.166-4.087,5.571c0.001-0.001,0.002-0.001,0.003-0.002l6.19,5.238C36.971,39.205,44,34,44,24C44,22.659,43.862,21.35,43.611,20.083z" />
-                        </svg>
+            {emailSent ? (
+                <div className={`login-card ${loaded ? 'fade-in' : ''}`}>
+                    <div className="email-confirmation-screen">
+                        <div className="confirmation-icon">📧</div>
+                        <h2 className="confirmation-title">Verifique seu email!</h2>
+                        <p className="confirmation-message">
+                            Enviamos um link de confirmação para:
+                        </p>
+                        <p className="confirmation-email">{registeredEmail}</p>
+                        <p className="confirmation-instructions">
+                            Por favor, verifique sua caixa de entrada (e também a pasta de spam)
+                            e clique no link para ativar sua conta.
+                        </p>
+                        <button
+                            className="back-to-login-btn"
+                            onClick={() => {
+                                setEmailSent(false)
+                                setIsSignUp(false)
+                                setEmail('')
+                                setPassword('')
+                                setName('')
+                            }}
+                        >
+                            Voltar para o Login
+                        </button>
                     </div>
-                    <span>Entrar com Google</span>
-                </button>
-            </div>
+                </div>
+            ) : (
+                <div className={`login-card ${loaded ? 'fade-in' : ''}`}>
+                    <div className="logo-area">
+                        <img src="/logo.png" alt="Jarvis Logo" className="login-logo" />
+                    </div>
 
-            <div className="footer-credits">
-                <p>Secure System © 2026</p>
-            </div>
+                    <div className="text-content">
+                        <h1>{isSignUp ? 'Criar Conta' : 'Bem-vindo de volta'}</h1>
+                        <p>{isSignUp ? 'Preencha seus dados para começar' : 'Acesse sua conta para continuar'}</p>
+                    </div>
+
+                    {/* Toggle Login/Signup */}
+                    <div className="auth-toggle">
+                        <button
+                            className={`auth-toggle-btn ${!isSignUp ? 'active' : ''}`}
+                            onClick={() => {
+                                setIsSignUp(false)
+                                setError('')
+                            }}
+                            type="button"
+                        >
+                            Login
+                        </button>
+                        <button
+                            className={`auth-toggle-btn ${isSignUp ? 'active' : ''}`}
+                            onClick={() => {
+                                setIsSignUp(true)
+                                setError('')
+                            }}
+                            type="button"
+                        >
+                            Cadastrar
+                        </button>
+                    </div>
+
+                    {/* Form */}
+                    <form className="auth-form" onSubmit={isSignUp ? handleSignUp : handleSignIn}>
+                        {isSignUp && (
+                            <div className="form-input-wrapper">
+                                <input
+                                    type="text"
+                                    placeholder="Nome completo"
+                                    value={name}
+                                    onChange={(e) => setName(e.target.value)}
+                                    className="form-input"
+                                    disabled={loading}
+                                />
+                            </div>
+                        )}
+
+                        <div className="form-input-wrapper">
+                            <input
+                                type="email"
+                                placeholder="Email"
+                                value={email}
+                                onChange={(e) => setEmail(e.target.value)}
+                                className="form-input"
+                                disabled={loading}
+                                autoComplete="email"
+                            />
+                        </div>
+
+                        <div className="form-input-wrapper">
+                            <input
+                                type="password"
+                                placeholder="Senha (mínimo 6 caracteres)"
+                                value={password}
+                                onChange={(e) => setPassword(e.target.value)}
+                                className="form-input"
+                                disabled={loading}
+                                autoComplete={isSignUp ? "new-password" : "current-password"}
+                            />
+                        </div>
+
+                        {error && (
+                            <div className="error-message">{error}</div>
+                        )}
+
+                        <button
+                            type="submit"
+                            className="submit-btn"
+                            disabled={loading}
+                        >
+                            {loading ? 'Processando...' : (isSignUp ? 'Criar Conta' : 'Entrar')}
+                        </button>
+                    </form>
+
+                    <div className="footer-credits">
+                        <p>Secure System © 2026</p>
+                    </div>
+                </div>
+            )}
         </div>
     )
 }
