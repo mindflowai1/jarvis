@@ -11,6 +11,22 @@ const CalendarAgenda = ({ session }) => {
     const [weekStart, setWeekStart] = useState(getStartOfWeek(new Date()))
     const [viewMode, setViewMode] = useState('grid') // 'grid' or 'list'
 
+    // Mobile State
+    const [selectedDate, setSelectedDate] = useState(new Date())
+
+    const isSameDay = (d1, d2) => {
+        return d1.getDate() === d2.getDate() &&
+            d1.getMonth() === d2.getMonth() &&
+            d1.getFullYear() === d2.getFullYear()
+    }
+
+    const getDayEvents = (date) => {
+        return events.filter(event => {
+            const eventDate = new Date(event.start.dateTime || event.start.date)
+            return isSameDay(eventDate, date)
+        })
+    }
+
     // Calendar Connection State
     const [isCalendarConnected, setIsCalendarConnected] = useState(false)
     const [checkingConnection, setCheckingConnection] = useState(true)
@@ -22,6 +38,7 @@ const CalendarAgenda = ({ session }) => {
 
     const accessTokenCache = useRef(null)
     const timeGridRef = useRef(null)
+    const mobileStripRef = useRef(null)
     const HOUR_HEIGHT = 120 // Altura em pixels de cada hora
 
     function getStartOfWeek(date) {
@@ -155,9 +172,18 @@ const CalendarAgenda = ({ session }) => {
             }
 
             const accessToken = await getValidAccessToken()
-            const start = weekStart
+
+            // Calculate a safe fetch window that covers both Desktop (weekStart) and Mobile (Today +/- 3)
+            const today = new Date()
+            const mobileStart = addDays(today, -3)
+            const desktopStart = weekStart
+
+            // Start from the earliest required date
+            const start = mobileStart < desktopStart ? mobileStart : desktopStart
             start.setHours(0, 0, 0, 0)
-            const end = addDays(weekStart, 7)
+
+            // End at the latest required date (approximate safe buffer: start + 14 days)
+            const end = addDays(start, 14)
             end.setHours(23, 59, 59, 999)
 
             const url = `https://www.googleapis.com/calendar/v3/calendars/primary/events?timeMin=${start.toISOString()}&timeMax=${end.toISOString()}&singleEvents=true&orderBy=startTime`
@@ -303,7 +329,18 @@ const CalendarAgenda = ({ session }) => {
         }
     }, [loading, viewMode])
 
+    // Scroll active day into view on mobile
+    useEffect(() => {
+        if (mobileStripRef.current) {
+            const selected = mobileStripRef.current.querySelector('.selected')
+            if (selected) {
+                selected.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' })
+            }
+        }
+    }, [selectedDate, viewMode])
+
     const weekDays = Array.from({ length: 7 }, (_, i) => addDays(weekStart, i))
+    const mobileDays = Array.from({ length: 7 }, (_, i) => addDays(new Date(), i - 3))
     const hours = Array.from({ length: 24 }, (_, i) => i)
 
     const getEventPosition = (event) => {
@@ -391,9 +428,51 @@ const CalendarAgenda = ({ session }) => {
         return <div className="calendar-wrapper"><div className="calendar-error">{error}</div></div>
     }
 
+
+
+    // ... existing CRUD handlers ...
+
     return (
         <div className="calendar-wrapper">
-            <div className="calendar-controls">
+            {/* Mobile Header & Controls */}
+            <div className="mobile-calendar-header">
+                <div className="mobile-header-top">
+                    <div className="mobile-month-title">
+                        {weekStart.toLocaleDateString('pt-BR', { month: 'long', year: 'numeric' })}
+                    </div>
+                    <button
+                        className="mobile-header-add-btn"
+                        onClick={() => {
+                            setSelectedEvent(null)
+                            setIsModalOpen(true)
+                        }}
+                    >
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor">
+                            <path strokeLinecap="round" strokeLinejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
+                        </svg>
+                    </button>
+                </div>
+                <div className="mobile-week-strip" ref={mobileStripRef}>
+                    {/* Render 7 days centered on Today (-3 to +3) */
+                        mobileDays.map((d, i) => (
+                            <div
+                                key={i}
+                                className={`mobile-day-item ${isSameDay(d, selectedDate) ? 'selected' : ''} ${isSameDay(d, new Date()) ? 'today' : ''}`}
+                                onClick={() => setSelectedDate(d)}
+                            >
+                                <span className="day-name">{d.toLocaleDateString('pt-BR', { weekday: 'short' }).replace('.', '')}</span>
+                                <span className="day-number">{d.getDate()}</span>
+                                {/* Dot indicator if events exist */}
+                                {events.some(e => isSameDay(new Date(e.start.dateTime || e.start.date), d)) && (
+                                    <div className="event-dot"></div>
+                                )}
+                            </div>
+                        ))}
+                </div>
+            </div>
+
+            {/* Desktop Controls (Hidden on Mobile) */}
+            <div className="calendar-controls desktop-only">
                 <div className="nav-buttons">
                     <button onClick={() => navigateWeek(-1)}>&lt;</button>
                     <span>{weekStart.toLocaleDateString('pt-BR')} - {addDays(weekStart, 6).toLocaleDateString('pt-BR')}</span>
@@ -433,59 +512,114 @@ const CalendarAgenda = ({ session }) => {
             </div>
 
             {viewMode === 'grid' ? (
-                <div className="calendar-grid-container">
-                    <div className="calendar-header">
-                        <div className="time-column-header"></div>
-                        {weekDays.map((d, i) => (
-                            <div key={i} className={`day-header-cell ${d.toDateString() === new Date().toDateString() ? 'today' : ''}`}>
-                                <div className="day-name">{d.toLocaleDateString('pt-BR', { weekday: 'short' })}</div>
-                                <div className="day-num">{d.getDate()}</div>
-                            </div>
-                        ))}
-                    </div>
-
-                    <div className="calendar-time-grid" ref={timeGridRef}>
-                        <div className="time-column">
-                            {hours.map(h => (
-                                <div key={h} className="time-label">
-                                    {h.toString().padStart(2, '0')}:00
+                <>
+                    {/* Desktop Grid View */}
+                    <div className="calendar-grid-container desktop-only">
+                        <div className="calendar-header">
+                            <div className="time-column-header"></div>
+                            {weekDays.map((d, i) => (
+                                <div key={i} className={`day-header-cell ${d.toDateString() === new Date().toDateString() ? 'today' : ''}`}>
+                                    <div className="day-name">{d.toLocaleDateString('pt-BR', { weekday: 'short' })}</div>
+                                    <div className="day-num">{d.getDate()}</div>
                                 </div>
                             ))}
                         </div>
 
-                        <div className="days-grid">
-                            {weekDays.map((d, dayIndex) => (
-                                <div key={dayIndex} className="day-column">
-                                    {hours.map(h => (
-                                        <div key={h} className="hour-cell"></div>
-                                    ))}
-                                </div>
-                            ))}
-
-                            {events.map(event => {
-                                const pos = getEventPosition(event)
-                                return (
-                                    <div
-                                        key={event.id}
-                                        className="calendar-event"
-                                        style={pos}
-                                        onClick={() => {
-                                            setSelectedEvent(event)
-                                            setIsModalOpen(true)
-                                        }}
-                                    >
-                                        <div className="event-title">{event.summary}</div>
-                                        {event.start.dateTime && (
-                                            <div className="event-time">
-                                                {new Date(event.start.dateTime).toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' })}
-                                            </div>
-                                        )}
+                        <div className="calendar-time-grid" ref={timeGridRef}>
+                            <div className="time-column">
+                                {hours.map(h => (
+                                    <div key={h} className="time-label">
+                                        {h.toString().padStart(2, '0')}:00
                                     </div>
-                                )
-                            })}
+                                ))}
+                            </div>
+
+                            <div className="days-grid">
+                                {weekDays.map((d, dayIndex) => (
+                                    <div key={dayIndex} className="day-column">
+                                        {hours.map(h => (
+                                            <div key={h} className="hour-cell"></div>
+                                        ))}
+                                    </div>
+                                ))}
+
+                                {events.map(event => {
+                                    const pos = getEventPosition(event)
+                                    return (
+                                        <div
+                                            key={event.id}
+                                            className="calendar-event"
+                                            style={pos}
+                                            onClick={() => {
+                                                setSelectedEvent(event)
+                                                setIsModalOpen(true)
+                                            }}
+                                        >
+                                            <div className="event-title">{event.summary}</div>
+                                            {event.start.dateTime && (
+                                                <div className="event-time">
+                                                    {new Date(event.start.dateTime).toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' })}
+                                                </div>
+                                            )}
+                                        </div>
+                                    )
+                                })}
+                            </div>
                         </div>
                     </div>
-                </div>
+
+                    {/* Mobile List View */}
+                    <div className="mobile-event-list mobile-only">
+                        <div className="mobile-list-header">
+                            <h3>Agenda de {selectedDate.toLocaleDateString('pt-BR', { weekday: 'long', day: 'numeric' })}</h3>
+                        </div>
+
+                        <div className="mobile-events-container">
+                            {getDayEvents(selectedDate).length === 0 ? (
+                                <div className="mobile-empty-state">
+                                    <div className="empty-icon">📅</div>
+                                    <p>Nenhum compromisso para esse dia</p>
+                                    <button className="mobile-add-btn" onClick={() => {
+                                        setSelectedEvent(null)
+                                        setIsModalOpen(true)
+                                    }}>
+                                        + Adicionar Evento
+                                    </button>
+                                </div>
+                            ) : (
+                                <div className="event-timeline">
+                                    {getDayEvents(selectedDate)
+                                        .sort((a, b) => new Date(a.start.dateTime || a.start.date) - new Date(b.start.dateTime || b.start.date))
+                                        .map(event => (
+                                            <div
+                                                key={event.id}
+                                                className="mobile-event-card"
+                                                onClick={() => {
+                                                    setSelectedEvent(event)
+                                                    setIsModalOpen(true)
+                                                }}
+                                            >
+                                                <div className="mobile-event-time">
+                                                    <span className="start-time">
+                                                        {new Date(event.start.dateTime).toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' })}
+                                                    </span>
+                                                    <div className="mobile-timeline-line"></div>
+                                                </div>
+                                                <div className="mobile-event-details">
+                                                    <h4>{event.summary}</h4>
+                                                    {event.location && (
+                                                        <span className="event-location">📍 {event.location}</span>
+                                                    )}
+                                                </div>
+                                            </div>
+                                        ))}
+                                </div>
+                            )}
+                        </div>
+
+                        {/* Mobile FAB Removed - Moved to Header */}
+                    </div>
+                </>
             ) : (
                 <EventList events={events} />
             )}
@@ -500,6 +634,7 @@ const CalendarAgenda = ({ session }) => {
         </div>
     )
 }
+
 
 export default CalendarAgenda
 

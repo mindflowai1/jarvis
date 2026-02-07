@@ -205,39 +205,110 @@ const FinancialDashboard = () => {
 
     return (
         <div className="financial-dashboard">
-            <header style={{
-                display: 'flex',
-                justifyContent: 'space-between',
-                alignItems: 'center',
-                width: '100%',
-                marginBottom: '24px',
-                gap: '20px'
-            }}>
-                <h1 style={{ margin: 0, flex: '0 0 auto' }}>Financeiro</h1>
-                <div style={{ display: 'flex', gap: '12px', marginLeft: 'auto' }}>
+            {/* Mobile Header */}
+            <div className="mobile-financial-header">
+                <div className="mobile-header-top">
+                    <h2>Financeiro</h2>
+                    <div style={{ display: 'flex', gap: '8px' }}>
+                        <button
+                            onClick={() => setIsRemindersOpen(true)}
+                            className="mobile-header-btn"
+                            title="Lembretes"
+                        >
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor">
+                                <path strokeLinecap="round" strokeLinejoin="round" d="M6.75 3v2.25M17.25 3v2.25M3 18.75V7.5a2.25 2.25 0 012.25-2.25h13.5A2.25 2.25 0 0121 7.5v11.25m-18 0A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75m-18 0v-7.5A2.25 2.25 0 015.25 9h13.5A2.25 2.25 0 0121 11.25v7.5" />
+                            </svg>
+                        </button>
+                        <button
+                            onClick={() => { setEditingTransaction(null); setIsModalOpen(true); }}
+                            className="mobile-header-btn"
+                        >
+                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="white">
+                                <path fillRule="evenodd" d="M12 3.75a.75.75 0 01.75.75v6.75h6.75a.75.75 0 010 1.5h-6.75v6.75a.75.75 0 01-1.5 0v-6.75H4.5a.75.75 0 010-1.5h6.75V4.5a.75.75 0 01.75-.75z" clipRule="evenodd" />
+                            </svg>
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <header className="dashboard-header desktop-only">
+                <h1>Financeiro</h1>
+                <div className="header-actions">
                     <button
                         onClick={() => setIsRemindersOpen(true)}
-                        style={{ display: 'flex', alignItems: 'center', gap: '8px' }}
-                        className="add-btn"
+                        className="header-btn"
                         title="Lembretes Recorrentes"
                     >
-                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" style={{ width: '20px', height: '20px' }}>
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor">
                             <path strokeLinecap="round" strokeLinejoin="round" d="M6.75 3v2.25M17.25 3v2.25M3 18.75V7.5a2.25 2.25 0 012.25-2.25h13.5A2.25 2.25 0 0121 7.5v11.25m-18 0A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75m-18 0v-7.5A2.25 2.25 0 015.25 9h13.5A2.25 2.25 0 0121 11.25v7.5" />
                         </svg>
-                        Lembretes
+                        <span className="btn-label">Lembretes</span>
                     </button>
                     <button
                         onClick={() => { setEditingTransaction(null); setIsModalOpen(true); }}
-                        style={{ display: 'flex', alignItems: 'center', gap: '8px' }}
-                        className="add-btn"
+                        className="header-btn primary desktop-only"
                     >
-                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" style={{ width: '20px', height: '20px' }}>
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor">
                             <path strokeLinecap="round" strokeLinejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
                         </svg>
-                        Nova Transação
+                        <span>Nova Transação</span>
                     </button>
                 </div>
             </header>
+
+            <section className="filters-bar">
+                <div className="search-input-wrapper">
+                    <svg className="search-icon" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                    </svg>
+                    <input
+                        type="text"
+                        placeholder="Buscar..."
+                        className="filter-input"
+                        value={filters.search}
+                        onChange={(e) => handleFilterChange('search', e.target.value)}
+                    />
+                </div>
+
+                <div className="filters-row">
+                    <input
+                        type="date"
+                        className="date-input"
+                        value={filters.startDate}
+                        onChange={(e) => handleFilterChange('startDate', e.target.value)}
+                    />
+                    <span className="date-separator">até</span>
+                    <input
+                        type="date"
+                        className="date-input"
+                        value={filters.endDate}
+                        onChange={(e) => handleFilterChange('endDate', e.target.value)}
+                    />
+                </div>
+
+                <div className="filters-row">
+                    <select
+                        className="filter-select"
+                        value={filters.type}
+                        onChange={(e) => handleFilterChange('type', e.target.value)}
+                    >
+                        <option value="all">Todos os Tipos</option>
+                        <option value="entrada">Entradas</option>
+                        <option value="saida">Saídas</option>
+                    </select>
+
+                    <select
+                        className="filter-select"
+                        value={filters.category}
+                        onChange={(e) => handleFilterChange('category', e.target.value)}
+                    >
+                        <option value="all">Todas as Categorias</option>
+                        {categories.map(cat => (
+                            <option key={cat} value={cat}>{cat}</option>
+                        ))}
+                    </select>
+                </div>
+            </section>
 
             <section className="summary-cards">
                 <div className="summary-card balance">
@@ -272,55 +343,7 @@ const FinancialDashboard = () => {
             {/* Gráfico de Gastos por Categoria */}
             <ExpensePieChart transactions={transactions} />
 
-            <section className="filters-bar">
-                <div className="search-input-wrapper">
-                    <svg className="search-icon" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-                    </svg>
-                    <input
-                        type="text"
-                        placeholder="Buscar transações..."
-                        className="filter-input"
-                        value={filters.search}
-                        onChange={(e) => handleFilterChange('search', e.target.value)}
-                    />
-                </div>
 
-                <input
-                    type="date"
-                    className="date-input"
-                    value={filters.startDate}
-                    onChange={(e) => handleFilterChange('startDate', e.target.value)}
-                />
-
-                <input
-                    type="date"
-                    className="date-input"
-                    value={filters.endDate}
-                    onChange={(e) => handleFilterChange('endDate', e.target.value)}
-                />
-
-                <select
-                    className="filter-select"
-                    value={filters.type}
-                    onChange={(e) => handleFilterChange('type', e.target.value)}
-                >
-                    <option value="all">Todos os Tipos</option>
-                    <option value="entrada">Entradas</option>
-                    <option value="saida">Saídas</option>
-                </select>
-
-                <select
-                    className="filter-select"
-                    value={filters.category}
-                    onChange={(e) => handleFilterChange('category', e.target.value)}
-                >
-                    <option value="all">Todas as Categorias</option>
-                    {categories.map(cat => (
-                        <option key={cat} value={cat}>{cat}</option>
-                    ))}
-                </select>
-            </section>
 
             <section className="transactions-list">
                 <div className="list-header">Transações Recentes</div>
@@ -331,7 +354,11 @@ const FinancialDashboard = () => {
                     <div className="no-results">Nenhuma transação encontrada.</div>
                 ) : (
                     transactions.map(tx => (
-                        <div key={tx.id} className="transaction-card">
+                        <div
+                            key={tx.id}
+                            className="transaction-card clickable"
+                            onClick={() => handleEdit(tx)}
+                        >
                             <div className="t-info">
                                 <div className={`t-icon ${tx.tipo}`}>
                                     {getIconForCategory(tx.categoria, tx.tipo)}
@@ -353,7 +380,10 @@ const FinancialDashboard = () => {
                                     <button
                                         className="action-btn edit"
                                         title="Editar"
-                                        onClick={() => handleEdit(tx)}
+                                        onClick={(e) => {
+                                            e.stopPropagation()
+                                            handleEdit(tx)
+                                        }}
                                     >
                                         <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor">
                                             <path strokeLinecap="round" strokeLinejoin="round" d="M16.862 4.487l1.687-1.688a1.875 1.875 0 112.652 2.652L10.582 16.07a4.5 4.5 0 01-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 011.13-1.897l8.932-8.931zm0 0L19.5 7.125M18 14v4.75A2.25 2.25 0 0115.75 21H5.25A2.25 2.25 0 013 18.75V8.25A2.25 2.25 0 015.25 6H10" />
@@ -362,7 +392,10 @@ const FinancialDashboard = () => {
                                     <button
                                         className="action-btn delete"
                                         title="Excluir"
-                                        onClick={() => handleDelete(tx.id)}
+                                        onClick={(e) => {
+                                            e.stopPropagation()
+                                            handleDelete(tx.id)
+                                        }}
                                     >
                                         <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor">
                                             <path strokeLinecap="round" strokeLinejoin="round" d="M14.74 9l-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 01-2.244 2.077H8.084a2.25 2.25 0 01-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 00-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 013.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 00-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 00-7.5 0" />
@@ -387,6 +420,19 @@ const FinancialDashboard = () => {
                 isOpen={isRemindersOpen}
                 onClose={() => setIsRemindersOpen(false)}
             />
+
+            {/* Mobile FAB */}
+            <button
+                className="mobile-fab-add mobile-only"
+                onClick={() => {
+                    setEditingTransaction(null)
+                    setIsModalOpen(true)
+                }}
+            >
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
+                </svg>
+            </button>
         </div>
     )
 }

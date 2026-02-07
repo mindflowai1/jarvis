@@ -12,6 +12,7 @@ export default function Tasks({ session }) {
     const [isModalOpen, setIsModalOpen] = useState(false)
     const [editingTask, setEditingTask] = useState(null)
     const [filterDate, setFilterDate] = useState('')
+    const [activeTab, setActiveTab] = useState('todo') // 'todo' | 'done'
 
     useEffect(() => {
         fetchNotes()
@@ -172,7 +173,53 @@ export default function Tasks({ session }) {
 
     return (
         <div className="tasks-container">
-            <div className="tasks-header">
+            {/* Mobile Header & Tabs */}
+            <div className="mobile-tasks-header">
+                <div className="mobile-header-top">
+                    <h2>Afazeres</h2>
+                    <div style={{ display: 'flex', gap: '8px' }}>
+                        {activeTab === 'done' && doneNotes.length > 0 && (
+                            <button
+                                className="mobile-add-btn mobile-clear-btn"
+                                onClick={handleClearCompleted}
+                                title="Esvaziar Lixeira"
+                                style={{ background: 'rgba(239, 68, 68, 0.2)', color: '#ef4444' }}
+                            >
+                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor">
+                                    <path strokeLinecap="round" strokeLinejoin="round" d="M14.74 9l-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 01-2.244 2.077H8.084a2.25 2.25 0 01-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 00-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 013.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 00-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 00-7.5 0" />
+                                </svg>
+                            </button>
+                        )}
+                        <button
+                            className="mobile-add-btn"
+                            onClick={() => {
+                                setEditingTask(null)
+                                setIsModalOpen(true)
+                            }}
+                        >
+                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="white">
+                                <path fillRule="evenodd" d="M12 3.75a.75.75 0 01.75.75v6.75h6.75a.75.75 0 010 1.5h-6.75v6.75a.75.75 0 01-1.5 0v-6.75H4.5a.75.75 0 010-1.5h6.75V4.5a.75.75 0 01.75-.75z" clipRule="evenodd" />
+                            </svg>
+                        </button>
+                    </div>
+                </div>
+                <div className="mobile-tabs">
+                    <button
+                        className={`tab-btn ${activeTab === 'todo' ? 'active' : ''}`}
+                        onClick={() => setActiveTab('todo')}
+                    >
+                        A Fazer <span className="tab-badge">{todoNotes.length}</span>
+                    </button>
+                    <button
+                        className={`tab-btn ${activeTab === 'done' ? 'active' : ''}`}
+                        onClick={() => setActiveTab('done')}
+                    >
+                        Concluídos <span className="tab-badge">{doneNotes.length}</span>
+                    </button>
+                </div>
+            </div>
+
+            <div className="tasks-header desktop-only">
                 <h2>Meus Afazeres</h2>
                 <div className="tasks-actions">
                     <div className="filter-container">
@@ -224,7 +271,7 @@ export default function Tasks({ session }) {
             <div className="kanban-board">
                 {/* Column: To Do */}
                 <div
-                    className="kanban-column todo-column"
+                    className={`kanban-column todo-column ${activeTab !== 'todo' ? 'mobile-hidden' : ''}`}
                     style={{ zIndex: todoNotes.some(n => n.id === draggingId) ? 20 : 1 }}
                 >
                     <div className="column-header">
@@ -260,7 +307,7 @@ export default function Tasks({ session }) {
 
                 {/* Column: Done */}
                 <div
-                    className="kanban-column done-column"
+                    className={`kanban-column done-column ${activeTab !== 'done' ? 'mobile-hidden' : ''}`}
                     style={{ zIndex: doneNotes.some(n => n.id === draggingId) ? 20 : 1 }}
                 >
                     <div className="column-header">

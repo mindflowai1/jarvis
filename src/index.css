@@ -498,9 +498,8 @@ body {
     }
 
     .main-content {
-        padding: 16px;
-        /* Space for bottom nav */
-        padding-bottom: 90px;
+        padding: 0 16px 90px;
+        /* No top padding - let mobile headers stick to top */
     }
 }
 
