@@ -13,6 +13,7 @@ const CalendarAgenda = ({ session }) => {
 
     // Mobile State
     const [selectedDate, setSelectedDate] = useState(new Date())
+    const [mobileWeekStart, setMobileWeekStart] = useState(getStartOfWeek(new Date()))
 
     const isSameDay = (d1, d2) => {
         return d1.getDate() === d2.getDate() &&
@@ -173,17 +174,20 @@ const CalendarAgenda = ({ session }) => {
 
             const accessToken = await getValidAccessToken()
 
-            // Calculate a safe fetch window that covers both Desktop (weekStart) and Mobile (Today +/- 3)
-            const today = new Date()
-            const mobileStart = addDays(today, -3)
+            // Calculate a safe fetch window that covers both Desktop and Mobile weeks
+            // Get the earliest and latest dates from both desktop and mobile views
             const desktopStart = weekStart
+            const desktopEnd = addDays(weekStart, 6)
+            const mobileStart = mobileWeekStart
+            const mobileEnd = addDays(mobileWeekStart, 6)
 
             // Start from the earliest required date
-            const start = mobileStart < desktopStart ? mobileStart : desktopStart
+            const start = desktopStart < mobileStart ? desktopStart : mobileStart
             start.setHours(0, 0, 0, 0)
 
-            // End at the latest required date (approximate safe buffer: start + 14 days)
-            const end = addDays(start, 14)
+            // End at the latest required date with buffer for navigation
+            const latestEnd = desktopEnd > mobileEnd ? desktopEnd : mobileEnd
+            const end = addDays(latestEnd, 14) // Add 2 week buffer for smooth navigation
             end.setHours(23, 59, 59, 999)
 
             const url = `https://www.googleapis.com/calendar/v3/calendars/primary/events?timeMin=${start.toISOString()}&timeMax=${end.toISOString()}&singleEvents=true&orderBy=startTime`
@@ -216,7 +220,7 @@ const CalendarAgenda = ({ session }) => {
 
     useEffect(() => {
         fetchEvents()
-    }, [session, weekStart])
+    }, [session, weekStart, mobileWeekStart])
 
     // Re-verificar conexão quando componente é montado ou quando volta para a aba
     useEffect(() => {
@@ -340,7 +344,7 @@ const CalendarAgenda = ({ session }) => {
     }, [selectedDate, viewMode])
 
     const weekDays = Array.from({ length: 7 }, (_, i) => addDays(weekStart, i))
-    const mobileDays = Array.from({ length: 7 }, (_, i) => addDays(new Date(), i - 3))
+    const mobileDays = Array.from({ length: 7 }, (_, i) => addDays(mobileWeekStart, i))
     const hours = Array.from({ length: 24 }, (_, i) => i)
 
     const getEventPosition = (event) => {
@@ -370,6 +374,17 @@ const CalendarAgenda = ({ session }) => {
 
     const navigateWeek = (direction) => {
         setWeekStart(addDays(weekStart, direction * 7))
+    }
+
+    const navigateMobileWeek = (direction) => {
+        setMobileWeekStart(addDays(mobileWeekStart, direction * 7))
+    }
+
+    const goToToday = () => {
+        const today = new Date()
+        setWeekStart(getStartOfWeek(today))
+        setMobileWeekStart(getStartOfWeek(today))
+        setSelectedDate(today)
     }
 
     if (checkingConnection) {
@@ -438,7 +453,7 @@ const CalendarAgenda = ({ session }) => {
             <div className="mobile-calendar-header">
                 <div className="mobile-header-top">
                     <div className="mobile-month-title">
-                        {weekStart.toLocaleDateString('pt-BR', { month: 'long', year: 'numeric' })}
+                        {mobileWeekStart.toLocaleDateString('pt-BR', { month: 'long', year: 'numeric' })}
                     </div>
                     <button
                         className="mobile-header-add-btn"
@@ -452,6 +467,37 @@ const CalendarAgenda = ({ session }) => {
                         </svg>
                     </button>
                 </div>
+
+                {/* Mobile Navigation Controls */}
+                <div className="mobile-nav-controls">
+                    <button
+                        className="mobile-nav-btn"
+                        onClick={() => navigateMobileWeek(-1)}
+                        aria-label="Semana anterior"
+                    >
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor">
+                            <path strokeLinecap="round" strokeLinejoin="round" d="M15.75 19.5L8.25 12l7.5-7.5" />
+                        </svg>
+                    </button>
+
+                    <button
+                        className="mobile-today-btn"
+                        onClick={goToToday}
+                    >
+                        Hoje
+                    </button>
+
+                    <button
+                        className="mobile-nav-btn"
+                        onClick={() => navigateMobileWeek(1)}
+                        aria-label="Próxima semana"
+                    >
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor">
+                            <path strokeLinecap="round" strokeLinejoin="round" d="M8.25 4.5l7.5 7.5-7.5 7.5" />
+                        </svg>
+                    </button>
+                </div>
+
                 <div className="mobile-week-strip" ref={mobileStripRef}>
                     {/* Render 7 days centered on Today (-3 to +3) */
                         mobileDays.map((d, i) => (
@@ -475,6 +521,7 @@ const CalendarAgenda = ({ session }) => {
             <div className="calendar-controls desktop-only">
                 <div className="nav-buttons">
                     <button onClick={() => navigateWeek(-1)}>&lt;</button>
+                    <button className="today-btn-desktop" onClick={goToToday}>Hoje</button>
                     <span>{weekStart.toLocaleDateString('pt-BR')} - {addDays(weekStart, 6).toLocaleDateString('pt-BR')}</span>
                     <button onClick={() => navigateWeek(1)}>&gt;</button>
                 </div>

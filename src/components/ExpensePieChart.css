@@ -210,7 +210,7 @@
 /* Responsividade */
 @media (max-width: 768px) {
     .expense-pie-chart {
-        padding: 20px 16px;
+        padding: 20px;
     }
 
     .chart-header h3 {
