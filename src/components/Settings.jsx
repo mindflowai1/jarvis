@@ -9,6 +9,13 @@ const Settings = ({ session }) => {
     const [error, setError] = useState(null)
     const [successMessage, setSuccessMessage] = useState('')
 
+    // Password Change State
+    const [newPassword, setNewPassword] = useState('')
+    const [confirmPassword, setConfirmPassword] = useState('')
+    const [loadingPassword, setLoadingPassword] = useState(false)
+    const [passwordError, setPasswordError] = useState(null)
+    const [passwordSuccess, setPasswordSuccess] = useState('')
+
     useEffect(() => {
         fetchProfile()
     }, [session])
@@ -121,6 +128,40 @@ const Settings = ({ session }) => {
         }
     }
 
+    const handleUpdatePassword = async () => {
+        setPasswordError(null)
+        setPasswordSuccess('')
+
+        if (newPassword !== confirmPassword) {
+            setPasswordError('As senhas não conferem.')
+            return
+        }
+
+        if (newPassword.length < 6) {
+            setPasswordError('A senha deve ter pelo menos 6 caracteres.')
+            return
+        }
+
+        setLoadingPassword(true)
+
+        try {
+            const { error } = await supabase.auth.updateUser({
+                password: newPassword
+            })
+
+            if (error) throw error
+
+            setPasswordSuccess('Senha atualizada com sucesso!')
+            setNewPassword('')
+            setConfirmPassword('')
+        } catch (err) {
+            console.error('Error updating password:', err)
+            setPasswordError('Erro ao atualizar senha. Tente novamente.')
+        } finally {
+            setLoadingPassword(false)
+        }
+    }
+
     if (fetching) return <div className="p-8 text-center">Carregando...</div>
 
     return (
@@ -164,6 +205,54 @@ const Settings = ({ session }) => {
                     disabled={loading || phone.length < 15}
                 >
                     {loading ? 'Salvando...' : 'Salvar Alterações'}
+                </button>
+            </div>
+
+            <div className="settings-card">
+                <h3 className="section-title">Segurança</h3>
+
+                <div className="input-group">
+                    <label>Nova Senha</label>
+                    <input
+                        type="password"
+                        className={`settings-input ${passwordError ? 'input-error' : ''}`}
+                        placeholder="Nova senha (mínimo 6 caracteres)"
+                        value={newPassword}
+                        onChange={(e) => setNewPassword(e.target.value)}
+                        disabled={loadingPassword}
+                    />
+                </div>
+
+                <div className="input-group">
+                    <label>Confirmar Senha</label>
+                    <input
+                        type="password"
+                        className={`settings-input ${passwordError ? 'input-error' : ''}`}
+                        placeholder="Confirme a nova senha"
+                        value={confirmPassword}
+                        onChange={(e) => setConfirmPassword(e.target.value)}
+                        disabled={loadingPassword}
+                    />
+                </div>
+
+                {passwordError && (
+                    <div className="error-message-settings">
+                        {passwordError}
+                    </div>
+                )}
+
+                {passwordSuccess && (
+                    <div className="success-message-settings">
+                        {passwordSuccess}
+                    </div>
+                )}
+
+                <button
+                    className="save-settings-btn"
+                    onClick={handleUpdatePassword}
+                    disabled={loadingPassword || !newPassword}
+                >
+                    {loadingPassword ? 'Atualizando...' : 'Alterar Senha'}
                 </button>
             </div>
         </div>

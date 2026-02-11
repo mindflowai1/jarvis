@@ -4,14 +4,10 @@ import '../index.css'
 
 const Login = () => {
     const [loaded, setLoaded] = useState(false)
-    const [isSignUp, setIsSignUp] = useState(false)
     const [loading, setLoading] = useState(false)
     const [error, setError] = useState('')
-    const [emailSent, setEmailSent] = useState(false)
-    const [registeredEmail, setRegisteredEmail] = useState('')
 
     // Form fields
-    const [name, setName] = useState('')
     const [email, setEmail] = useState('')
     const [password, setPassword] = useState('')
 
@@ -25,10 +21,6 @@ const Login = () => {
     }
 
     const validateForm = () => {
-        if (isSignUp && !name.trim()) {
-            setError('Por favor, informe seu nome')
-            return false
-        }
         if (!email.trim()) {
             setError('Por favor, informe seu email')
             return false
@@ -42,37 +34,6 @@ const Login = () => {
             return false
         }
         return true
-    }
-
-    const handleSignUp = async (e) => {
-        e.preventDefault()
-        setError('')
-
-        if (!validateForm()) return
-
-        setLoading(true)
-        try {
-            const { data, error } = await supabase.auth.signUp({
-                email,
-                password,
-                options: {
-                    data: {
-                        name: name.trim()
-                    }
-                }
-            })
-
-            if (error) throw error
-
-            // Mostrar mensagem de confirmação de email
-            setRegisteredEmail(email)
-            setEmailSent(true)
-        } catch (err) {
-            console.error('Signup error:', err)
-            setError(err.message || 'Erro ao criar conta')
-        } finally {
-            setLoading(false)
-        }
     }
 
     const handleSignIn = async (e) => {
@@ -106,125 +67,59 @@ const Login = () => {
             <div className="bg-glow top-left"></div>
             <div className="bg-glow bottom-right"></div>
 
-            {emailSent ? (
-                <div className={`login-card ${loaded ? 'fade-in' : ''}`}>
-                    <div className="email-confirmation-screen">
-                        <div className="confirmation-icon">📧</div>
-                        <h2 className="confirmation-title">Verifique seu email!</h2>
-                        <p className="confirmation-message">
-                            Enviamos um link de confirmação para:
-                        </p>
-                        <p className="confirmation-email">{registeredEmail}</p>
-                        <p className="confirmation-instructions">
-                            Por favor, verifique sua caixa de entrada (e também a pasta de spam)
-                            e clique no link para ativar sua conta.
-                        </p>
-                        <button
-                            className="back-to-login-btn"
-                            onClick={() => {
-                                setEmailSent(false)
-                                setIsSignUp(false)
-                                setEmail('')
-                                setPassword('')
-                                setName('')
-                            }}
-                        >
-                            Voltar para o Login
-                        </button>
-                    </div>
+            <div className={`login-card ${loaded ? 'fade-in' : ''}`}>
+                <div className="logo-area">
+                    <img src="/logo.png" alt="Jarvis Logo" className="login-logo" />
                 </div>
-            ) : (
-                <div className={`login-card ${loaded ? 'fade-in' : ''}`}>
-                    <div className="logo-area">
-                        <img src="/logo.png" alt="Jarvis Logo" className="login-logo" />
-                    </div>
 
-                    <div className="text-content">
-                        <h1>{isSignUp ? 'Criar Conta' : 'Bem-vindo de volta'}</h1>
-                        <p>{isSignUp ? 'Preencha seus dados para começar' : 'Acesse sua conta para continuar'}</p>
-                    </div>
+                <div className="text-content">
+                    <h1>Bem-vindo de volta</h1>
+                    <p>Acesse sua conta para continuar</p>
+                </div>
 
-                    {/* Toggle Login/Signup */}
-                    <div className="auth-toggle">
-                        <button
-                            className={`auth-toggle-btn ${!isSignUp ? 'active' : ''}`}
-                            onClick={() => {
-                                setIsSignUp(false)
-                                setError('')
-                            }}
-                            type="button"
-                        >
-                            Login
-                        </button>
-                        <button
-                            className={`auth-toggle-btn ${isSignUp ? 'active' : ''}`}
-                            onClick={() => {
-                                setIsSignUp(true)
-                                setError('')
-                            }}
-                            type="button"
-                        >
-                            Cadastrar
-                        </button>
-                    </div>
-
-                    {/* Form */}
-                    <form className="auth-form" onSubmit={isSignUp ? handleSignUp : handleSignIn}>
-                        {isSignUp && (
-                            <div className="form-input-wrapper">
-                                <input
-                                    type="text"
-                                    placeholder="Nome completo"
-                                    value={name}
-                                    onChange={(e) => setName(e.target.value)}
-                                    className="form-input"
-                                    disabled={loading}
-                                />
-                            </div>
-                        )}
-
-                        <div className="form-input-wrapper">
-                            <input
-                                type="email"
-                                placeholder="Email"
-                                value={email}
-                                onChange={(e) => setEmail(e.target.value)}
-                                className="form-input"
-                                disabled={loading}
-                                autoComplete="email"
-                            />
-                        </div>
-
-                        <div className="form-input-wrapper">
-                            <input
-                                type="password"
-                                placeholder="Senha (mínimo 6 caracteres)"
-                                value={password}
-                                onChange={(e) => setPassword(e.target.value)}
-                                className="form-input"
-                                disabled={loading}
-                                autoComplete={isSignUp ? "new-password" : "current-password"}
-                            />
-                        </div>
-
-                        {error && (
-                            <div className="error-message">{error}</div>
-                        )}
-
-                        <button
-                            type="submit"
-                            className="submit-btn"
+                {/* Form */}
+                <form className="auth-form" onSubmit={handleSignIn}>
+                    <div className="form-input-wrapper">
+                        <input
+                            type="email"
+                            placeholder="Email"
+                            value={email}
+                            onChange={(e) => setEmail(e.target.value)}
+                            className="form-input"
                             disabled={loading}
-                        >
-                            {loading ? 'Processando...' : (isSignUp ? 'Criar Conta' : 'Entrar')}
-                        </button>
-                    </form>
-
-                    <div className="footer-credits">
-                        <p>Secure System © 2026</p>
+                            autoComplete="email"
+                        />
                     </div>
+
+                    <div className="form-input-wrapper">
+                        <input
+                            type="password"
+                            placeholder="Senha"
+                            value={password}
+                            onChange={(e) => setPassword(e.target.value)}
+                            className="form-input"
+                            disabled={loading}
+                            autoComplete="current-password"
+                        />
+                    </div>
+
+                    {error && (
+                        <div className="error-message">{error}</div>
+                    )}
+
+                    <button
+                        type="submit"
+                        className="submit-btn"
+                        disabled={loading}
+                    >
+                        {loading ? 'Processando...' : 'Entrar'}
+                    </button>
+                </form>
+
+                <div className="footer-credits">
+                    <p>Secure System © 2026</p>
                 </div>
-            )}
+            </div>
         </div>
     )
 }

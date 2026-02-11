@@ -691,29 +691,69 @@
         flex-direction: column;
         align-items: center;
         justify-content: center;
-        padding: 40px 20px;
-        background: rgba(255, 255, 255, 0.02);
-        border-radius: 16px;
-        border: 2px dashed rgba(255, 255, 255, 0.05);
-        color: #64748b;
+        padding: 40px 24px;
+        background: rgba(30, 41, 59, 0.4);
+        border-radius: 20px;
+        border: 1px dashed rgba(255, 255, 255, 0.1);
+        color: #94a3b8;
         text-align: center;
+        margin-top: 20px;
     }
 
     .mobile-empty-state .empty-icon {
-        font-size: 40px;
+        font-size: 48px;
         margin-bottom: 16px;
-        opacity: 0.5;
+        opacity: 0.8;
+        filter: drop-shadow(0 0 20px rgba(59, 130, 246, 0.2));
     }
 
-    .mobile-add-btn {
-        margin-top: 20px;
-        padding: 10px 20px;
-        background: rgba(59, 130, 246, 0.1);
-        color: var(--primary-blue);
+    .mobile-empty-state p {
+        font-size: 15px;
+        color: #cbd5e1;
+        margin-bottom: 24px;
+    }
+
+    .mobile-agenda-add-btn {
+        margin-top: 0;
+        width: 100%;
+        max-width: 250px;
+        padding: 16px 32px;
+        background: linear-gradient(135deg, #3b82f6 0%, #8b5cf6 100%);
+        color: white;
         border: none;
-        border-radius: 8px;
-        font-weight: 600;
-        font-size: 14px;
+        border-radius: 16px;
+        font-weight: 700;
+        font-size: 16px;
+        box-shadow: 0 10px 25px -5px rgba(59, 130, 246, 0.5), 0 8px 10px -6px rgba(59, 130, 246, 0.1);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 12px;
+        transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+        letter-spacing: 0.5px;
+        position: relative;
+        overflow: hidden;
+    }
+
+    .mobile-agenda-add-btn::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: linear-gradient(to bottom, rgba(255, 255, 255, 0.1), transparent);
+        opacity: 0;
+        transition: opacity 0.2s;
+    }
+
+    .mobile-agenda-add-btn:active {
+        transform: scale(0.98);
+        box-shadow: 0 5px 15px -3px rgba(59, 130, 246, 0.4);
+    }
+
+    .mobile-agenda-add-btn:active::before {
+        opacity: 1;
     }
 
     /* Event Timeline Cards */

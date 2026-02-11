@@ -5,6 +5,9 @@ import './index.css'
 import LandingPage from './components/LandingPage'
 import Login from './pages/Login'
 import Dashboard from './pages/Dashboard'
+import AdminDashboard from './pages/AdminDashboard'
+import SubscriptionGuard from './components/SubscriptionGuard'
+import AccessDenied from './pages/AccessDenied'
 
 function App() {
     const [session, setSession] = useState(null)
@@ -63,6 +66,8 @@ function App() {
         return null // Or a loading spinner
     }
 
+
+
     return (
         <BrowserRouter>
             <Routes>
@@ -72,8 +77,24 @@ function App() {
                     element={!session ? <Login /> : <Navigate to="/dashboard" replace />}
                 />
                 <Route
+                    path="/access-denied"
+                    element={<AccessDenied />}
+                />
+                <Route
                     path="/dashboard"
-                    element={session ? <Dashboard session={session} /> : <Navigate to="/login" replace />}
+                    element={
+                        session ? (
+                            <SubscriptionGuard session={session}>
+                                <Dashboard session={session} />
+                            </SubscriptionGuard>
+                        ) : (
+                            <Navigate to="/login" replace />
+                        )
+                    }
+                />
+                <Route
+                    path="/admin"
+                    element={session ? <AdminDashboard session={session} /> : <Navigate to="/login" replace />}
                 />
                 {/* Catch all - redirect to "/" */}
                 <Route path="*" element={<Navigate to="/" replace />} />
