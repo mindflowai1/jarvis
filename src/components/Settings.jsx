@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react'
 import { supabase } from '../supabaseClient'
-import './Settings.css'
+import './SettingsPage.css'
 
 const Settings = ({ session }) => {
     const [phone, setPhone] = useState('')
