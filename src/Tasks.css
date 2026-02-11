@@ -20,9 +20,7 @@
     display: none;
 }
 
-.mobile-hidden {
-    display: none !important;
-}
+
 
 .desktop-only {
     display: flex;

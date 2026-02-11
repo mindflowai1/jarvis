@@ -373,12 +373,13 @@ function KanbanCard({ note, formatDate, isDone, onDragEnd, setDraggingId, onEdit
     return (
         <motion.div
             layout
-            layoutId={note.id}
-            initial={{ opacity: 0, scale: 0.9 }}
-            animate={{ opacity: 1, scale: 1 }}
-            exit={{ opacity: 0, scale: 0.9 }}
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, scale: 0.95, transition: { duration: 0.2 } }}
             drag
             dragSnapToOrigin={true}
+            dragMomentum={false}
+            dragElastic={0.1}
             onDragStart={() => {
                 isDragging.current = true
                 setDraggingId(note.id)

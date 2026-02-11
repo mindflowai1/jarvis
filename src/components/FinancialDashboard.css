@@ -151,6 +151,9 @@
     outline: none;
     cursor: pointer;
     min-width: 140px;
+    appearance: none;
+    -webkit-appearance: none;
+    -moz-appearance: none;
 }
 
 .filter-select:focus,
@@ -162,6 +165,14 @@
 .date-input {
     color-scheme: dark;
     min-height: 42px;
+    color: #fff !important;
+    /* Force white text */
+}
+
+/* Placeholder color */
+.date-input::placeholder {
+    color: rgba(255, 255, 255, 0.7);
+    opacity: 1;
 }
 
 .date-input::-webkit-calendar-picker-indicator {

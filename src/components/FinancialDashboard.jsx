@@ -272,16 +272,26 @@ const FinancialDashboard = () => {
 
                 <div className="filters-row">
                     <input
-                        type="date"
+                        type={filters.startDate ? "date" : "text"}
+                        placeholder="Data Inicial"
                         className="date-input"
                         value={filters.startDate}
+                        onFocus={(e) => (e.target.type = "date")}
+                        onBlur={(e) => {
+                            if (!e.target.value) e.target.type = "text";
+                        }}
                         onChange={(e) => handleFilterChange('startDate', e.target.value)}
                     />
                     <span className="date-separator">até</span>
                     <input
-                        type="date"
+                        type={filters.endDate ? "date" : "text"}
+                        placeholder="Data Final"
                         className="date-input"
                         value={filters.endDate}
+                        onFocus={(e) => (e.target.type = "date")}
+                        onBlur={(e) => {
+                            if (!e.target.value) e.target.type = "text";
+                        }}
                         onChange={(e) => handleFilterChange('endDate', e.target.value)}
                     />
                 </div>
