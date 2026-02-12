@@ -214,21 +214,19 @@ const AdminDashboard = ({ session }) => {
                 </div>
 
                 {/* Barra de Ferramentas (Busca e Filtros) */}
-                <div className="admin-toolbar" style={{ display: 'flex', gap: '16px', marginBottom: '24px' }}>
-                    <div className="admin-search-bar" style={{ flex: 1, position: 'relative' }}>
-                        <Search size={18} style={{ position: 'absolute', left: '12px', top: '50%', transform: 'translateY(-50%)', color: '#94a3b8' }} />
+                <div className="admin-toolbar">
+                    <div className="admin-search-bar">
+                        <Search size={18} className="admin-search-icon" />
                         <input
                             type="text"
                             placeholder="Buscar por nome, email ou WhatsApp..."
                             className="admin-form-input"
-                            style={{ paddingLeft: '40px', width: '100%' }}
                             value={searchTerm}
                             onChange={(e) => setSearchTerm(e.target.value)}
                         />
                     </div>
                     <select
-                        className="admin-form-select" // Estilizar no CSS
-                        style={{ padding: '10px', borderRadius: '8px', background: 'rgba(30, 41, 59, 0.4)', border: '1px solid rgba(255,255,255,0.1)', color: 'white' }}
+                        className="admin-form-select"
                         value={filterRole}
                         onChange={(e) => setFilterRole(e.target.value)}
                     >
