@@ -14,7 +14,7 @@ import {
     Database,
     Activity
 } from 'lucide-react'
-import './AdminDashboard.css'
+// import './AdminDashboard.css' // Imported globally in index.css
 
 const AdminDashboard = ({ session }) => {
     const navigate = useNavigate()
@@ -151,19 +151,19 @@ const AdminDashboard = ({ session }) => {
         <div className="admin-dashboard-container">
             {/* Barra Lateral */}
             <aside className="admin-sidebar">
-                <div className="sidebar-header">
+                <div className="admin-sidebar-header">
                     <h2>Painel Admin</h2>
                 </div>
 
-                <nav className="sidebar-nav">
-                    <button className="nav-item active">
+                <nav className="admin-sidebar-nav">
+                    <button className="admin-nav-item active">
                         <Users size={20} />
                         <span>Usuários</span>
                     </button>
                     {/* ... outros botões ... */}
                 </nav>
 
-                <button onClick={() => navigate('/dashboard')} className="nav-item back-btn">
+                <button onClick={() => navigate('/dashboard')} className="admin-nav-item admin-back-btn">
                     <ChevronLeft size={20} />
                     <span>Voltar ao App</span>
                 </button>
@@ -176,58 +176,58 @@ const AdminDashboard = ({ session }) => {
                         <h1>Gerenciamento de Usuários</h1>
                         <p>Gerencie o acesso e funções do sistema</p>
                     </div>
-                    <button onClick={() => setShowCreateModal(true)} className="create-user-btn">
+                    <button onClick={() => setShowCreateModal(true)} className="admin-create-user-btn">
                         <UserPlus size={18} />
                         Adicionar Usuário
                     </button>
                 </header>
 
                 {/* Estatísticas */}
-                <div className="stats-grid">
-                    <div className="stat-card">
-                        <div className="stat-header">
+                <div className="admin-stats-grid">
+                    <div className="admin-stat-card">
+                        <div className="admin-stat-header">
                             <div>
-                                <div className="stat-value">{stats.totalContext}</div>
-                                <div className="stat-label">Total</div>
+                                <div className="admin-stat-value">{stats.totalContext}</div>
+                                <div className="admin-stat-label">Total</div>
                             </div>
-                            <Users size={20} className="text-blue-400" />
+                            <Users size={20} className="admin-stat-icon users" />
                         </div>
                     </div>
-                    <div className="stat-card">
-                        <div className="stat-header">
+                    <div className="admin-stat-card">
+                        <div className="admin-stat-header">
                             <div>
-                                <div className="stat-value">{stats.admins}</div>
-                                <div className="stat-label">Admins</div>
+                                <div className="admin-stat-value">{stats.admins}</div>
+                                <div className="admin-stat-label">Admins</div>
                             </div>
-                            <Shield size={20} className="text-purple-400" />
+                            <Shield size={20} className="admin-stat-icon admins" />
                         </div>
                     </div>
-                    <div className="stat-card">
-                        <div className="stat-header">
+                    <div className="admin-stat-card">
+                        <div className="admin-stat-header">
                             <div>
-                                <div className="stat-value">+{stats.newThisWeek}</div>
-                                <div className="stat-label">Novos (Semana)</div>
+                                <div className="admin-stat-value">+{stats.newThisWeek}</div>
+                                <div className="admin-stat-label">Novos (Semana)</div>
                             </div>
-                            <Activity size={20} className="text-green-400" />
+                            <Activity size={20} className="admin-stat-icon new" />
                         </div>
                     </div>
                 </div>
 
                 {/* Barra de Ferramentas (Busca e Filtros) */}
                 <div className="admin-toolbar" style={{ display: 'flex', gap: '16px', marginBottom: '24px' }}>
-                    <div className="search-bar" style={{ flex: 1, position: 'relative' }}>
+                    <div className="admin-search-bar" style={{ flex: 1, position: 'relative' }}>
                         <Search size={18} style={{ position: 'absolute', left: '12px', top: '50%', transform: 'translateY(-50%)', color: '#94a3b8' }} />
                         <input
                             type="text"
                             placeholder="Buscar por nome, email ou WhatsApp..."
-                            className="form-input"
+                            className="admin-form-input"
                             style={{ paddingLeft: '40px', width: '100%' }}
                             value={searchTerm}
                             onChange={(e) => setSearchTerm(e.target.value)}
                         />
                     </div>
                     <select
-                        className="form-select" // Estilizar no CSS
+                        className="admin-form-select" // Estilizar no CSS
                         style={{ padding: '10px', borderRadius: '8px', background: 'rgba(30, 41, 59, 0.4)', border: '1px solid rgba(255,255,255,0.1)', color: 'white' }}
                         value={filterRole}
                         onChange={(e) => setFilterRole(e.target.value)}
@@ -239,8 +239,8 @@ const AdminDashboard = ({ session }) => {
                 </div>
 
                 {/* Tabela de Usuários */}
-                <div className="table-container">
-                    <table className="users-table">
+                <div className="admin-table-container">
+                    <table className="admin-users-table">
                         <thead>
                             <tr>
                                 <th>Usuário</th>
@@ -260,8 +260,8 @@ const AdminDashboard = ({ session }) => {
                             ) : filteredUsers.map(user => (
                                 <tr key={user.id} className={user.subscription_status === 'blocked' ? 'opacity-50' : ''}>
                                     <td>
-                                        <div className="user-cell">
-                                            <div className="user-avatar">
+                                        <div className="admin-user-cell">
+                                            <div className="admin-user-avatar">
                                                 {user.name ? user.name[0].toUpperCase() : (user.email ? user.email[0].toUpperCase() : '?')}
                                             </div>
                                             <div>
@@ -283,7 +283,7 @@ const AdminDashboard = ({ session }) => {
                                     </td>
                                     <td>
                                         <select
-                                            className="status-select"
+                                            className="admin-status-select"
                                             value={user.subscription_status || 'active'}
                                             onChange={async (e) => {
                                                 const newStatus = e.target.value
@@ -317,7 +317,7 @@ const AdminDashboard = ({ session }) => {
                                     <td>
                                         <input
                                             type="date"
-                                            className="date-input"
+                                            className="admin-date-input"
                                             value={user.subscription_expires_at ? new Date(user.subscription_expires_at).toISOString().split('T')[0] : ''}
                                             onChange={async (e) => {
                                                 const newDate = e.target.value
@@ -345,7 +345,7 @@ const AdminDashboard = ({ session }) => {
                                     <td>
                                         <div style={{ display: 'flex', gap: '8px' }}>
                                             <button
-                                                className="action-btn delete"
+                                                className="admin-action-btn delete"
                                                 title="Excluir Usuário"
                                                 onClick={() => confirmDelete(user)}
                                             >
@@ -378,7 +378,7 @@ const AdminDashboard = ({ session }) => {
                                     <input
                                         type="email"
                                         placeholder="Endereço de Email"
-                                        className="form-input"
+                                        className="admin-form-input"
                                         required
                                         value={newUserData.email}
                                         onChange={e => setNewUserData({ ...newUserData, email: e.target.value })}
@@ -386,15 +386,15 @@ const AdminDashboard = ({ session }) => {
                                     <input
                                         type="text"
                                         placeholder="Nome Completo"
-                                        className="form-input"
+                                        className="admin-form-input"
                                         required
                                         value={newUserData.name}
                                         onChange={e => setNewUserData({ ...newUserData, name: e.target.value })}
                                     />
                                 </div>
-                                <div className="modal-actions">
-                                    <button type="button" onClick={() => setShowCreateModal(false)} className="btn-secondary">Cancelar</button>
-                                    <button type="submit" disabled={processing} className="btn-primary">
+                                <div className="admin-modal-actions">
+                                    <button type="button" onClick={() => setShowCreateModal(false)} className="admin-btn-secondary">Cancelar</button>
+                                    <button type="submit" disabled={processing} className="admin-btn-primary">
                                         {processing ? 'Criando...' : 'Criar Usuário'}
                                     </button>
                                 </div>
@@ -420,9 +420,9 @@ const AdminDashboard = ({ session }) => {
                             <p style={{ color: '#94a3b8', marginBottom: '24px' }}>
                                 Tem certeza que deseja excluir <strong>{selectedUser?.email}</strong>? Esta ação não pode ser desfeita.
                             </p>
-                            <div className="modal-actions">
-                                <button onClick={() => setShowDeleteModal(false)} className="btn-secondary">Cancelar</button>
-                                <button onClick={handleDeleteUser} disabled={processing} className="btn-primary" style={{ background: '#ef4444' }}>
+                            <div className="admin-modal-actions">
+                                <button onClick={() => setShowDeleteModal(false)} className="admin-btn-secondary">Cancelar</button>
+                                <button onClick={handleDeleteUser} disabled={processing} className="admin-btn-primary" style={{ background: '#ef4444' }}>
                                     {processing ? 'Excluindo...' : 'Excluir Usuário'}
                                 </button>
                             </div>

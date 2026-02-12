@@ -4,6 +4,7 @@
 @import './UserProfile.css';
 @import './Tasks.css';
 @import './components/SettingsPage.css';
+@import './pages/AdminDashboard.css';
 
 :root {
     --bg-dark: #0f172a;
