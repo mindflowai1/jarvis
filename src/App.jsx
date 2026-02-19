@@ -8,6 +8,7 @@ import Dashboard from './pages/Dashboard'
 import AdminDashboard from './pages/AdminDashboard'
 import SubscriptionGuard from './components/SubscriptionGuard'
 import AccessDenied from './pages/AccessDenied'
+import LandingPageTest from './pages/LandingPageTest'
 
 function App() {
     const [session, setSession] = useState(null)
@@ -66,8 +67,6 @@ function App() {
         return null // Or a loading spinner
     }
 
-
-
     return (
         <BrowserRouter>
             <Routes>
@@ -79,6 +78,10 @@ function App() {
                 <Route
                     path="/access-denied"
                     element={<AccessDenied />}
+                />
+                <Route
+                    path="/landing-page-test"
+                    element={<LandingPageTest />}
                 />
                 <Route
                     path="/dashboard"

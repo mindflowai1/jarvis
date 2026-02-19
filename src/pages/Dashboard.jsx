@@ -90,7 +90,10 @@ const Dashboard = ({ session }) => {
             {/* Desktop Sidebar */}
             <aside className="sidebar">
                 <div className="sidebar-header">
-                    <img src="/logo.png" alt="Jarvis Logo" className="sidebar-logo" />
+                    <div className="flex flex-col items-center gap-4 py-4 px-2">
+                        <img src="/logo-controle-c.png" alt="Controle-C Logo" className="sidebar-logo object-contain" />
+                        <h2 className="text-white text-2xl font-bold tracking-[0.15em] uppercase whitespace-nowrap" style={{ fontFamily: "'Rajdhani', sans-serif" }}>CONTROLE-C</h2>
+                    </div>
                 </div>
 
                 <div className="user-profile">

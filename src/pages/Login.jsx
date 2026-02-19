@@ -69,12 +69,12 @@ const Login = () => {
 
             <div className={`login-card ${loaded ? 'fade-in' : ''}`}>
                 <div className="logo-area">
-                    <img src="/logo.png" alt="Jarvis Logo" className="login-logo" />
+                    <img src="/logo-controle-c.png" alt="Controle-C Logo" className="login-logo" />
                 </div>
 
                 <div className="text-content">
-                    <h1>Bem-vindo de volta</h1>
-                    <p>Acesse sua conta para continuar</p>
+                    <h1 className="uppercase tracking-[0.2em]" style={{ fontFamily: "'Rajdhani', sans-serif" }}>Controle-C</h1>
+                    <p>Acesse seu painel financeiro</p>
                 </div>
 
                 {/* Form */}
@@ -117,7 +117,7 @@ const Login = () => {
                 </form>
 
                 <div className="footer-credits">
-                    <p>Secure System © 2026</p>
+                    <p>Controle-C © 2026</p>
                 </div>
             </div>
         </div>

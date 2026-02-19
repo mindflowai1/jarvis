@@ -1,0 +1,358 @@
+<!DOCTYPE html>
+<html class="dark" lang="pt-BR"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Controle-se Premium Hero Section</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@300;400;500;600;700;800&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#11d452",
+                        "primary-dark": "#0ea641",
+                        "premium-green": "#104a32",
+                        "premium-green-light": "#1a6b4a",
+                        "background-light": "#f6f8f6",
+                        "background-dark": "#0a0a0a",
+                        "surface-dark": "#121212",
+                        "whatsapp-green": "#00a884",
+                        "whatsapp-bubble-out": "#005c4b",
+                        "whatsapp-bubble-in": "#202c33",
+                    },
+                    fontFamily: {
+                        "display": ["Manrope", "sans-serif"]
+                    },
+                    backgroundImage: {
+                        'noise': "url('data:image/svg+xml;base64,PHN2ZyB2aWV3Qm94PSIwIDAgMjAwIDIwMCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48ZmlsdGVyIGlkPSJub2lzZUZpbHRlciI+PGZlVHVyYnVsZW5jZSB0eXBlPSJmcmFjdGFsTm9pc2UiIGJhc2VGcmVxdWVuY3k9IjAuNjUiIG51bT1vY3RhdmVzPSIzIiBzdGl0Y2hUaWxlcz0ic3RpdGNoIi8+PC9maWx0ZXI+PHJlY3Qgd2lkdGg9IjEwMCUiIGhlaWdodD0iMTAwJSIgZmlsdGVyPSJ1cmwoI25vaXNlRmlsdGVyKSIgb3BhY2l0eT0iMC4wNSIvPjwvc3ZnPg==')",
+                    },
+                    animation: {
+                        'float': 'float 6s ease-in-out infinite',
+                        'glow': 'glow 2s ease-in-out infinite alternate',
+                    },
+                    keyframes: {
+                        float: {
+                            '0%, 100%': { transform: 'translateY(0) rotate(-2deg)' },
+                            '50%': { transform: 'translateY(-20px) rotate(-2deg)' },
+                        },
+                        glow: {
+                            '0%': { boxShadow: '0 0 5px rgba(17, 212, 82, 0.2), inset 0 0 10px rgba(17, 212, 82, 0.1)' },
+                            '100%': { boxShadow: '0 0 20px rgba(17, 212, 82, 0.4), inset 0 0 15px rgba(17, 212, 82, 0.2)' },
+                        }
+                    }
+                },
+            },
+        }
+    </script>
+<style>
+        .chat-scrollbar::-webkit-scrollbar {
+            width: 4px;
+        }
+        .chat-scrollbar::-webkit-scrollbar-track {
+            background: #111b21;
+        }
+        .chat-scrollbar::-webkit-scrollbar-thumb {
+            background: #374045;
+            border-radius: 2px;
+        }
+        .perspective-container {
+            perspective: 1500px;
+        }
+        .tilted-chat {
+            transform: rotateY(-10deg) rotateX(5deg) rotateZ(-2deg);
+            transform-style: preserve-3d;
+            box-shadow: 
+                -20px 20px 60px -10px rgba(0,0,0,0.8),
+                0 0 0 1px rgba(255,255,255,0.05),
+                inset 0 0 0 1px rgba(255,255,255,0.05);
+        }
+        .glass-reflection {
+            background: linear-gradient(
+                135deg,
+                rgba(255, 255, 255, 0.03) 0%,
+                rgba(255, 255, 255, 0.01) 50%,
+                rgba(255, 255, 255, 0) 100%
+            );
+        }
+        #mobile-menu-toggle:checked ~ #mobile-menu-overlay {
+            opacity: 1;
+            pointer-events: auto;
+            visibility: visible;
+        }
+        #mobile-menu-toggle:checked ~ #mobile-menu-content {
+            transform: translateX(0);
+        }
+        .nav-link {
+            position: relative;
+        }
+        .nav-link::after {
+            content: '';
+            position: absolute;
+            bottom: -4px;
+            left: 0;
+            width: 0;
+            height: 1px;
+            background: #11d452;
+            transition: width .3s ease;
+            opacity: 0.7;
+        }
+        .nav-link:hover::after {
+            width: 100%;
+        }
+        .premium-btn-glow {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 1px;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.5), transparent);
+            opacity: 0.5;
+        }
+    </style>
+</head>
+<body class="bg-background-light dark:bg-background-dark font-display text-gray-900 dark:text-gray-100 min-h-screen relative overflow-x-hidden selection:bg-primary selection:text-black">
+<div class="fixed inset-0 pointer-events-none z-50 mix-blend-overlay opacity-20 bg-noise"></div>
+<div class="absolute top-0 right-0 w-[500px] h-[500px] bg-primary/5 rounded-full blur-[120px] pointer-events-none"></div>
+<div class="absolute bottom-0 left-0 w-[400px] h-[400px] bg-primary/5 rounded-full blur-[100px] pointer-events-none"></div>
+<nav class="fixed top-0 left-0 right-0 z-50 transition-all duration-300 backdrop-blur-md bg-black/40 border-b border-white/5">
+<div class="max-w-7xl mx-auto px-6 h-20 flex items-center justify-between">
+<a class="text-xl font-bold tracking-tight text-white uppercase hover:text-primary transition-colors font-display" href="#">
+            Controle-se
+        </a>
+<div class="hidden md:flex items-center gap-10">
+<a class="nav-link text-sm font-medium text-gray-300 hover:text-white transition-colors tracking-wide" href="#">Funcionalidades</a>
+<a class="nav-link text-sm font-medium text-gray-300 hover:text-white transition-colors tracking-wide" href="#">Como Funciona</a>
+<a class="nav-link text-sm font-medium text-gray-300 hover:text-white transition-colors tracking-wide" href="#">Preços</a>
+</div>
+<div class="hidden md:flex items-center gap-6">
+<a class="text-sm font-medium text-gray-300 hover:text-white transition-colors px-2 py-2 tracking-wide" href="#">
+                Entrar
+            </a>
+<a class="relative group flex items-center gap-2 bg-gradient-to-b from-[#155e3b] to-[#0c402b] hover:from-[#1a6b4a] hover:to-[#0f4d34] text-white border border-[#ffffff15] shadow-[0_0_15px_-5px_rgba(16,74,50,0.5)] text-xs font-bold uppercase tracking-wider px-5 py-2.5 rounded-lg transition-all duration-300 overflow-hidden" href="#">
+<div class="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent pointer-events-none"></div>
+<div class="absolute top-0 left-0 right-0 h-[1px] bg-gradient-to-r from-transparent via-white/30 to-transparent opacity-60"></div>
+<span class="relative z-10">Ativar agora</span>
+<span class="material-icons relative z-10 text-[10px] opacity-70 group-hover:opacity-100 group-hover:translate-x-0.5 transition-all duration-300">add</span>
+</a>
+</div>
+<label class="md:hidden relative z-50 cursor-pointer p-2 -mr-2 text-white hover:text-primary transition-colors" for="mobile-menu-toggle">
+<span class="material-icons text-2xl">menu</span>
+</label>
+</div>
+</nav>
+<input class="hidden" id="mobile-menu-toggle" type="checkbox"/>
+<div class="fixed inset-0 bg-black/80 backdrop-blur-sm z-40 opacity-0 invisible transition-all duration-300" id="mobile-menu-overlay"></div>
+<div class="fixed top-0 right-0 h-full w-[300px] sm:w-[400px] bg-[#0f0f0f] z-50 transform translate-x-full transition-transform duration-300 ease-in-out border-l border-white/10 flex flex-col shadow-2xl" id="mobile-menu-content">
+<div class="p-6 flex justify-between items-center border-b border-white/5">
+<span class="text-lg font-bold text-white tracking-widest uppercase">Menu</span>
+<label class="cursor-pointer p-2 -mr-2 text-gray-400 hover:text-white" for="mobile-menu-toggle">
+<span class="material-icons">close</span>
+</label>
+</div>
+<div class="flex-1 flex flex-col p-8 gap-8">
+<a class="text-3xl font-bold text-white hover:text-primary transition-colors tracking-tight" href="#">Funcionalidades</a>
+<a class="text-3xl font-bold text-white hover:text-primary transition-colors tracking-tight" href="#">Como Funciona</a>
+<a class="text-3xl font-bold text-white hover:text-primary transition-colors tracking-tight" href="#">Preços</a>
+<a class="text-2xl font-semibold text-gray-500 hover:text-white transition-colors mt-4" href="#">Entrar</a>
+</div>
+<div class="p-8 border-t border-white/5 bg-[#121212]">
+<a class="flex items-center justify-center gap-3 w-full bg-premium-green text-white font-bold py-4 rounded-lg hover:bg-premium-green-light transition-all shadow-lg border border-white/10" href="#">
+<span class="material-icons">whatsapp</span>
+            Ativar no WhatsApp
+        </a>
+</div>
+</div>
+<main class="relative z-30 max-w-7xl mx-auto px-6 pt-32 pb-20 lg:pt-40 lg:pb-32 flex flex-col lg:flex-row items-center gap-16 lg:gap-8 min-h-[calc(100vh-80px)]">
+<div class="w-full lg:w-1/2 flex flex-col justify-center text-center lg:text-left">
+<h1 class="text-4xl sm:text-6xl lg:text-7xl font-extrabold tracking-tight leading-[0.95] lg:leading-[0.9] text-white mb-8">
+                Seu assessor <br class="hidden lg:block"/>
+                pessoal mora <br class="hidden lg:block"/>
+<span class="text-transparent bg-clip-text bg-gradient-to-r from-primary to-emerald-300">no WhatsApp.</span>
+</h1>
+<p class="text-lg text-gray-400 font-medium leading-relaxed max-w-xl mx-auto lg:mx-0 mb-8 border-l-2 border-primary/30 pl-6 text-left">
+                Agenda com Google Calendar, tarefas, compromissos e controle financeiro completo — com alertas e lembretes. <span class="text-gray-200">Por áudio, texto ou imagem.</span>
+</p>
+<div class="flex flex-col sm:flex-row items-center gap-8 mt-4">
+<div class="flex flex-col items-center sm:items-start gap-3">
+<button class="group relative overflow-hidden bg-gradient-to-br from-[#125c3e] to-[#0a3826] text-white font-bold text-lg px-8 py-4 rounded-2xl transition-all duration-300 hover:shadow-[0_0_25px_-5px_rgba(17,212,82,0.3)] border border-[#ffffff1a] shadow-inner w-full sm:w-auto flex items-center justify-center gap-3">
+<div class="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent pointer-events-none"></div>
+<div class="premium-btn-glow"></div>
+<div class="absolute inset-0 rounded-2xl ring-1 ring-inset ring-white/10 group-hover:ring-primary/30 transition-all duration-500"></div>
+<span class="relative z-10 flex items-center gap-3 tracking-wide">
+<svg class="w-5 h-5 fill-current transition-transform duration-300 group-hover:scale-110" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"></path></svg>
+                        Ativar no WhatsApp
+                        <span class="material-icons text-sm transition-all duration-300 group-hover:translate-x-1 opacity-70 group-hover:opacity-100">arrow_forward</span>
+</span>
+</button>
+<span class="text-[11px] uppercase tracking-[0.2em] text-gray-500 font-medium">Sem app. Sem complicação.</span>
+</div>
+<button class="flex items-center gap-3 text-gray-400 hover:text-white transition-colors group text-sm font-semibold uppercase tracking-wider h-14">
+<span class="flex items-center justify-center w-10 h-10 rounded-full border border-white/20 bg-white/5 group-hover:border-primary group-hover:bg-primary/10 transition-all">
+<span class="material-icons text-primary text-base">play_arrow</span>
+</span>
+                    Ver como funciona
+                </button>
+</div>
+<p class="mt-12 text-sm text-gray-500 font-medium italic">
+                "Você fala. Ele organiza. Você vive."
+            </p>
+</div>
+<div class="w-full lg:w-1/2 perspective-container h-[600px] flex items-center justify-center relative">
+<div class="absolute inset-0 bg-gradient-to-tr from-primary/10 to-transparent opacity-20 blur-3xl transform -rotate-6"></div>
+<div class="tilted-chat animate-float w-full max-w-md bg-[#0b141a] border border-white/10 rounded-2xl overflow-hidden relative shadow-2xl h-[580px] flex flex-col">
+<div class="bg-[#202c33] px-4 py-3 flex items-center gap-3 border-b border-white/5 z-20">
+<div class="relative">
+<img class="w-10 h-10 rounded-full object-cover ring-2 ring-primary/50" data-alt="Controle-se AI Assistant Avatar, minimalist robot face" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAax93fSL_sfi0z3WeGtudlQBZ5y--qBeuU_FK40MdFrTmljkcNrLDSseRpTCqwp3t35E2p-m_D3I-d0Shslo0BS6mPFJL6eQTM9-hduD9c4IV1ZhbQwAGwn6PhFrpftFQe633SLU4RmOXkcqhygKipsXLRL40ih-41vIxRQ-U8zEZzx-b1pKr47XhJiBGYLehA08YjHcKnNir-EUk5IxjC92vK_OSBeU62dDLkKbdhRKxtdIgL-uDDLLZLMwFFPnmXrLe4APPumxWE"/>
+<div class="absolute bottom-0 right-0 w-2.5 h-2.5 bg-primary rounded-full border-2 border-[#202c33]"></div>
+</div>
+<div class="flex-1">
+<h3 class="text-gray-100 font-semibold text-sm">Controle-se AI</h3>
+<p class="text-primary text-xs flex items-center gap-1">
+<span class="w-1 h-1 bg-primary rounded-full animate-pulse"></span>
+                            Online | Assessor Pessoal
+                        </p>
+</div>
+<span class="material-icons text-gray-400">more_vert</span>
+</div>
+<div class="absolute inset-0 bg-[#0b141a] z-0 opacity-100">
+<div class="absolute inset-0 opacity-[0.03]" style="background-image: radial-gradient(#ffffff 1px, transparent 1px); background-size: 20px 20px;"></div>
+</div>
+<div class="relative z-10 flex-1 overflow-y-auto p-4 space-y-6 chat-scrollbar">
+<div class="flex justify-center">
+<span class="bg-[#1f2c34] text-[#8696a0] text-[10px] font-medium px-3 py-1 rounded-lg shadow-sm uppercase tracking-wide">Hoje</span>
+</div>
+<div class="flex justify-end group">
+<div class="bg-[#005c4b] rounded-lg rounded-tr-none p-2 max-w-[85%] shadow-sm relative">
+<div class="flex items-center gap-3 min-w-[200px]">
+<div class="relative">
+<div class="w-10 h-10 rounded-full bg-black/20 flex items-center justify-center text-gray-300">
+<span class="material-icons text-xl">play_arrow</span>
+</div>
+<svg class="absolute top-0 left-0 w-10 h-10 rotate-[-90deg]" viewBox="0 0 40 40">
+<circle cx="20" cy="20" fill="none" r="18" stroke="rgba(255,255,255,0.2)" stroke-width="2"></circle>
+<circle cx="20" cy="20" fill="none" r="18" stroke="#fff" stroke-dasharray="113" stroke-dashoffset="80" stroke-width="2"></circle>
+</svg>
+</div>
+<div class="flex-1 flex flex-col gap-1">
+<div class="h-4 flex items-center gap-[2px]">
+<div class="w-1 h-2 bg-white/40 rounded-full"></div>
+<div class="w-1 h-3 bg-white/60 rounded-full"></div>
+<div class="w-1 h-4 bg-white/80 rounded-full"></div>
+<div class="w-1 h-3 bg-white/60 rounded-full"></div>
+<div class="w-1 h-2 bg-white/40 rounded-full"></div>
+<div class="w-1 h-4 bg-white/80 rounded-full"></div>
+<div class="w-1 h-3 bg-white/60 rounded-full"></div>
+<div class="w-1 h-2 bg-white/40 rounded-full"></div>
+<div class="w-1 h-2 bg-white/40 rounded-full"></div>
+<div class="w-1 h-3 bg-white/60 rounded-full"></div>
+</div>
+<span class="text-[10px] text-white/70">0:12 • Reproduzido</span>
+</div>
+</div>
+<div class="absolute bottom-1 right-2 flex items-center gap-1">
+<span class="text-[9px] text-white/60">10:42</span>
+<span class="material-icons text-[12px] text-[#53bdeb]">done_all</span>
+</div>
+</div>
+</div>
+<div class="flex justify-start">
+<div class="bg-[#202c33] rounded-lg rounded-tl-none p-3 max-w-[90%] shadow-sm border-l-4 border-primary">
+<div class="mb-2 pb-2 border-b border-white/5">
+<span class="text-xs text-primary font-bold tracking-wide uppercase">Entendido</span>
+</div>
+<div class="flex items-start gap-3 mb-3">
+<div class="bg-blue-500/20 p-2 rounded-lg">
+<span class="material-icons text-blue-400 text-sm">event</span>
+</div>
+<div>
+<h4 class="text-sm text-gray-200 font-medium">Dentista</h4>
+<p class="text-xs text-gray-400">Terça-feira, 14:00 - 15:00</p>
+<span class="inline-flex items-center gap-1 mt-1 px-1.5 py-0.5 rounded bg-blue-500/10 border border-blue-500/20 text-[9px] text-blue-300 font-medium">
+<span class="material-icons text-[9px]">sync</span> G-Calendar
+                                    </span>
+</div>
+</div>
+<div class="flex items-start gap-3">
+<div class="bg-orange-500/20 p-2 rounded-lg">
+<span class="material-icons text-orange-400 text-sm">check_circle_outline</span>
+</div>
+<div>
+<h4 class="text-sm text-gray-200 font-medium">Pagar Cartão</h4>
+<p class="text-xs text-gray-400">Vencimento: Dia 20</p>
+<span class="text-[9px] text-orange-300 block mt-1">Lembrete ativado para 09:00</span>
+</div>
+</div>
+<div class="flex justify-end items-center gap-1 mt-1">
+<span class="text-[9px] text-gray-400">10:42</span>
+</div>
+</div>
+</div>
+<div class="flex justify-end">
+<div class="bg-[#005c4b] rounded-lg rounded-tr-none p-1 max-w-[70%] shadow-sm relative">
+<div class="relative rounded overflow-hidden">
+<img class="w-full h-auto object-cover opacity-80 hover:opacity-100 transition-opacity" data-alt="Photo of an electricity bill on a wooden table" src="https://lh3.googleusercontent.com/aida-public/AB6AXuD_fedz4PdozQ3wG-XzAoZLzNntzWolsXPG5cdM-zgbA-vr1GryjhD49zCe5XGSEnZKzyG7QXppB32SOIo4gdSmohBGf7wrNKB2p0SK_Ikk1LdUzfrtMA4N4myjKwkpdm-3DLMPl1vprfibUC_Im3BT5d4y7owH4z0wMg5bTyulfC-wlfxYYnnbnz4vO300C-KdqUlZCn2hUkQhshfWDQOUzGNw1wzx2YE3AqVvHbq7AYmoO8B3u0riT-9-9uguPQiR14qqRZo02rlh"/>
+<div class="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent flex items-end p-2">
+<span class="text-xs text-white font-medium truncate">conta_luz_julho.jpg</span>
+</div>
+</div>
+<div class="flex justify-end items-center gap-1 px-1 pt-1">
+<span class="text-[9px] text-white/60">10:45</span>
+<span class="material-icons text-[12px] text-[#53bdeb]">done_all</span>
+</div>
+</div>
+</div>
+<div class="flex justify-start">
+<div class="bg-[#202c33] rounded-lg rounded-tl-none p-3 max-w-[85%] shadow-sm">
+<p class="text-sm text-gray-200 mb-2">
+                                Processei a conta. Agendado!
+                            </p>
+<div class="bg-black/20 rounded p-2 flex items-center justify-between border border-white/5">
+<div class="flex items-center gap-2">
+<span class="material-icons text-primary text-sm">attach_money</span>
+<div class="text-xs">
+<div class="text-gray-300">Enel Distribuição</div>
+<div class="text-gray-500">R$ 150,00 • Venc. 15/07</div>
+</div>
+</div>
+<span class="material-icons text-primary text-sm">check_circle</span>
+</div>
+<div class="flex justify-end items-center gap-1 mt-1">
+<span class="text-[9px] text-gray-400">10:45</span>
+</div>
+</div>
+</div>
+</div>
+<div class="bg-[#202c33] px-3 py-2 flex items-center gap-3 border-t border-white/5 relative z-20">
+<span class="material-icons text-gray-400 cursor-pointer hover:text-white">add</span>
+<div class="flex-1 bg-[#2a3942] rounded-lg h-9 px-3 flex items-center text-sm text-gray-400 select-none">
+                        Mensagem
+                    </div>
+<span class="material-icons text-gray-400 cursor-pointer hover:text-white">mic</span>
+</div>
+<div class="absolute inset-0 pointer-events-none z-30 glass-reflection rounded-2xl"></div>
+</div>
+<div class="absolute -right-4 top-1/4 bg-surface-dark border border-white/10 p-3 rounded-xl shadow-xl animate-bounce" style="animation-duration: 3s;">
+<span class="material-icons text-blue-400 text-3xl">event_available</span>
+</div>
+<div class="absolute -left-8 bottom-1/3 bg-surface-dark border border-white/10 p-3 rounded-xl shadow-xl animate-bounce" style="animation-duration: 4s; animation-delay: 1s;">
+<span class="material-icons text-primary text-3xl">savings</span>
+</div>
+</div>
+</main>
+<div class="fixed bottom-6 right-6 z-40 hidden lg:block">
+<div class="text-right">
+<div class="text-xs font-bold text-gray-500 uppercase tracking-widest mb-1">Capacidades</div>
+<div class="flex items-center gap-3 text-sm font-medium text-gray-300 bg-black/40 backdrop-blur-sm px-4 py-2 rounded-full border border-white/5">
+<span>Agenda</span>
+<span class="w-1 h-1 rounded-full bg-primary"></span>
+<span>Tarefas</span>
+<span class="w-1 h-1 rounded-full bg-primary"></span>
+<span>Finanças</span>
+</div>
+</div>
+</div>
+</body></html>

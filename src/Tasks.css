@@ -351,7 +351,7 @@
     box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
     flex-shrink: 0;
     justify-content: space-between;
-    transition: transform 0.2s, background 0.2s, border-color 0.2s;
+    transition: background 0.2s, border-color 0.2s, box-shadow 0.2s;
 }
 
 .note-card:active {

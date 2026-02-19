@@ -278,7 +278,7 @@ export default function Tasks({ session }) {
                         <h3>A Fazer</h3>
                         <span className="count-badge">{todoNotes.length}</span>
                     </div>
-                    <motion.div className="column-content" layout>
+                    <motion.div className="column-content">
                         <AnimatePresence>
                             {todoNotes.map((note) => (
                                 <KanbanCard
@@ -328,7 +328,7 @@ export default function Tasks({ session }) {
                             </button>
                         )}
                     </div>
-                    <motion.div className="column-content" layout>
+                    <motion.div className="column-content">
                         <AnimatePresence>
                             {doneNotes.map((note) => (
                                 <KanbanCard
@@ -372,10 +372,9 @@ function KanbanCard({ note, formatDate, isDone, onDragEnd, setDraggingId, onEdit
 
     return (
         <motion.div
-            layout
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, scale: 0.95, transition: { duration: 0.2 } }}
+            exit={{ opacity: 0, transition: { duration: 0.15 } }}
             drag
             dragSnapToOrigin={true}
             dragMomentum={false}

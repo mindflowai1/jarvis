@@ -152,7 +152,10 @@ const AdminDashboard = ({ session }) => {
             {/* Barra Lateral */}
             <aside className="admin-sidebar">
                 <div className="admin-sidebar-header">
-                    <h2>Painel Admin</h2>
+                    <div className="flex items-center gap-3">
+                        <img src="/logo-controle-c.png" alt="Controle-C Logo" className="h-12 w-auto object-contain" />
+                        <h2 className="text-white text-2xl font-bold tracking-[0.15em] uppercase" style={{ fontFamily: "'Rajdhani', sans-serif" }}>Controle-C</h2>
+                    </div>
                 </div>
 
                 <nav className="admin-sidebar-nav">

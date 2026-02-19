@@ -6,7 +6,13 @@
 @import './components/SettingsPage.css';
 @import './pages/AdminDashboard.css';
 
+
+html {
+    scroll-behavior: smooth;
+}
+
 :root {
+
     --bg-dark: #0f172a;
     --bg-darker: #020617;
     --primary-blue: #3b82f6;
