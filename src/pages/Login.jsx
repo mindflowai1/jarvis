@@ -74,7 +74,7 @@ const Login = () => {
 
                 <div className="text-content">
                     <h1 className="uppercase tracking-[0.2em]" style={{ fontFamily: "'Rajdhani', sans-serif" }}>Controle-C</h1>
-                    <p>Acesse seu painel financeiro</p>
+                    <p>Acesse seu dashboard de usuário</p>
                 </div>
 
                 {/* Form */}

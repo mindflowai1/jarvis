@@ -3,7 +3,15 @@ import React from 'react';
 
 import { motion } from 'framer-motion';
 
+import { useTypewriter } from '../hooks/useTypewriter';
+
 const LandingPageHero = () => {
+    const dynamicText = useTypewriter([
+        'sua vida financeira',
+        'sua agenda',
+        'suas tarefas'
+    ]);
+
     return (
         <div id="hero" className="relative min-h-screen flex items-center pt-32 pb-24 lg:pb-32 overflow-hidden bg-background-ocean">
             <div className="absolute top-0 right-0 w-3/4 h-3/4 bg-[radial-gradient(circle_at_50%_50%,_rgba(37,212,102,0.15)_0%,_rgba(2,12,27,0)_70%)] blur-3xl opacity-50 pointer-events-none -z-10"></div>
@@ -27,7 +35,7 @@ const LandingPageHero = () => {
                     </motion.div>
                     <div className="flex flex-col gap-4">
                         <h1 className="text-white text-5xl lg:text-7xl font-display font-bold leading-[1.1] tracking-tight">
-                            Sua vida financeira organizada em <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#25d466] to-[#00d2ff]">um áudio.</span>
+                            A IA que organiza, em um áudio, <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#25d466] to-[#00d2ff]">{dynamicText}</span><span className="text-primary animate-pulse w-1 inline-block">|</span>
                         </h1>
                         <p className="text-slate-400 text-lg leading-relaxed max-w-xl">
                             O assistente de IA que vive no seu WhatsApp. Envie uma mensagem de voz para registrar gastos, agendar pagamentos e visualizar gráficos. Sem apps complexos.
