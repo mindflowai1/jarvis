@@ -5,6 +5,10 @@
 @import './Tasks.css';
 @import './components/SettingsPage.css';
 @import './pages/AdminDashboard.css';
+@import './components/FinancialDashboard.css';
+@import './components/TransactionModal.css';
+@import './components/RecurringReminders.css';
+@import './components/ExpensePieChart.css';
 
 
 html {
@@ -449,6 +453,8 @@ body {
     overflow: auto;
     padding: 32px;
     background: radial-gradient(circle at top right, #1e293b 0%, #020617 100%);
+    display: flex;
+    flex-direction: column;
 }
 
 /* Mobile Navigation */
