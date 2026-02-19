@@ -13,7 +13,7 @@ const LandingPageHero = () => {
     ]);
 
     return (
-        <div id="hero" className="relative min-h-screen flex items-center pt-32 pb-24 lg:pb-32 overflow-hidden bg-background-ocean">
+        <div id="hero" className="relative min-h-screen flex items-center pt-24 pb-24 lg:pb-32 overflow-hidden bg-background-ocean">
             <div className="absolute top-0 right-0 w-3/4 h-3/4 bg-[radial-gradient(circle_at_50%_50%,_rgba(37,212,102,0.15)_0%,_rgba(2,12,27,0)_70%)] blur-3xl opacity-50 pointer-events-none -z-10"></div>
             <div className="absolute bottom-0 left-0 w-[500px] h-[500px] bg-primary/5 rounded-full blur-[100px] pointer-events-none -z-10"></div>
 
