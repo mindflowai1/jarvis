@@ -34,7 +34,7 @@ const LandingPageHero = () => {
                         Novo: Integração com Google Calendar lançada 🚀
                     </motion.div>
                     <div className="flex flex-col gap-4">
-                        <h1 className="text-white text-5xl lg:text-7xl font-display font-bold leading-[1.1] tracking-tight">
+                        <h1 className="min-h-[4.5em] text-white text-5xl lg:text-7xl font-display font-bold leading-[1.1] tracking-tight">
                             A IA que organiza, em um áudio, <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#25d466] to-[#00d2ff]">{dynamicText}</span><span className="text-primary animate-pulse w-1 inline-block">|</span>
                         </h1>
                         <p className="text-slate-400 text-lg leading-relaxed max-w-xl">
