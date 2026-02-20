@@ -15,6 +15,16 @@ function App() {
     const [loading, setLoading] = useState(true)
 
     useEffect(() => {
+        // Debug: Check if Tailwind classes are applied
+        const testEl = document.createElement('div');
+        testEl.className = 'hidden';
+        document.body.appendChild(testEl);
+        const computedStyle = window.getComputedStyle(testEl);
+        console.log('Tailwind Check: .hidden display property:', computedStyle.display);
+        document.body.removeChild(testEl);
+    }, []);
+
+    useEffect(() => {
         supabase.auth.getSession().then(({ data: { session } }) => {
             setSession(session)
             // Salvar tokens se houver provider_token (OAuth do Google)
