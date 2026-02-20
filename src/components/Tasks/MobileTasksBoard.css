@@ -1,0 +1,369 @@
+/* ===== MOBILE TASKS BOARD ===== */
+/* All classes prefixed with mtk- to prevent collisions */
+/* No media queries — component only renders on mobile */
+
+.mtk-container {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    background: transparent;
+}
+
+/* ===== HEADER ===== */
+.mtk-header {
+    position: sticky;
+    top: 0;
+    z-index: 50;
+    background: rgba(15, 23, 42, 0.92);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+    padding-top: 16px;
+}
+
+.mtk-header-top {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0 20px 14px;
+}
+
+.mtk-title {
+    font-size: 26px;
+    font-weight: 800;
+    color: #f1f5f9;
+    margin: 0;
+    letter-spacing: -0.5px;
+}
+
+.mtk-header-actions {
+    display: flex;
+    gap: 8px;
+}
+
+.mtk-icon-btn {
+    width: 38px;
+    height: 38px;
+    border-radius: 12px;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.2s;
+    -webkit-tap-highlight-color: transparent;
+}
+
+.mtk-icon-btn svg {
+    width: 20px;
+    height: 20px;
+}
+
+.mtk-add-btn {
+    background: linear-gradient(135deg, #3b82f6, #6366f1);
+    border: none;
+    color: white;
+    box-shadow: 0 4px 12px rgba(59, 130, 246, 0.35);
+}
+
+.mtk-add-btn:active {
+    transform: scale(0.92);
+    box-shadow: 0 2px 8px rgba(59, 130, 246, 0.3);
+}
+
+.mtk-clear-btn {
+    background: rgba(239, 68, 68, 0.12);
+    border-color: rgba(239, 68, 68, 0.25);
+    color: #f87171;
+}
+
+.mtk-clear-btn:active {
+    transform: scale(0.92);
+    background: rgba(239, 68, 68, 0.2);
+}
+
+/* ===== TABS ===== */
+.mtk-tabs {
+    display: flex;
+    padding: 0 16px;
+    gap: 4px;
+}
+
+.mtk-tab {
+    flex: 1;
+    background: transparent;
+    border: none;
+    color: #64748b;
+    padding: 12px 8px;
+    font-size: 14px;
+    font-weight: 600;
+    border-bottom: 2.5px solid transparent;
+    transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    cursor: pointer;
+    -webkit-tap-highlight-color: transparent;
+}
+
+.mtk-tab-active {
+    color: #f1f5f9;
+    border-bottom-color: #3b82f6;
+}
+
+.mtk-tab-dot {
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    flex-shrink: 0;
+}
+
+.mtk-dot-todo {
+    background: #3b82f6;
+    box-shadow: 0 0 6px rgba(59, 130, 246, 0.5);
+}
+
+.mtk-dot-done {
+    background: #22c55e;
+    box-shadow: 0 0 6px rgba(34, 197, 94, 0.5);
+}
+
+.mtk-tab:not(.mtk-tab-active) .mtk-tab-dot {
+    opacity: 0.4;
+    box-shadow: none;
+}
+
+.mtk-tab-badge {
+    background: rgba(255, 255, 255, 0.06);
+    padding: 2px 8px;
+    border-radius: 10px;
+    font-size: 11px;
+    font-weight: 700;
+    color: #94a3b8;
+}
+
+.mtk-tab-active .mtk-tab-badge {
+    background: rgba(59, 130, 246, 0.15);
+    color: #60a5fa;
+}
+
+/* ===== TASK LIST ===== */
+.mtk-list {
+    flex: 1;
+    padding: 16px 16px 100px;
+    overflow-y: auto;
+}
+
+.mtk-cards {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+/* ===== TASK CARD ===== */
+.mtk-card {
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    background: rgba(30, 41, 59, 0.5);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    padding: 16px;
+    border-radius: 16px;
+    border: 1px solid rgba(255, 255, 255, 0.06);
+    cursor: pointer;
+    transition: background 0.2s, border-color 0.2s;
+    -webkit-tap-highlight-color: transparent;
+    position: relative;
+    overflow: hidden;
+}
+
+.mtk-card::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 0;
+    bottom: 0;
+    width: 3px;
+    background: linear-gradient(180deg, #3b82f6, #6366f1);
+    border-radius: 3px 0 0 3px;
+    opacity: 0.8;
+}
+
+.mtk-card:active {
+    background: rgba(30, 41, 59, 0.7);
+}
+
+.mtk-card-done {
+    opacity: 0.7;
+}
+
+.mtk-card-done::before {
+    background: linear-gradient(180deg, #22c55e, #16a34a);
+    opacity: 0.5;
+}
+
+/* Deadline urgency */
+.mtk-card.mtk-overdue::before {
+    background: linear-gradient(180deg, #ef4444, #dc2626);
+}
+
+.mtk-card.mtk-due-today::before {
+    background: linear-gradient(180deg, #f59e0b, #d97706);
+}
+
+.mtk-card.mtk-due-soon::before {
+    background: linear-gradient(180deg, #f97316, #ea580c);
+}
+
+/* ===== CHECKBOX ===== */
+.mtk-checkbox {
+    width: 26px;
+    height: 26px;
+    min-width: 26px;
+    border: none;
+    background: transparent;
+    padding: 0;
+    cursor: pointer;
+    color: #64748b;
+    transition: color 0.2s, transform 0.2s;
+    -webkit-tap-highlight-color: transparent;
+    margin-top: 1px;
+}
+
+.mtk-checkbox:active {
+    transform: scale(0.85);
+}
+
+.mtk-checkbox svg {
+    width: 24px;
+    height: 24px;
+}
+
+.mtk-card-done .mtk-checkbox {
+    color: #22c55e;
+}
+
+/* ===== CARD BODY ===== */
+.mtk-card-body {
+    flex: 1;
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.mtk-card-text {
+    margin: 0;
+    font-size: 15px;
+    line-height: 1.5;
+    color: #e2e8f0;
+    word-break: break-word;
+    white-space: pre-wrap;
+}
+
+.mtk-card-done .mtk-card-text {
+    text-decoration: line-through;
+    color: #94a3b8;
+}
+
+.mtk-card-deadline {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    font-size: 12px;
+    color: #94a3b8;
+    font-weight: 500;
+}
+
+.mtk-card-deadline.mtk-overdue {
+    color: #f87171;
+}
+
+.mtk-card-deadline.mtk-due-today {
+    color: #fbbf24;
+}
+
+.mtk-card-deadline.mtk-due-soon {
+    color: #fb923c;
+}
+
+/* ===== DELETE BUTTON ===== */
+.mtk-delete-btn {
+    width: 32px;
+    height: 32px;
+    min-width: 32px;
+    border-radius: 8px;
+    border: none;
+    background: rgba(255, 255, 255, 0.04);
+    color: #64748b;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.2s;
+    -webkit-tap-highlight-color: transparent;
+    margin-top: 1px;
+}
+
+.mtk-delete-btn:active {
+    transform: scale(0.9);
+    background: rgba(239, 68, 68, 0.15);
+    color: #f87171;
+}
+
+.mtk-delete-btn svg {
+    width: 16px;
+    height: 16px;
+}
+
+/* ===== EMPTY STATE ===== */
+.mtk-empty {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 56px 24px;
+    background: rgba(30, 41, 59, 0.25);
+    border-radius: 20px;
+    border: 1.5px dashed rgba(255, 255, 255, 0.08);
+    text-align: center;
+    margin-top: 8px;
+}
+
+.mtk-empty-icon {
+    font-size: 48px;
+    margin-bottom: 16px;
+    opacity: 0.8;
+}
+
+.mtk-empty-text {
+    font-size: 15px;
+    color: #94a3b8;
+    margin: 0 0 24px 0;
+    line-height: 1.5;
+}
+
+.mtk-empty-cta {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 14px 28px;
+    background: linear-gradient(135deg, #3b82f6 0%, #6366f1 100%);
+    color: white;
+    border: none;
+    border-radius: 14px;
+    font-weight: 700;
+    font-size: 14px;
+    box-shadow: 0 8px 20px rgba(59, 130, 246, 0.35);
+    cursor: pointer;
+    transition: all 0.2s;
+    letter-spacing: 0.3px;
+    -webkit-tap-highlight-color: transparent;
+}
+
+.mtk-empty-cta:active {
+    transform: scale(0.97);
+    box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
+}

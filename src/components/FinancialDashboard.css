@@ -1,37 +1,65 @@
 /* FinancialDashboard.css */
-.financial-dashboard * {
-    box-sizing: border-box;
+
+/* Container */
+.financial-dashboard-container {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
 }
 
+/* Wrappers Visibility Control */
+.desktop-wrapper {
+    display: block;
+    height: 100%;
+    flex: 1;
+    overflow-y: auto;
+}
+
+.mobile-wrapper {
+    display: none;
+    height: 100%;
+    flex: 1;
+    overflow-y: auto;
+}
+
+/* Mobile Responsive Breakpoint */
+@media (max-width: 768px) {
+    .desktop-wrapper {
+        display: none !important;
+    }
+
+    .mobile-wrapper {
+        display: block !important;
+    }
+}
+
+/* 
+   Shared Styles or Desktop Specifics 
+   (Kept for DesktopFinancialDashboard.jsx usage)
+*/
 .financial-dashboard {
     flex: 1;
     display: flex;
     flex-direction: column;
     padding: 24px;
-    padding: 24px;
     color: #fff;
-}
-
-.mobile-financial-header {
-    display: none;
-}
-
-.desktop-only {
-    display: flex;
+    height: 100%;
 }
 
 .dashboard-header {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    margin-bottom: 8px;
+    margin-bottom: 24px;
 }
 
 .dashboard-header h1 {
-    font-size: 24px;
+    font-size: 28px;
     font-weight: 700;
     margin: 0;
-    background: linear-gradient(to right, #fff, #94a3b8);
+    background: linear-gradient(135deg, #fff 0%, #94a3b8 100%);
     -webkit-background-clip: text;
     background-clip: text;
     -webkit-text-fill-color: transparent;
@@ -69,12 +97,12 @@
     background: linear-gradient(135deg, #3b82f6, #2563eb);
     color: white;
     border: none;
-    box-shadow: 0 4px 6px -1px rgba(59, 130, 246, 0.2);
+    box-shadow: 0 4px 12px rgba(59, 130, 246, 0.2);
 }
 
 .header-btn.primary:hover {
     background: linear-gradient(135deg, #2563eb, #1d4ed8);
-    box-shadow: 0 8px 12px -1px rgba(37, 99, 235, 0.3);
+    box-shadow: 0 8px 20px rgba(37, 99, 235, 0.3);
 }
 
 .header-btn svg {
@@ -93,6 +121,7 @@
     align-items: center;
     flex-wrap: wrap;
     backdrop-filter: blur(8px);
+    margin-bottom: 24px;
 }
 
 .filters-row {
@@ -154,6 +183,7 @@
     appearance: none;
     -webkit-appearance: none;
     -moz-appearance: none;
+    color-scheme: dark;
 }
 
 .filter-select:focus,
@@ -161,31 +191,12 @@
     border-color: #3b82f6;
 }
 
-/* Fix for mobile date inputs opacity/visibility */
-.date-input {
-    color-scheme: dark;
-    min-height: 42px;
-    color: #fff !important;
-    /* Force white text */
-}
-
-/* Placeholder color */
-.date-input::placeholder {
-    color: rgba(255, 255, 255, 0.7);
-    opacity: 1;
-}
-
-.date-input::-webkit-calendar-picker-indicator {
-    filter: invert(1);
-    opacity: 0.6;
-    cursor: pointer;
-}
-
 /* Summary Cards */
 .summary-cards {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
     gap: 20px;
+    margin-bottom: 32px;
 }
 
 .summary-card {
@@ -230,7 +241,7 @@
 }
 
 .card-value {
-    font-size: 28px;
+    font-size: 32px;
     font-weight: 700;
     color: #fff;
     letter-spacing: -0.5px;
@@ -249,10 +260,10 @@
 }
 
 .list-header {
-    font-size: 14px;
+    font-size: 18px;
     font-weight: 600;
-    color: #94a3b8;
-    margin-bottom: 8px;
+    color: #f8fafc;
+    margin-bottom: 16px;
 }
 
 /* Transaction Card Redesign */
@@ -264,7 +275,6 @@
     border: 1px solid rgba(148, 163, 184, 0.1);
     padding: 16px 20px;
     border-radius: 16px;
-    /* More rounded */
     transition: all 0.2s ease;
     gap: 16px;
     cursor: pointer;
@@ -283,7 +293,6 @@
     gap: 16px;
     flex: 1;
     min-width: 0;
-    /* Enable truncation if needed */
 }
 
 .t-icon {
@@ -350,7 +359,7 @@
 .t-right-side {
     display: flex;
     align-items: center;
-    gap: 20px;
+    gap: 24px;
     flex-shrink: 0;
 }
 
@@ -358,7 +367,6 @@
     font-size: 16px;
     font-weight: 700;
     white-space: nowrap;
-    /* Prevent breaking */
     letter-spacing: -0.3px;
 }
 
@@ -375,13 +383,14 @@
 .t-actions {
     display: flex;
     gap: 8px;
-    opacity: 0.6;
-    /* Subtler by default */
-    transition: opacity 0.2s;
+    opacity: 0;
+    transform: translateX(10px);
+    transition: all 0.2s;
 }
 
 .transaction-card:hover .t-actions {
     opacity: 1;
+    transform: translateX(0);
 }
 
 .action-btn {
@@ -427,150 +436,4 @@
     flex-direction: column;
     align-items: center;
     gap: 12px;
-}
-
-
-
-/* Mobile Responsive */
-@media (max-width: 768px) {
-    .financial-dashboard {
-        padding: 0;
-        gap: 20px;
-    }
-
-    .desktop-only {
-        display: none !important;
-    }
-
-    .mobile-only {
-        display: flex !important;
-    }
-
-    .btn-label {
-        display: none;
-        /* Icon only on mobile header for reminders */
-    }
-
-    /* Filters Bar - Fixed Overflow */
-    .filters-bar {
-        padding: 0 20px;
-        margin-bottom: 24px;
-        gap: 12px;
-        flex-direction: column;
-        align-items: stretch;
-        background: transparent;
-        border: none;
-    }
-
-    .filters-row {
-        gap: 10px;
-        flex-wrap: wrap;
-    }
-
-    .filters-row .date-input,
-    .filters-row .filter-select {
-        flex: 1;
-        min-width: 0;
-        /* Allow shrinking to prevent overflow */
-        width: 100%;
-        /* Ensure they take space in wrap */
-    }
-
-    .desktop-only {
-        display: none !important;
-    }
-
-    /* Mobile Header - Modern Redesign */
-    .mobile-financial-header {
-        display: block;
-        background: rgba(15, 23, 42, 0.7);
-        backdrop-filter: blur(20px);
-        -webkit-backdrop-filter: blur(20px);
-        padding: 16px 20px;
-        position: sticky;
-        top: 0;
-        z-index: 50;
-        border-bottom: 1px solid rgba(255, 255, 255, 0.05);
-        margin: 0;
-        /* Removed bottom margin */
-    }
-
-    .mobile-financial-header .mobile-header-top {
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
-    }
-
-    .mobile-financial-header .mobile-header-top h2 {
-        font-size: 22px;
-        font-weight: 700;
-        color: #f8fafc;
-        margin: 0;
-        letter-spacing: -0.5px;
-    }
-
-    .mobile-financial-header .mobile-header-btn {
-        width: 40px;
-        height: 40px;
-        border-radius: 12px;
-        background: rgba(255, 255, 255, 0.05);
-        color: #94a3b8;
-        border: 1px solid rgba(255, 255, 255, 0.05);
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        cursor: pointer;
-        transition: all 0.2s ease;
-    }
-
-    .mobile-financial-header .mobile-header-btn:active {
-        transform: scale(0.95);
-        background: rgba(255, 255, 255, 0.1);
-    }
-
-    .mobile-financial-header .mobile-header-btn:last-child {
-        background: linear-gradient(135deg, #3b82f6, #2563eb);
-        color: white;
-        border: none;
-        box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
-    }
-
-    .mobile-financial-header .mobile-header-btn svg {
-        width: 22px;
-        height: 22px;
-        flex-shrink: 0;
-    }
-
-    .summary-cards {
-        grid-template-columns: repeat(2, 1fr);
-        /* 2x2 Grid */
-        gap: 12px;
-        padding: 0 20px;
-    }
-
-    .summary-card:last-child {
-        grid-column: span 2;
-        /* Make expense or balance full width if odd? Or just let it fit */
-        /* Actually, let's keep it 3 items. Balance (Full), Income/Expense (Half) */
-    }
-
-    .summary-card.balance {
-        grid-column: span 2;
-    }
-
-    .summary-card {
-        padding: 16px;
-    }
-
-    .card-value {
-        font-size: 24px;
-    }
-
-    .transactions-list {
-        padding: 0 20px;
-    }
-
-    .transaction-card {
-        padding: 12px;
-    }
 }

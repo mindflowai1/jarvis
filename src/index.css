@@ -6,6 +6,7 @@
 @import './components/SettingsPage.css';
 @import './pages/AdminDashboard.css';
 @import './components/FinancialDashboard.css';
+@import './components/FinancialDashboard/MobileFinancialDashboard.css';
 @import './components/TransactionModal.css';
 @import './components/RecurringReminders.css';
 @import './components/ExpensePieChart.css';
@@ -281,6 +282,7 @@ body {
     background-clip: padding-box;
     position: relative;
     overflow: hidden;
+    flex-shrink: 0;
 }
 
 .sidebar-header::before {
@@ -318,6 +320,7 @@ body {
 
 .sidebar-logo {
     width: 180px;
+    max-width: 100%;
     height: auto;
     position: relative;
     z-index: 1;

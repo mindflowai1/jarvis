@@ -494,140 +494,28 @@
     }
 }
 
+/* ===== Wrapper Visibility Control ===== */
+.tasks-desktop-wrapper {
+    display: block;
+}
+
+.tasks-mobile-wrapper {
+    display: none;
+}
+
 @media (max-width: 768px) {
-    .card-actions {
-        opacity: 1 !important;
-        transform: translateX(0) !important;
+    .tasks-desktop-wrapper {
+        display: none !important;
     }
 
-    .kanban-board {
-        grid-template-columns: 1fr;
-        gap: var(--space-md);
+    .tasks-mobile-wrapper {
+        display: block !important;
     }
 
     .tasks-container {
-        padding-top: 0;
-    }
-
-    .desktop-only {
-        display: none !important;
-    }
-
-    .mobile-hidden {
-        display: none !important;
-    }
-
-    /* Mobile Header */
-    .mobile-tasks-header {
-        display: block;
-        background: rgba(15, 23, 42, 0.95);
-        backdrop-filter: blur(12px);
-        padding: 20px 0 0;
-        position: sticky;
-        top: 0;
-        z-index: 50;
-        border-bottom: 1px solid rgba(255, 255, 255, 0.05);
-        margin: 0 0 20px 0;
-    }
-
-    .mobile-header-top {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        padding: 0 20px 16px;
-    }
-
-    .mobile-header-top h2 {
-        font-size: 24px;
-        font-weight: 700;
-        color: white;
-        margin: 0;
-    }
-
-    .mobile-add-btn {
-        width: 36px;
-        height: 36px;
-        border-radius: 10px;
-        background: var(--primary-blue);
-        color: white;
-        border: none;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        cursor: pointer;
-        box-shadow: 0 4px 10px rgba(59, 130, 246, 0.3);
-    }
-
-    .mobile-add-btn svg {
-        width: 20px;
-        height: 20px;
-        flex-shrink: 0;
-    }
-
-    /* Mobile Tabs */
-    .mobile-tabs {
-        display: flex;
-        padding: 0 12px;
-        gap: 8px;
-        overflow-x: auto;
-        padding-bottom: 12px;
-    }
-
-    .tab-btn {
-        flex: 1;
+        padding: 0;
         background: transparent;
         border: none;
-        color: #94a3b8;
-        padding: 10px;
-        font-size: 14px;
-        font-weight: 500;
-        border-bottom: 2px solid transparent;
-        transition: all 0.2s;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        gap: 8px;
-    }
-
-    .tab-btn.active {
-        color: var(--primary-blue);
-        border-bottom-color: var(--primary-blue);
-    }
-
-    .tab-badge {
-        background: rgba(255, 255, 255, 0.05);
-        padding: 2px 6px;
-        border-radius: 10px;
-        font-size: 10px;
-    }
-
-    .tab-btn.active .tab-badge {
-        background: rgba(59, 130, 246, 0.1);
-        color: var(--primary-blue);
-    }
-
-    /* Column Reset for Mobile */
-    .kanban-board {
-        display: block;
-        /* Stack */
-        padding: 0 16px;
-        gap: 0;
-    }
-
-    .kanban-column {
-        background: transparent;
-        border: none;
-        padding: 0;
-        backdrop-filter: none;
-    }
-
-    .column-header {
-        display: none;
-        /* Hide default column headers on mobile */
-    }
-
-    .column-content {
-        padding: 0;
-        gap: 12px;
+        height: auto;
     }
 }

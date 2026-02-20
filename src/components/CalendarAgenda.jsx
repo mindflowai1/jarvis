@@ -2,6 +2,7 @@ import { useState, useEffect, useRef } from 'react'
 import { supabase } from '../supabaseClient'
 import EventList from './EventList'
 import EventModal from './EventModal'
+import MobileCalendarAgenda from './CalendarAgenda/MobileCalendarAgenda'
 import './CalendarAgenda.css'
 
 const CalendarAgenda = ({ session }) => {
@@ -39,7 +40,6 @@ const CalendarAgenda = ({ session }) => {
 
     const accessTokenCache = useRef(null)
     const timeGridRef = useRef(null)
-    const mobileStripRef = useRef(null)
     const HOUR_HEIGHT = 120 // Altura em pixels de cada hora
 
     function getStartOfWeek(date) {
@@ -333,15 +333,6 @@ const CalendarAgenda = ({ session }) => {
         }
     }, [loading, viewMode])
 
-    // Scroll active day into view on mobile
-    useEffect(() => {
-        if (mobileStripRef.current) {
-            const selected = mobileStripRef.current.querySelector('.selected')
-            if (selected) {
-                selected.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' })
-            }
-        }
-    }, [selectedDate, viewMode])
 
     const weekDays = Array.from({ length: 7 }, (_, i) => addDays(weekStart, i))
     const mobileDays = Array.from({ length: 7 }, (_, i) => addDays(mobileWeekStart, i))
@@ -449,119 +440,50 @@ const CalendarAgenda = ({ session }) => {
 
     return (
         <div className="calendar-wrapper">
-            {/* Mobile Header & Controls */}
-            <div className="mobile-calendar-header">
-                <div className="mobile-header-top">
-                    <div className="mobile-month-title">
-                        {mobileWeekStart.toLocaleDateString('pt-BR', { month: 'long', year: 'numeric' })}
+            {/* ===== DESKTOP VIEW ===== */}
+            <div className="cal-desktop-wrapper">
+                <div className="calendar-controls">
+                    <div className="nav-buttons">
+                        <button onClick={() => navigateWeek(-1)}>&lt;</button>
+                        <button className="today-btn-desktop" onClick={goToToday}>Hoje</button>
+                        <span>{weekStart.toLocaleDateString('pt-BR')} - {addDays(weekStart, 6).toLocaleDateString('pt-BR')}</span>
+                        <button onClick={() => navigateWeek(1)}>&gt;</button>
                     </div>
-                    <button
-                        className="mobile-header-add-btn"
-                        onClick={() => {
-                            setSelectedEvent(null)
-                            setIsModalOpen(true)
-                        }}
-                    >
-                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor">
-                            <path strokeLinecap="round" strokeLinejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
-                        </svg>
-                    </button>
-                </div>
 
-                {/* Mobile Navigation Controls */}
-                <div className="mobile-nav-controls">
-                    <button
-                        className="mobile-nav-btn"
-                        onClick={() => navigateMobileWeek(-1)}
-                        aria-label="Semana anterior"
-                    >
-                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor">
-                            <path strokeLinecap="round" strokeLinejoin="round" d="M15.75 19.5L8.25 12l7.5-7.5" />
-                        </svg>
-                    </button>
-
-                    <button
-                        className="mobile-today-btn"
-                        onClick={goToToday}
-                    >
-                        Hoje
-                    </button>
-
-                    <button
-                        className="mobile-nav-btn"
-                        onClick={() => navigateMobileWeek(1)}
-                        aria-label="Próxima semana"
-                    >
-                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor">
-                            <path strokeLinecap="round" strokeLinejoin="round" d="M8.25 4.5l7.5 7.5-7.5 7.5" />
-                        </svg>
-                    </button>
-                </div>
-
-                <div className="mobile-week-strip" ref={mobileStripRef}>
-                    {/* Render 7 days centered on Today (-3 to +3) */
-                        mobileDays.map((d, i) => (
-                            <div
-                                key={i}
-                                className={`mobile-day-item ${isSameDay(d, selectedDate) ? 'selected' : ''} ${isSameDay(d, new Date()) ? 'today' : ''}`}
-                                onClick={() => setSelectedDate(d)}
-                            >
-                                <span className="day-name">{d.toLocaleDateString('pt-BR', { weekday: 'short' }).replace('.', '')}</span>
-                                <span className="day-number">{d.getDate()}</span>
-                                {/* Dot indicator if events exist */}
-                                {events.some(e => isSameDay(new Date(e.start.dateTime || e.start.date), d)) && (
-                                    <div className="event-dot"></div>
-                                )}
-                            </div>
-                        ))}
-                </div>
-            </div>
-
-            {/* Desktop Controls (Hidden on Mobile) */}
-            <div className="calendar-controls desktop-only">
-                <div className="nav-buttons">
-                    <button onClick={() => navigateWeek(-1)}>&lt;</button>
-                    <button className="today-btn-desktop" onClick={goToToday}>Hoje</button>
-                    <span>{weekStart.toLocaleDateString('pt-BR')} - {addDays(weekStart, 6).toLocaleDateString('pt-BR')}</span>
-                    <button onClick={() => navigateWeek(1)}>&gt;</button>
-                </div>
-
-                <div className="control-buttons">
-                    <button
-                        className="primary-action-btn"
-                        onClick={() => {
-                            setSelectedEvent(null)
-                            setIsModalOpen(true)
-                        }}
-                    >
-                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor">
-                            <path strokeLinecap="round" strokeLinejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
-                        </svg>
-                        Novo Agendamento
-                    </button>
-
-                    <button
-                        onClick={() => setViewMode(viewMode === 'grid' ? 'list' : 'grid')}
-                        className="view-toggle-btn secondary-action-btn"
-                    >
-                        {viewMode === 'grid' ? (
-                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor">
-                                <path strokeLinecap="round" strokeLinejoin="round" d="M8.25 6.75h12M8.25 12h12m-12 5.25h12M3.75 6.75h.007v.008H3.75V6.75zm.375 0a.375.375 0 11-.75 0 .375.375 0 01.75 0zM3.75 12h.007v.008H3.75V12zm.375 0a.375.375 0 11-.75 0 .375.375 0 01.75 0zm-.375 5.25h.007v.008H3.75v-.008zm.375 0a.375.375 0 11-.75 0 .375.375 0 01.75 0z" />
+                    <div className="control-buttons">
+                        <button
+                            className="primary-action-btn"
+                            onClick={() => {
+                                setSelectedEvent(null)
+                                setIsModalOpen(true)
+                            }}
+                        >
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor">
+                                <path strokeLinecap="round" strokeLinejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
                             </svg>
-                        ) : (
-                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor">
-                                <path strokeLinecap="round" strokeLinejoin="round" d="M3.75 6A2.25 2.25 0 016 3.75h2.25A2.25 2.25 0 0110.5 6v2.25a2.25 2.25 0 01-2.25 2.25H6a2.25 2.25 0 01-2.25-2.25V6zM3.75 15.75A2.25 2.25 0 016 13.5h2.25a2.25 2.25 0 012.25 2.25V18a2.25 2.25 0 01-2.25 2.25H6A2.25 2.25 0 013.75 18v-2.25zM13.5 6a2.25 2.25 0 012.25-2.25H18A2.25 2.25 0 0120.25 6v2.25A2.25 2.25 0 0118 10.5h-2.25a2.25 2.25 0 01-2.25-2.25V6zM13.5 15.75a2.25 2.25 0 012.25-2.25H18a2.25 2.25 0 012.25 2.25V18A2.25 2.25 0 0118 20.25h-2.25A2.25 2.25 0 0113.5 18v-2.25z" />
-                            </svg>
-                        )}
-                        <span>{viewMode === 'grid' ? 'Lista' : 'Grade'}</span>
-                    </button>
-                </div>
-            </div>
+                            Novo Agendamento
+                        </button>
 
-            {viewMode === 'grid' ? (
-                <>
-                    {/* Desktop Grid View */}
-                    <div className="calendar-grid-container desktop-only">
+                        <button
+                            onClick={() => setViewMode(viewMode === 'grid' ? 'list' : 'grid')}
+                            className="view-toggle-btn secondary-action-btn"
+                        >
+                            {viewMode === 'grid' ? (
+                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor">
+                                    <path strokeLinecap="round" strokeLinejoin="round" d="M8.25 6.75h12M8.25 12h12m-12 5.25h12M3.75 6.75h.007v.008H3.75V6.75zm.375 0a.375.375 0 11-.75 0 .375.375 0 01.75 0zM3.75 12h.007v.008H3.75V12zm.375 0a.375.375 0 11-.75 0 .375.375 0 01.75 0zm-.375 5.25h.007v.008H3.75v-.008zm.375 0a.375.375 0 11-.75 0 .375.375 0 01.75 0z" />
+                                </svg>
+                            ) : (
+                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor">
+                                    <path strokeLinecap="round" strokeLinejoin="round" d="M3.75 6A2.25 2.25 0 016 3.75h2.25A2.25 2.25 0 0110.5 6v2.25a2.25 2.25 0 01-2.25 2.25H6a2.25 2.25 0 01-2.25-2.25V6zM3.75 15.75A2.25 2.25 0 016 13.5h2.25a2.25 2.25 0 012.25 2.25V18a2.25 2.25 0 01-2.25 2.25H6A2.25 2.25 0 013.75 18v-2.25zM13.5 6a2.25 2.25 0 012.25-2.25H18A2.25 2.25 0 0120.25 6v2.25A2.25 2.25 0 0118 10.5h-2.25a2.25 2.25 0 01-2.25-2.25V6zM13.5 15.75a2.25 2.25 0 012.25-2.25H18a2.25 2.25 0 012.25 2.25V18A2.25 2.25 0 0118 20.25h-2.25A2.25 2.25 0 0113.5 18v-2.25z" />
+                                </svg>
+                            )}
+                            <span>{viewMode === 'grid' ? 'Lista' : 'Grade'}</span>
+                        </button>
+                    </div>
+                </div>
+
+                {viewMode === 'grid' ? (
+                    <div className="calendar-grid-container">
                         <div className="calendar-header">
                             <div className="time-column-header"></div>
                             {weekDays.map((d, i) => (
@@ -614,65 +536,27 @@ const CalendarAgenda = ({ session }) => {
                             </div>
                         </div>
                     </div>
+                ) : (
+                    <EventList events={events} />
+                )}
+            </div>
 
-                    {/* Mobile List View */}
-                    <div className="mobile-event-list mobile-only">
-                        <div className="mobile-list-header">
-                            <h3>Agenda de {selectedDate.toLocaleDateString('pt-BR', { weekday: 'long', day: 'numeric' })}</h3>
-                        </div>
-
-                        <div className="mobile-events-container">
-                            {getDayEvents(selectedDate).length === 0 ? (
-                                <div className="mobile-empty-state">
-                                    <div className="empty-icon">📅</div>
-                                    <p>Nenhum compromisso para esse dia</p>
-                                    <button className="mobile-agenda-add-btn" onClick={() => {
-                                        setSelectedEvent(null)
-                                        setIsModalOpen(true)
-                                    }}>
-                                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2.5} stroke="currentColor" style={{ width: 22, height: 22 }}>
-                                            <path strokeLinecap="round" strokeLinejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
-                                        </svg>
-                                        NOVO EVENTO
-                                    </button>
-                                </div>
-                            ) : (
-                                <div className="event-timeline">
-                                    {getDayEvents(selectedDate)
-                                        .sort((a, b) => new Date(a.start.dateTime || a.start.date) - new Date(b.start.dateTime || b.start.date))
-                                        .map(event => (
-                                            <div
-                                                key={event.id}
-                                                className="mobile-event-card"
-                                                onClick={() => {
-                                                    setSelectedEvent(event)
-                                                    setIsModalOpen(true)
-                                                }}
-                                            >
-                                                <div className="mobile-event-time">
-                                                    <span className="start-time">
-                                                        {new Date(event.start.dateTime).toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' })}
-                                                    </span>
-                                                    <div className="mobile-timeline-line"></div>
-                                                </div>
-                                                <div className="mobile-event-details">
-                                                    <h4>{event.summary}</h4>
-                                                    {event.location && (
-                                                        <span className="event-location">📍 {event.location}</span>
-                                                    )}
-                                                </div>
-                                            </div>
-                                        ))}
-                                </div>
-                            )}
-                        </div>
-
-                        {/* Mobile FAB Removed - Moved to Header */}
-                    </div>
-                </>
-            ) : (
-                <EventList events={events} />
-            )}
+            {/* ===== MOBILE VIEW ===== */}
+            <div className="cal-mobile-wrapper">
+                <MobileCalendarAgenda
+                    events={events}
+                    selectedDate={selectedDate}
+                    setSelectedDate={setSelectedDate}
+                    mobileWeekStart={mobileWeekStart}
+                    navigateMobileWeek={navigateMobileWeek}
+                    goToToday={goToToday}
+                    getDayEvents={getDayEvents}
+                    isSameDay={isSameDay}
+                    setSelectedEvent={setSelectedEvent}
+                    setIsModalOpen={setIsModalOpen}
+                    mobileDays={mobileDays}
+                />
+            </div>
 
             <EventModal
                 isOpen={isModalOpen}

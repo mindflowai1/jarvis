@@ -2,6 +2,7 @@ import { useState, useEffect, useRef } from 'react'
 import { supabase } from '../supabaseClient'
 import { motion, AnimatePresence } from 'framer-motion'
 import TaskModal from './TaskModal'
+import MobileTasksBoard from './Tasks/MobileTasksBoard'
 import '../Tasks.css'
 
 export default function Tasks({ session }) {
@@ -12,7 +13,6 @@ export default function Tasks({ session }) {
     const [isModalOpen, setIsModalOpen] = useState(false)
     const [editingTask, setEditingTask] = useState(null)
     const [filterDate, setFilterDate] = useState('')
-    const [activeTab, setActiveTab] = useState('todo') // 'todo' | 'done'
 
     useEffect(() => {
         fetchNotes()
@@ -173,188 +173,159 @@ export default function Tasks({ session }) {
 
     return (
         <div className="tasks-container">
-            {/* Mobile Header & Tabs */}
-            <div className="mobile-tasks-header">
-                <div className="mobile-header-top">
-                    <h2>Afazeres</h2>
-                    <div style={{ display: 'flex', gap: '8px' }}>
-                        {activeTab === 'done' && doneNotes.length > 0 && (
-                            <button
-                                className="mobile-add-btn mobile-clear-btn"
-                                onClick={handleClearCompleted}
-                                title="Esvaziar Lixeira"
-                                style={{ background: 'rgba(239, 68, 68, 0.2)', color: '#ef4444' }}
-                            >
-                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor">
-                                    <path strokeLinecap="round" strokeLinejoin="round" d="M14.74 9l-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 01-2.244 2.077H8.084a2.25 2.25 0 01-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 00-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 013.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 00-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 00-7.5 0" />
-                                </svg>
-                            </button>
-                        )}
-                        <button
-                            className="mobile-add-btn"
-                            onClick={() => {
-                                setEditingTask(null)
-                                setIsModalOpen(true)
-                            }}
-                        >
-                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="white">
-                                <path fillRule="evenodd" d="M12 3.75a.75.75 0 01.75.75v6.75h6.75a.75.75 0 010 1.5h-6.75v6.75a.75.75 0 01-1.5 0v-6.75H4.5a.75.75 0 010-1.5h6.75V4.5a.75.75 0 01.75-.75z" clipRule="evenodd" />
+            {/* ===== DESKTOP VIEW ===== */}
+            <div className="tasks-desktop-wrapper">
+                <div className="tasks-header">
+                    <h2>Meus Afazeres</h2>
+                    <div className="tasks-actions">
+                        <div className="filter-container">
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="filter-icon">
+                                <path strokeLinecap="round" strokeLinejoin="round" d="M6.75 3v2.25M17.25 3v2.25M3 18.75V7.5a2.25 2.25 0 012.25-2.25h13.5A2.25 2.25 0 0121 7.5v11.25m-18 0A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75m-18 0v-7.5A2.25 2.25 0 015.25 9h13.5A2.25 2.25 0 0121 11.25v7.5" />
+                            </svg>
+                            <div className="filter-input-wrapper">
+                                {!filterDate && <span className="filter-placeholder">Todos</span>}
+                                <input
+                                    type="date"
+                                    className={`filter-date-input ${!filterDate ? 'transparent-input' : ''}`}
+                                    value={filterDate}
+                                    onChange={(e) => setFilterDate(e.target.value)}
+                                    title="Filtrar por data"
+                                />
+                            </div>
+                            {filterDate && (
+                                <button
+                                    className="clear-filter-btn"
+                                    onClick={() => setFilterDate('')}
+                                    title="Mostrar Todos"
+                                >
+                                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor">
+                                        <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
+                                    </svg>
+                                </button>
+                            )}
+                        </div>
+
+                        <button className="add-btn" onClick={() => {
+                            setEditingTask(null)
+                            setIsModalOpen(true)
+                        }}>
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor">
+                                <path strokeLinecap="round" strokeLinejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
+                            </svg>
+                            Nova Tarefa
+                        </button>
+                        <button className="refresh-btn" onClick={fetchNotes} title="Atualizar">
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor">
+                                <path strokeLinecap="round" strokeLinejoin="round" d="M16.023 9.348h4.992v-.001M2.985 19.644v-4.992m0 0h4.992m-4.993 0l3.181 3.183a8.25 8.25 0 0013.803-3.7M4.031 9.865a8.25 8.25 0 0113.803-3.7l3.181 3.182m0-4.991v4.99" />
                             </svg>
                         </button>
                     </div>
                 </div>
-                <div className="mobile-tabs">
-                    <button
-                        className={`tab-btn ${activeTab === 'todo' ? 'active' : ''}`}
-                        onClick={() => setActiveTab('todo')}
+
+                {error && <div className="error-message">{error}</div>}
+
+                <div className="kanban-board">
+                    {/* Column: To Do */}
+                    <div
+                        className="kanban-column todo-column"
+                        style={{ zIndex: todoNotes.some(n => n.id === draggingId) ? 20 : 1 }}
                     >
-                        A Fazer <span className="tab-badge">{todoNotes.length}</span>
-                    </button>
-                    <button
-                        className={`tab-btn ${activeTab === 'done' ? 'active' : ''}`}
-                        onClick={() => setActiveTab('done')}
+                        <div className="column-header">
+                            <h3>A Fazer</h3>
+                            <span className="count-badge">{todoNotes.length}</span>
+                        </div>
+                        <motion.div className="column-content">
+                            <AnimatePresence>
+                                {todoNotes.map((note) => (
+                                    <KanbanCard
+                                        key={note.id}
+                                        note={note}
+                                        formatDate={formatDate}
+                                        setDraggingId={setDraggingId}
+                                        onEdit={() => {
+                                            setEditingTask(note)
+                                            setIsModalOpen(true)
+                                        }}
+                                        onDelete={() => handleDeleteTask(note.id)}
+                                        onDragEnd={(e, info) => {
+                                            if (info.offset.x > 100) updateTaskStatus(note.id, true)
+                                        }}
+                                    />
+                                ))}
+                            </AnimatePresence>
+                            {todoNotes.length === 0 && (
+                                <div className="empty-column-state">
+                                    <p>{filterDate ? 'Nenhuma tarefa para esta data' : 'Tudo feito! 🎉'}</p>
+                                </div>
+                            )}
+                        </motion.div>
+                    </div>
+
+                    {/* Column: Done */}
+                    <div
+                        className="kanban-column done-column"
+                        style={{ zIndex: doneNotes.some(n => n.id === draggingId) ? 20 : 1 }}
                     >
-                        Concluídos <span className="tab-badge">{doneNotes.length}</span>
-                    </button>
+                        <div className="column-header">
+                            <div className="column-header-left">
+                                <h3>Concluído</h3>
+                                <span className="count-badge">{doneNotes.length}</span>
+                            </div>
+                            {doneNotes.length > 0 && (
+                                <button
+                                    className="clear-completed-btn"
+                                    onClick={handleClearCompleted}
+                                    title="Esvaziar tarefas concluídas"
+                                >
+                                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor">
+                                        <path strokeLinecap="round" strokeLinejoin="round" d="M14.74 9l-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 01-2.244 2.077H8.084a2.25 2.25 0 01-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 00-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 013.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 00-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 00-7.5 0" />
+                                    </svg>
+                                    Esvaziar
+                                </button>
+                            )}
+                        </div>
+                        <motion.div className="column-content">
+                            <AnimatePresence>
+                                {doneNotes.map((note) => (
+                                    <KanbanCard
+                                        key={note.id}
+                                        note={note}
+                                        formatDate={formatDate}
+                                        isDone={true}
+                                        setDraggingId={setDraggingId}
+                                        onEdit={() => {
+                                            setEditingTask(note)
+                                            setIsModalOpen(true)
+                                        }}
+                                        onDelete={() => handleDeleteTask(note.id)}
+                                        onDragEnd={(e, info) => {
+                                            if (info.offset.x < -100) updateTaskStatus(note.id, false)
+                                        }}
+                                    />
+                                ))}
+                            </AnimatePresence>
+                            {doneNotes.length === 0 && (
+                                <div className="empty-column-state">
+                                    <p>{filterDate ? 'Nenhuma tarefa concluída nesta data' : 'Nenhuma tarefa concluída'}</p>
+                                </div>
+                            )}
+                        </motion.div>
+                    </div>
                 </div>
             </div>
 
-            <div className="tasks-header desktop-only">
-                <h2>Meus Afazeres</h2>
-                <div className="tasks-actions">
-                    <div className="filter-container">
-                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="filter-icon">
-                            <path strokeLinecap="round" strokeLinejoin="round" d="M6.75 3v2.25M17.25 3v2.25M3 18.75V7.5a2.25 2.25 0 012.25-2.25h13.5A2.25 2.25 0 0121 7.5v11.25m-18 0A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75m-18 0v-7.5A2.25 2.25 0 015.25 9h13.5A2.25 2.25 0 0121 11.25v7.5" />
-                        </svg>
-                        <div className="filter-input-wrapper">
-                            {!filterDate && <span className="filter-placeholder">Todos</span>}
-                            <input
-                                type="date"
-                                className={`filter-date-input ${!filterDate ? 'transparent-input' : ''}`}
-                                value={filterDate}
-                                onChange={(e) => setFilterDate(e.target.value)}
-                                title="Filtrar por data"
-                            />
-                        </div>
-                        {filterDate && (
-                            <button
-                                className="clear-filter-btn"
-                                onClick={() => setFilterDate('')}
-                                title="Mostrar Todos"
-                            >
-                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor">
-                                    <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
-                                </svg>
-                            </button>
-                        )}
-                    </div>
-
-                    <button className="add-btn" onClick={() => {
-                        setEditingTask(null)
-                        setIsModalOpen(true)
-                    }}>
-                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor">
-                            <path strokeLinecap="round" strokeLinejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
-                        </svg>
-                        Nova Tarefa
-                    </button>
-                    <button className="refresh-btn" onClick={fetchNotes} title="Atualizar">
-                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor">
-                            <path strokeLinecap="round" strokeLinejoin="round" d="M16.023 9.348h4.992v-.001M2.985 19.644v-4.992m0 0h4.992m-4.993 0l3.181 3.183a8.25 8.25 0 0013.803-3.7M4.031 9.865a8.25 8.25 0 0113.803-3.7l3.181 3.182m0-4.991v4.99" />
-                        </svg>
-                    </button>
-                </div>
-            </div>
-
-            {error && <div className="error-message">{error}</div>}
-
-            <div className="kanban-board">
-                {/* Column: To Do */}
-                <div
-                    className={`kanban-column todo-column ${activeTab !== 'todo' ? 'mobile-hidden' : ''}`}
-                    style={{ zIndex: todoNotes.some(n => n.id === draggingId) ? 20 : 1 }}
-                >
-                    <div className="column-header">
-                        <h3>A Fazer</h3>
-                        <span className="count-badge">{todoNotes.length}</span>
-                    </div>
-                    <motion.div className="column-content">
-                        <AnimatePresence>
-                            {todoNotes.map((note) => (
-                                <KanbanCard
-                                    key={note.id}
-                                    note={note}
-                                    formatDate={formatDate}
-                                    setDraggingId={setDraggingId}
-                                    onEdit={() => {
-                                        setEditingTask(note)
-                                        setIsModalOpen(true)
-                                    }}
-                                    onDelete={() => handleDeleteTask(note.id)}
-                                    onDragEnd={(e, info) => {
-                                        if (info.offset.x > 100) updateTaskStatus(note.id, true)
-                                    }}
-                                />
-                            ))}
-                        </AnimatePresence>
-                        {todoNotes.length === 0 && (
-                            <div className="empty-column-state">
-                                <p>{filterDate ? 'Nenhuma tarefa para esta data' : 'Tudo feito! 🎉'}</p>
-                            </div>
-                        )}
-                    </motion.div>
-                </div>
-
-                {/* Column: Done */}
-                <div
-                    className={`kanban-column done-column ${activeTab !== 'done' ? 'mobile-hidden' : ''}`}
-                    style={{ zIndex: doneNotes.some(n => n.id === draggingId) ? 20 : 1 }}
-                >
-                    <div className="column-header">
-                        <div className="column-header-left">
-                            <h3>Concluído</h3>
-                            <span className="count-badge">{doneNotes.length}</span>
-                        </div>
-                        {doneNotes.length > 0 && (
-                            <button
-                                className="clear-completed-btn"
-                                onClick={handleClearCompleted}
-                                title="Esvaziar tarefas concluídas"
-                            >
-                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor">
-                                    <path strokeLinecap="round" strokeLinejoin="round" d="M14.74 9l-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 01-2.244 2.077H8.084a2.25 2.25 0 01-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 00-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 013.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 00-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 00-7.5 0" />
-                                </svg>
-                                Esvaziar
-                            </button>
-                        )}
-                    </div>
-                    <motion.div className="column-content">
-                        <AnimatePresence>
-                            {doneNotes.map((note) => (
-                                <KanbanCard
-                                    key={note.id}
-                                    note={note}
-                                    formatDate={formatDate}
-                                    isDone={true}
-                                    setDraggingId={setDraggingId}
-                                    onEdit={() => {
-                                        setEditingTask(note)
-                                        setIsModalOpen(true)
-                                    }}
-                                    onDelete={() => handleDeleteTask(note.id)}
-                                    onDragEnd={(e, info) => {
-                                        if (info.offset.x < -100) updateTaskStatus(note.id, false)
-                                    }}
-                                />
-                            ))}
-                        </AnimatePresence>
-                        {doneNotes.length === 0 && (
-                            <div className="empty-column-state">
-                                <p>{filterDate ? 'Nenhuma tarefa concluída nesta data' : 'Nenhuma tarefa concluída'}</p>
-                            </div>
-                        )}
-                    </motion.div>
-                </div>
+            {/* ===== MOBILE VIEW ===== */}
+            <div className="tasks-mobile-wrapper">
+                <MobileTasksBoard
+                    todoNotes={todoNotes}
+                    doneNotes={doneNotes}
+                    updateTaskStatus={updateTaskStatus}
+                    handleDeleteTask={handleDeleteTask}
+                    handleClearCompleted={handleClearCompleted}
+                    formatDate={formatDate}
+                    setIsModalOpen={setIsModalOpen}
+                    setEditingTask={setEditingTask}
+                />
             </div>
 
             <TaskModal
