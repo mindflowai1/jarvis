@@ -7,8 +7,12 @@ export default function EventModal({ isOpen, onClose, onSave, onDelete, initialE
     const [title, setTitle] = useState('')
     const [description, setDescription] = useState('')
     const [location, setLocation] = useState('')
-    const [start, setStart] = useState('')
-    const [end, setEnd] = useState('')
+
+    // Split state for separate inputs
+    const [startDate, setStartDate] = useState('')
+    const [startTime, setStartTime] = useState('')
+    const [endDate, setEndDate] = useState('')
+    const [endTime, setEndTime] = useState('')
 
     useEffect(() => {
         if (isOpen) {
@@ -17,12 +21,17 @@ export default function EventModal({ isOpen, onClose, onSave, onDelete, initialE
                 setDescription(initialEvent.description || '')
                 setLocation(initialEvent.location || '')
 
-                // Format dates for datetime-local input
-                const startDate = new Date(initialEvent.start.dateTime || initialEvent.start.date)
-                const endDate = new Date(initialEvent.end.dateTime || initialEvent.end.date)
+                // Format dates for inputs
+                const startObj = new Date(initialEvent.start.dateTime || initialEvent.start.date)
+                const endObj = new Date(initialEvent.end.dateTime || initialEvent.end.date)
 
-                setStart(formatForInput(startDate))
-                setEnd(formatForInput(endDate))
+                const { date: sDate, time: sTime } = formatDateTime(startObj)
+                const { date: eDate, time: eTime } = formatDateTime(endObj)
+
+                setStartDate(sDate)
+                setStartTime(sTime)
+                setEndDate(eDate)
+                setEndTime(eTime)
             } else {
                 // Default new event: starts now, ends in 1 hour
                 const now = new Date()
@@ -30,31 +39,43 @@ export default function EventModal({ isOpen, onClose, onSave, onDelete, initialE
                 const nextHour = new Date(now)
                 nextHour.setHours(now.getHours() + 1)
 
+                const { date: sDate, time: sTime } = formatDateTime(now)
+                const { date: eDate, time: eTime } = formatDateTime(nextHour)
+
                 setTitle('')
                 setDescription('')
                 setLocation('')
-                setStart(formatForInput(now))
-                setEnd(formatForInput(nextHour))
+                setStartDate(sDate)
+                setStartTime(sTime)
+                setEndDate(eDate)
+                setEndTime(eTime)
             }
         }
     }, [isOpen, initialEvent])
 
-    const formatForInput = (date) => {
-        if (!date) return ''
+    const formatDateTime = (date) => {
+        if (!date) return { date: '', time: '' }
         const offset = date.getTimezoneOffset()
         const localDate = new Date(date.getTime() - (offset * 60 * 1000))
-        return localDate.toISOString().slice(0, 16)
+        const iso = localDate.toISOString()
+        return {
+            date: iso.slice(0, 10),
+            time: iso.slice(11, 16)
+        }
     }
 
     const handleSubmit = (e) => {
         e.preventDefault()
 
+        const startDateTime = new Date(`${startDate}T${startTime}:00`)
+        const endDateTime = new Date(`${endDate}T${endTime}:00`)
+
         const eventData = {
             summary: title,
             description,
             location,
-            start: { dateTime: new Date(start).toISOString() },
-            end: { dateTime: new Date(end).toISOString() }
+            start: { dateTime: startDateTime.toISOString() },
+            end: { dateTime: endDateTime.toISOString() }
         }
 
         onSave(eventData)
@@ -99,24 +120,43 @@ export default function EventModal({ isOpen, onClose, onSave, onDelete, initialE
                                 />
                             </div>
 
-                            <div className="form-row">
-                                <div className="form-group">
-                                    <label>Início</label>
+                            <div className="form-group">
+                                <label>Início</label>
+                                <div className="form-row" style={{ display: 'flex', gap: '12px' }}>
                                     <input
-                                        type="datetime-local"
-                                        value={start}
-                                        onChange={(e) => setStart(e.target.value)}
+                                        type="date"
+                                        value={startDate}
+                                        onChange={(e) => setStartDate(e.target.value)}
                                         required
+                                        style={{ flex: 2 }}
+                                    />
+                                    <input
+                                        type="time"
+                                        value={startTime}
+                                        onChange={(e) => setStartTime(e.target.value)}
+                                        required
+                                        style={{ flex: 1 }}
                                     />
                                 </div>
-                                <div className="form-group">
-                                    <label>Fim</label>
+                            </div>
+
+                            <div className="form-group">
+                                <label>Fim</label>
+                                <div className="form-row" style={{ display: 'flex', gap: '12px' }}>
                                     <input
-                                        type="datetime-local"
-                                        value={end}
-                                        onChange={(e) => setEnd(e.target.value)}
+                                        type="date"
+                                        value={endDate}
+                                        onChange={(e) => setEndDate(e.target.value)}
                                         required
-                                        min={start}
+                                        min={startDate}
+                                        style={{ flex: 2 }}
+                                    />
+                                    <input
+                                        type="time"
+                                        value={endTime}
+                                        onChange={(e) => setEndTime(e.target.value)}
+                                        required
+                                        style={{ flex: 1 }}
                                     />
                                 </div>
                             </div>
