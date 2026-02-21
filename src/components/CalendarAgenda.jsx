@@ -41,11 +41,19 @@ const CalendarAgenda = ({ session }) => {
     const accessTokenCache = useRef(null)
     const timeGridRef = useRef(null)
     const HOUR_HEIGHT = 120 // Altura em pixels de cada hora
+    const [currentTime, setCurrentTime] = useState(new Date())
+
+    // Update current time every minute
+    useEffect(() => {
+        const timer = setInterval(() => {
+            setCurrentTime(new Date())
+        }, 60000)
+        return () => clearInterval(timer)
+    }, [])
 
     function getStartOfWeek(date) {
         const d = new Date(date)
-        const day = d.getDay()
-        const diff = d.getDate() - day
+        const diff = d.getDate() - 3
         return new Date(d.setDate(diff))
     }
 
@@ -316,22 +324,45 @@ const CalendarAgenda = ({ session }) => {
         }
     }
 
-    useEffect(() => {
-        if (!loading && timeGridRef.current && viewMode === 'grid') {
-            setTimeout(() => {
-                const now = new Date()
-                const currentHour = now.getHours()
-                const currentTimePosition = (currentHour * HOUR_HEIGHT)
-                const containerHeight = timeGridRef.current.clientHeight
-                const scrollPosition = currentTimePosition - (containerHeight / 2)
+    // Abordagem reforçada para garantir o scroll no horário atual
+    const performScrollToNow = (behavior = 'auto') => {
+        if (!timeGridRef.current) return
 
-                timeGridRef.current.scrollTo({
-                    top: Math.max(0, scrollPosition),
-                    behavior: 'smooth'
-                })
-            }, 100)
+        const now = new Date()
+        const isCurrentWeek = weekDays.some(d => isSameDay(d, now))
+
+        // Foca no horário atual se for a semana de hoje, caso contrário foca no horário comercial (8h)
+        const targetHour = isCurrentWeek ? now.getHours() : 8
+        const targetMin = isCurrentWeek ? now.getMinutes() : 0
+
+        // Calcula a posição (150px de margem no topo para contexto)
+        const position = (targetHour * HOUR_HEIGHT) + (targetMin * HOUR_HEIGHT / 60) - 150
+        const finalPos = Math.max(0, position)
+
+        console.log('Scrolling to position:', finalPos, 'isCurrentWeek:', isCurrentWeek)
+
+        try {
+            timeGridRef.current.scrollTo({
+                top: finalPos,
+                behavior: behavior
+            })
+        } catch (e) {
+            timeGridRef.current.scrollTop = finalPos
         }
-    }, [loading, viewMode])
+    }
+
+    useEffect(() => {
+        if (!loading && viewMode === 'grid' && timeGridRef.current) {
+            // Sequência de tentativas para garantir que o scroll aconteça após o render completo
+            const timers = [
+                setTimeout(() => performScrollToNow('auto'), 100),   // Imediato sem animação
+                setTimeout(() => performScrollToNow('smooth'), 500), // Suave após renderização
+                setTimeout(() => performScrollToNow('smooth'), 1500) // Backup extra
+            ]
+
+            return () => timers.forEach(t => clearTimeout(t))
+        }
+    }, [loading, viewMode, weekStart, events.length])
 
 
     const weekDays = Array.from({ length: 7 }, (_, i) => addDays(weekStart, i))
@@ -342,14 +373,18 @@ const CalendarAgenda = ({ session }) => {
         const start = new Date(event.start.dateTime || event.start.date)
         const end = new Date(event.end.dateTime || event.end.date)
 
-        const dayOfWeek = start.getDay()
+        // Calcula a diferença de dias entre a data do evento e o inicio da semana que esta em exibicao
+        const startDay = new Date(start.getFullYear(), start.getMonth(), start.getDate());
+        const weekStartDay = new Date(weekStart.getFullYear(), weekStart.getMonth(), weekStart.getDate());
+        const dayOffset = Math.round((startDay - weekStartDay) / (1000 * 60 * 60 * 24));
+
         const startHour = start.getHours()
         const startMin = start.getMinutes()
         const endHour = end.getHours()
         const endMin = end.getMinutes()
 
         const dayWidth = 100 / 7
-        const left = dayOfWeek * dayWidth
+        const left = dayOffset * dayWidth
         const top = (startHour * HOUR_HEIGHT) + (startMin * HOUR_HEIGHT / 60)
 
         const durationMinutes = (endHour * 60 + endMin) - (startHour * 60 + startMin)
@@ -446,6 +481,15 @@ const CalendarAgenda = ({ session }) => {
                     <div className="nav-buttons">
                         <button onClick={() => navigateWeek(-1)}>&lt;</button>
                         <button className="today-btn-desktop" onClick={goToToday}>Hoje</button>
+                        <button
+                            className="focus-now-btn"
+                            onClick={() => performScrollToNow('smooth')}
+                            title="Focar no horário atual"
+                        >
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor">
+                                <path strokeLinecap="round" strokeLinejoin="round" d="M12 6v6h4.5m4.5 0a9 9 0 11-18 0 9 9 0 0118 0z" />
+                            </svg>
+                        </button>
                         <span>{weekStart.toLocaleDateString('pt-BR')} - {addDays(weekStart, 6).toLocaleDateString('pt-BR')}</span>
                         <button onClick={() => navigateWeek(1)}>&gt;</button>
                     </div>
@@ -505,12 +549,38 @@ const CalendarAgenda = ({ session }) => {
 
                             <div className="days-grid">
                                 {weekDays.map((d, dayIndex) => (
-                                    <div key={dayIndex} className="day-column">
-                                        {hours.map(h => (
-                                            <div key={h} className="hour-cell"></div>
-                                        ))}
+                                    <div key={dayIndex} className={`day-column ${isSameDay(d, currentTime) ? 'today-column' : ''}`}>
+                                        {hours.map(h => {
+                                            const isPast = isSameDay(d, currentTime) && h < currentTime.getHours()
+                                            const isCurrent = isSameDay(d, currentTime) && h === currentTime.getHours()
+
+                                            return (
+                                                <div
+                                                    key={h}
+                                                    className={`hour-cell ${isPast ? 'past-hour' : ''} ${isCurrent ? 'current-hour-cell' : ''}`}
+                                                >
+                                                    {isCurrent && <div className="hour-focus-glow" />}
+                                                </div>
+                                            )
+                                        })}
                                     </div>
                                 ))}
+
+                                {weekDays.some(d => isSameDay(d, currentTime)) && (
+                                    <div
+                                        className="current-time-indicator"
+                                        style={{
+                                            top: `${(currentTime.getHours() * HOUR_HEIGHT) + (currentTime.getMinutes() * HOUR_HEIGHT / 60)}px`
+                                        }}
+                                    >
+                                        <div className="indicator-line"></div>
+                                        <div className="indicator-dot">
+                                            <span className="indicator-time">
+                                                {currentTime.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' })}
+                                            </span>
+                                        </div>
+                                    </div>
+                                )}
 
                                 {events.map(event => {
                                     const pos = getEventPosition(event)

@@ -325,6 +325,8 @@ export default function Tasks({ session }) {
                     formatDate={formatDate}
                     setIsModalOpen={setIsModalOpen}
                     setEditingTask={setEditingTask}
+                    filterDate={filterDate}
+                    setFilterDate={setFilterDate}
                 />
             </div>
 

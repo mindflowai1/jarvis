@@ -4,6 +4,8 @@ import './PhoneNumberModal.css'
 
 const PhoneNumberModal = ({ session, onSave, onClose }) => {
     const [phone, setPhone] = useState('')
+    const [password, setPassword] = useState('')
+    const [confirmPassword, setConfirmPassword] = useState('')
     const [loading, setLoading] = useState(false)
     const [error, setError] = useState(null)
 
@@ -38,10 +40,29 @@ const PhoneNumberModal = ({ session, onSave, onClose }) => {
             return
         }
 
+        if (password.length < 6) {
+            setError('A senha deve ter pelo menos 6 caracteres')
+            return
+        }
+
+        if (password !== confirmPassword) {
+            setError('As senhas não coincidem')
+            return
+        }
+
         setLoading(true)
         setError(null)
 
         try {
+            // Atualiza a senha no Supabase Auth
+            const { error: passwordError } = await supabase.auth.updateUser({
+                password: password
+            })
+
+            if (passwordError) {
+                throw new Error(passwordError.message || 'Erro ao definir a senha')
+            }
+
             // Remove formatação e adiciona código do país (+55)
             const rawPhone = phone.replace(/\D/g, '')
             const phoneWithCountryCode = `55${rawPhone}` // +55 (Brasil)
@@ -57,7 +78,7 @@ const PhoneNumberModal = ({ session, onSave, onClose }) => {
             // Pega o nome do usuário dos metadados
             const userName = session.user.user_metadata?.full_name || session.user.email?.split('@')[0] || 'Usuário'
 
-            console.log('💾 Updating phone for user:', session.user.id)
+            console.log('💾 Updating profile for user:', session.user.id)
 
             // Usa UPDATE direto, pois o trigger já criou o registro
             const { data, error: dbError } = await supabase
@@ -115,8 +136,8 @@ const PhoneNumberModal = ({ session, onSave, onClose }) => {
                     </svg>
                 </div>
 
-                <h2>Cadastro de Celular</h2>
-                <p>Para continuar, precisamos que você vincule seu número de WhatsApp à sua conta.</p>
+                <h2>Configuração de Conta</h2>
+                <p>Para continuar, defina sua senha e vincule seu número de WhatsApp.</p>
 
                 <div className="phone-input-group">
                     <label className="phone-input-label">Seu número de WhatsApp</label>
@@ -133,20 +154,51 @@ const PhoneNumberModal = ({ session, onSave, onClose }) => {
                             disabled={loading}
                         />
                     </div>
-                    {error && (
-                        <div className="error-message">
-                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" width="16" height="16">
-                                <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
-                            </svg>
-                            {error}
-                        </div>
-                    )}
                 </div>
+
+                <div className="phone-input-group" style={{ marginBottom: '1rem' }}>
+                    <label className="phone-input-label">Definir Nova Senha</label>
+                    <div className="phone-input-wrapper" style={{ paddingLeft: 0 }}>
+                        <input
+                            type="password"
+                            className={`phone-input ${error && error.includes('senha') ? 'error' : ''}`}
+                            style={{ paddingLeft: '1rem' }}
+                            placeholder="Mínimo de 6 caracteres"
+                            value={password}
+                            onChange={(e) => setPassword(e.target.value)}
+                            disabled={loading}
+                        />
+                    </div>
+                </div>
+
+                <div className="phone-input-group" style={{ marginBottom: '2rem' }}>
+                    <label className="phone-input-label">Confirmar Senha</label>
+                    <div className="phone-input-wrapper" style={{ paddingLeft: 0 }}>
+                        <input
+                            type="password"
+                            className={`phone-input ${error && error.includes('coincidem') ? 'error' : ''}`}
+                            style={{ paddingLeft: '1rem' }}
+                            placeholder="Repita a senha"
+                            value={confirmPassword}
+                            onChange={(e) => setConfirmPassword(e.target.value)}
+                            disabled={loading}
+                        />
+                    </div>
+                </div>
+
+                {error && (
+                    <div className="error-message" style={{ marginBottom: '1rem' }}>
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" width="16" height="16">
+                            <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
+                        </svg>
+                        {error}
+                    </div>
+                )}
 
                 <button
                     className="save-btn"
                     onClick={handleSave}
-                    disabled={loading || phone.length < 15}
+                    disabled={loading || phone.length < 15 || password.length < 6 || confirmPassword.length < 6}
                 >
                     {loading ? (
                         <>

@@ -1,77 +1,36 @@
 import React from 'react';
 
-
-import { motion } from 'framer-motion';
-
-import { useTypewriter } from '../hooks/useTypewriter';
-
 const LandingPageHero = () => {
-    const dynamicText = useTypewriter([
-        'sua vida financeira',
-        'sua agenda',
-        'suas tarefas'
-    ]);
-
     return (
-        <div id="hero" className="relative flex items-center pt-24 pb-12 lg:pb-20 overflow-hidden bg-background-ocean">
+        <div id="hero" className="relative min-h-screen flex items-center pt-32 pb-24 lg:pb-32 overflow-hidden bg-background-ocean">
             <div className="absolute top-0 right-0 w-3/4 h-3/4 bg-[radial-gradient(circle_at_50%_50%,_rgba(37,212,102,0.15)_0%,_rgba(2,12,27,0)_70%)] blur-3xl opacity-50 pointer-events-none -z-10"></div>
             <div className="absolute bottom-0 left-0 w-[500px] h-[500px] bg-primary/5 rounded-full blur-[100px] pointer-events-none -z-10"></div>
 
             <div className="max-w-7xl mx-auto px-6 w-full grid lg:grid-cols-2 gap-12 lg:gap-20 items-center">
-                <motion.div
-                    initial={{ opacity: 0, x: -50 }}
-                    animate={{ opacity: 1, x: 0 }}
-                    transition={{ duration: 0.8, ease: "easeOut" }}
-                    className="flex flex-col gap-8 items-start relative z-10"
-                >
-                    <motion.div
-                        initial={{ opacity: 0, y: 20 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        transition={{ delay: 0.2, duration: 0.6 }}
-                        className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full border border-primary/20 bg-primary/5 text-primary text-xs font-semibold"
-                    >
+                <div className="flex flex-col gap-8 items-start relative z-10">
+                    <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full border border-primary/20 bg-primary/5 text-primary text-xs font-semibold animate-fade-in-up">
                         <span className="w-1.5 h-1.5 rounded-full bg-primary animate-pulse"></span>
                         Novo: Integração com Google Calendar lançada 🚀
-                    </motion.div>
+                    </div>
                     <div className="flex flex-col gap-4">
-                        <h1 className="min-h-[4.5em] text-white text-5xl lg:text-7xl font-display font-bold leading-[1.1] tracking-tight">
-                            A IA que organiza, em um áudio, <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#25d466] to-[#00d2ff]">{dynamicText}</span><span className="text-primary animate-pulse w-1 inline-block">|</span>
+                        <h1 className="text-white text-5xl lg:text-7xl font-display font-bold leading-[1.1] tracking-tight">
+                            Sua vida financeira organizada em <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#25d466] to-[#00d2ff]">um áudio.</span>
                         </h1>
                         <p className="text-slate-400 text-lg leading-relaxed max-w-xl">
                             O assistente de IA que vive no seu WhatsApp. Envie uma mensagem de voz para registrar gastos, agendar pagamentos e visualizar gráficos. Sem apps complexos.
                         </p>
                     </div>
-                    <motion.div
-                        initial={{ opacity: 0, y: 20 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        transition={{ delay: 0.4, duration: 0.6 }}
-                        className="flex flex-col sm:flex-row gap-4 w-full sm:w-auto"
-                    >
-                        <motion.button
-                            whileHover={{ scale: 1.05 }}
-                            whileTap={{ scale: 0.95 }}
-                            onClick={() => window.open('https://wa.me/5511999999999', '_blank')}
-                            className="group flex items-center justify-center gap-3 h-14 px-8 rounded-full bg-primary hover:bg-primary-dark text-[#020c1b] text-base font-bold transition-all duration-300 shadow-[0_0_25px_rgba(37,212,102,0.25)] hover:shadow-[0_0_40px_rgba(37,212,102,0.4)]"
-                        >
+                    <div className="flex flex-col sm:flex-row gap-4 w-full sm:w-auto">
+                        <button className="group flex items-center justify-center gap-3 h-14 px-8 rounded-full bg-primary hover:bg-primary-dark text-[#020c1b] text-base font-bold transition-all duration-300 shadow-[0_0_25px_rgba(37,212,102,0.25)] hover:shadow-[0_0_40px_rgba(37,212,102,0.4)]">
                             <span className="material-symbols-outlined text-xl">chat</span>
                             <span>Começar Agora — É Grátis</span>
-                        </motion.button>
-                        <motion.button
-                            whileHover={{ scale: 1.05 }}
-                            whileTap={{ scale: 0.95 }}
-                            onClick={() => document.getElementById('dashboard')?.scrollIntoView({ behavior: 'smooth' })}
-                            className="flex items-center justify-center gap-2 h-14 px-8 rounded-full border border-slate-700 hover:border-slate-500 hover:bg-slate-800/50 text-white text-base font-bold transition-all duration-300"
-                        >
+                        </button>
+                        <button className="flex items-center justify-center gap-2 h-14 px-8 rounded-full border border-slate-700 hover:border-slate-500 hover:bg-slate-800/50 text-white text-base font-bold transition-all duration-300">
                             <span className="material-symbols-outlined text-xl">play_circle</span>
-                            <span>Ver Demo</span>
-                        </motion.button>
-                    </motion.div>
-                    <motion.div
-                        initial={{ opacity: 0 }}
-                        animate={{ opacity: 1 }}
-                        transition={{ delay: 0.6, duration: 0.8 }}
-                        className="flex flex-col gap-4 pt-4"
-                    >
+                            <span>Ver Demo em Vídeo</span>
+                        </button>
+                    </div>
+                    <div className="flex flex-col gap-4 pt-4">
                         <p className="text-slate-500 text-sm font-medium">Aprovado por +10.000 usuários de empresas como</p>
                         <div className="flex flex-wrap items-center gap-6 opacity-60 grayscale hover:grayscale-0 hover:opacity-100 transition-all duration-500">
                             <div className="h-6 w-auto flex items-center text-white font-display font-bold text-lg">Google</div>
@@ -82,27 +41,17 @@ const LandingPageHero = () => {
                             <div className="w-px h-4 bg-slate-700"></div>
                             <div className="h-6 w-auto flex items-center text-white font-display font-bold text-lg">Stone</div>
                         </div>
-                    </motion.div>
-                </motion.div>
+                    </div>
+                </div>
 
                 {/* Right Side - Phone Mockup */}
-                <motion.div
-                    initial={{ opacity: 0, x: 50, rotate: 5 }}
-                    animate={{ opacity: 1, x: 0, rotate: 0 }}
-                    transition={{ duration: 1, ease: "easeOut", delay: 0.2 }}
-                    className="relative flex justify-center lg:justify-end min-h-[680px] lg:h-[800px] items-center mt-12 lg:mt-0"
-                >
+                <div className="relative flex justify-center lg:justify-end min-h-[680px] lg:h-[800px] items-center mt-12 lg:mt-0">
 
                     {/* Main Scale Wrapper for Responsiveness */}
                     <div className="relative scale-90 sm:scale-100 transition-transform duration-300">
 
                         {/* Floating Widgets */}
-                        <motion.div
-                            initial={{ y: 20, opacity: 0 }}
-                            animate={{ y: 0, opacity: 1 }}
-                            transition={{ delay: 1, duration: 0.8 }}
-                            className="absolute top-10 left-0 lg:-left-8 z-20 animate-float glass-panel p-4 rounded-2xl flex items-center gap-4 max-w-[220px] shadow-2xl"
-                        >
+                        <div className="absolute top-10 left-0 lg:-left-8 z-20 animate-float glass-panel p-4 rounded-2xl flex items-center gap-4 max-w-[220px] shadow-2xl">
                             <div className="size-10 rounded-full bg-blue-500/20 flex items-center justify-center text-blue-400">
                                 <span className="material-symbols-outlined">calendar_month</span>
                             </div>
@@ -110,14 +59,9 @@ const LandingPageHero = () => {
                                 <span className="text-xs text-slate-400">Google Calendar</span>
                                 <span className="text-sm text-white font-bold">Fatura Sincronizada</span>
                             </div>
-                        </motion.div>
+                        </div>
 
-                        <motion.div
-                            initial={{ y: 20, opacity: 0 }}
-                            animate={{ y: 0, opacity: 1 }}
-                            transition={{ delay: 1.2, duration: 0.8 }}
-                            className="absolute bottom-20 right-0 lg:-right-4 z-20 animate-float-delayed glass-panel p-4 rounded-2xl flex flex-col gap-2 shadow-2xl border border-primary/20"
-                        >
+                        <div className="absolute bottom-20 right-0 lg:-right-4 z-20 animate-float-delayed glass-panel p-4 rounded-2xl flex flex-col gap-2 shadow-2xl border border-primary/20">
                             <div className="flex justify-between items-center gap-8">
                                 <span className="text-xs text-slate-400">Economia Mensal</span>
                                 <span className="text-xs text-primary font-bold flex items-center">
@@ -131,7 +75,7 @@ const LandingPageHero = () => {
                                 <div className="w-2 bg-primary/20 rounded-t-sm h-[70%]"></div>
                                 <div className="w-2 bg-primary rounded-t-sm h-[85%] shadow-[0_0_10px_rgba(37,212,102,0.5)]"></div>
                             </div>
-                        </motion.div>
+                        </div>
 
                         <div className="relative z-10">
                             <div className="absolute -inset-6 bg-gradient-to-tr from-[#25D366] to-[#00d2ff] rounded-[3.5rem] blur-2xl opacity-50 animate-pulse-glow"></div>
@@ -164,12 +108,7 @@ const LandingPageHero = () => {
                                     </div>
 
                                     {/* User Message */}
-                                    <motion.div
-                                        initial={{ scale: 0.8, opacity: 0 }}
-                                        animate={{ scale: 1, opacity: 1 }}
-                                        transition={{ delay: 1.5, type: "spring" }}
-                                        className="relative z-10 self-end max-w-[85%] bg-[#005c4b] rounded-lg rounded-tr-none p-2 shadow-sm"
-                                    >
+                                    <div className="relative z-10 self-end max-w-[85%] bg-[#005c4b] rounded-lg rounded-tr-none p-2 shadow-sm">
                                         <div className="flex items-center gap-3 pr-2">
                                             <div className="text-[#aebac1]">
                                                 <span className="material-symbols-outlined text-3xl">account_circle</span>
@@ -196,15 +135,10 @@ const LandingPageHero = () => {
                                                 </div>
                                             </div>
                                         </div>
-                                    </motion.div>
+                                    </div>
 
                                     {/* Bot Message */}
-                                    <motion.div
-                                        initial={{ scale: 0.8, opacity: 0 }}
-                                        animate={{ scale: 1, opacity: 1 }}
-                                        transition={{ delay: 2.5, type: "spring" }}
-                                        className="relative z-10 self-start max-w-[85%] bg-[#202c33] rounded-lg rounded-tl-none p-3 shadow-sm"
-                                    >
+                                    <div className="relative z-10 self-start max-w-[85%] bg-[#202c33] rounded-lg rounded-tl-none p-3 shadow-sm">
                                         <div className="flex flex-col gap-2">
                                             <p className="text-white text-sm">Entendido! Registrei o gasto:</p>
                                             <div className="bg-[#182229] rounded p-2 border-l-4 border-primary">
@@ -217,15 +151,10 @@ const LandingPageHero = () => {
                                                 <span className="text-[#8696a0] text-[10px]">10:42</span>
                                             </div>
                                         </div>
-                                    </motion.div>
+                                    </div>
 
                                     {/* Chart Message */}
-                                    <motion.div
-                                        initial={{ scale: 0.8, opacity: 0 }}
-                                        animate={{ scale: 1, opacity: 1 }}
-                                        transition={{ delay: 3.5, type: "spring" }}
-                                        className="relative z-10 self-start max-w-[85%] bg-[#202c33] rounded-lg rounded-tl-none p-1 shadow-sm mt-1"
-                                    >
+                                    <div className="relative z-10 self-start max-w-[85%] bg-[#202c33] rounded-lg rounded-tl-none p-1 shadow-sm mt-1">
                                         <div className="bg-[#111b21] rounded p-3">
                                             <p className="text-[#8696a0] text-xs mb-2 uppercase tracking-wide font-bold">Gastos da Semana</p>
                                             <div className="flex items-end justify-between h-16 gap-1 px-1">
@@ -244,7 +173,7 @@ const LandingPageHero = () => {
                                         <div className="flex justify-end items-center gap-1 p-2 pb-1">
                                             <span className="text-[#8696a0] text-[10px]">10:43</span>
                                         </div>
-                                    </motion.div>
+                                    </div>
 
                                     {/* Input Area */}
                                     <div className="absolute bottom-16 left-0 w-full p-2 flex gap-2 items-center z-20">
@@ -266,7 +195,7 @@ const LandingPageHero = () => {
                             </div>
                         </div>
                     </div>
-                </motion.div>
+                </div>
             </div>
         </div>
     );

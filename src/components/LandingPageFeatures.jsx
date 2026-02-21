@@ -1,5 +1,4 @@
 import React from 'react';
-import ScrollReveal from './ScrollReveal';
 
 const LandingPageFeatures = () => {
     return (
@@ -12,8 +11,8 @@ const LandingPageFeatures = () => {
 
             <div className="max-w-7xl w-full grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-16 relative z-10 items-center">
                 {/* Left Column: Copy */}
-                <div className="lg:col-span-5 flex flex-col gap-8 order-2 lg:order-1">
-                    <ScrollReveal variant="fadeInLeft" className="space-y-6">
+                <div className="lg:col-span-12 xl:col-span-5 flex flex-col gap-8 order-2 lg:order-1">
+                    <div className="space-y-6 text-center lg:text-left">
                         <h2 className="text-4xl md:text-5xl lg:text-[52px] font-bold text-white leading-[1.1] tracking-tight font-display">
                             Você <span className="relative inline-block text-white">
                                 manda
@@ -30,49 +29,44 @@ const LandingPageFeatures = () => {
                                 O Controle-C elimina a adivinhação. Nossa IA transforma recibos físicos em inteligência financeira instantânea, permitindo que você assuma o comando de cada centavo sem levantar um dedo.
                             </p>
                         </div>
-                    </ScrollReveal>
+                    </div>
 
                     {/* Feature Bullets */}
-                    <div className="space-y-6 pt-4">
+                    <div className="space-y-6 pt-4 max-w-xl mx-auto lg:mx-0">
                         {[
                             { icon: 'document_scanner', title: 'Leitura de Notas Fiscais', desc: 'Digitalize instantaneamente qualquer comprovante via câmera com precisão de 99%.' },
                             { icon: 'pie_chart', title: 'Categorização Inteligente', desc: 'A IA identifica o estabelecimento e classifica seus gastos automaticamente em segundos.' },
                             { icon: 'notifications_active', title: 'Alertas de Orçamento', desc: 'Receba notificações proativas no WhatsApp antes de estourar seus limites mensais.' }
                         ].map((feature, idx) => (
-                            <ScrollReveal key={idx} variant="fadeInUp" delay={idx * 0.1}>
-                                <div className="group flex items-start gap-4 p-4 rounded-xl hover:bg-white/5 transition-colors duration-300 border border-transparent hover:border-white/5">
-                                    <div className="flex-shrink-0 w-12 h-12 rounded-full bg-[#19e664]/10 flex items-center justify-center text-[#19e664] group-hover:bg-[#19e664] group-hover:text-[#022c22] transition-colors">
-                                        <span className="material-symbols-outlined text-[24px]">{feature.icon}</span>
-                                    </div>
-                                    <div>
-                                        <h3 className="text-white text-lg font-bold mb-1 font-display">{feature.title}</h3>
-                                        <p className="text-sm text-slate-400 font-display">{feature.desc}</p>
-                                    </div>
+                            <div key={idx} className="group flex items-start gap-4 p-4 rounded-xl hover:bg-white/5 transition-colors duration-300 border border-transparent hover:border-white/5">
+                                <div className="flex-shrink-0 w-12 h-12 rounded-full bg-[#19e664]/10 flex items-center justify-center text-[#19e664] group-hover:bg-[#19e664] group-hover:text-[#022c22] transition-colors">
+                                    <span className="material-symbols-outlined text-[24px]">{feature.icon}</span>
                                 </div>
-                            </ScrollReveal>
+                                <div>
+                                    <h3 className="text-white text-lg font-bold mb-1 font-display">{feature.title}</h3>
+                                    <p className="text-sm text-slate-400 font-display">{feature.desc}</p>
+                                </div>
+                            </div>
                         ))}
                     </div>
 
-                    <ScrollReveal delay={0.4} className="pt-4">
-                        <button
-                            onClick={() => document.getElementById('dashboard')?.scrollIntoView({ behavior: 'smooth' })}
-                            className="group inline-flex items-center gap-3 text-[#19e664] font-bold text-lg hover:text-white transition-colors"
-                        >
+                    <div className="pt-4 text-center lg:text-left">
+                        <button className="group inline-flex items-center gap-3 text-[#19e664] font-bold text-lg hover:text-white transition-colors relative">
                             Ver automação em ação
                             <span className="material-symbols-outlined group-hover:translate-x-1 transition-transform">arrow_forward</span>
                             <div className="h-[2px] w-0 bg-[#19e664] absolute bottom-0 left-0 transition-all duration-300 group-hover:w-full"></div>
                         </button>
-                    </ScrollReveal>
+                    </div>
                 </div>
 
                 {/* Right Column: Visual */}
-                <div className="lg:col-span-7 h-full min-h-[500px] relative order-1 lg:order-2 flex items-center">
-                    <div className="relative w-full h-[500px] glass-panel rounded-2xl overflow-hidden p-8 flex items-center justify-center bg-[linear-gradient(145deg,rgba(255,255,255,0.05)_0%,rgba(255,255,255,0.01)_100%)]">
-                        <div className="grid grid-cols-2 w-full h-full gap-8 relative z-10">
+                <div className="lg:col-span-12 xl:col-span-7 h-full min-h-[500px] relative order-1 lg:order-2 flex items-center justify-center">
+                    <div className="relative w-full max-w-3xl h-[500px] glass-panel rounded-2xl overflow-hidden p-4 md:p-8 flex items-center justify-center bg-[linear-gradient(145deg,rgba(255,255,255,0.05)_0%,rgba(255,255,255,0.01)_100%)]">
+                        <div className="grid grid-cols-1 md:grid-cols-2 w-full h-full gap-8 relative z-10">
 
                             {/* Receipt Visual */}
-                            <div className="relative h-full flex items-center justify-center">
-                                <div className="relative w-48 h-72 bg-white rotate-[-6deg] shadow-2xl overflow-hidden rounded-sm mx-auto">
+                            <div className="relative h-full flex items-center justify-center overflow-hidden">
+                                <div className="relative w-40 md:w-48 h-64 md:h-72 bg-white rotate-[-6deg] shadow-2xl overflow-hidden rounded-sm mx-auto">
                                     <div className="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/crumpled-paper.png')] opacity-20 z-10 mix-blend-multiply pointer-events-none"></div>
                                     <div className="p-4 flex flex-col items-center text-gray-800 text-[10px] font-mono leading-tight h-full">
                                         <div className="font-bold text-sm mb-2">STARBUCKS COFFEE</div>
@@ -89,20 +83,12 @@ const LandingPageFeatures = () => {
                                 </div>
                             </div>
 
-                            {/* Connection Lines */}
-                            <div className="absolute inset-0 pointer-events-none z-0">
-                                <svg className="w-full h-full" fill="none" preserveAspectRatio="none" viewBox="0 0 600 400" xmlns="http://www.w3.org/2000/svg">
-                                    <path d="M180 200 C 250 200, 250 200, 320 200" fill="none" stroke="#19e664" strokeOpacity="0.3" strokeWidth="2"></path>
-                                    <path className="animate-[dash_1s_linear_infinite]" strokeDasharray="10" d="M180 200 C 250 200, 250 200, 320 200" stroke="#19e664" strokeDashoffset="20" strokeWidth="2"></path>
-                                </svg>
-                            </div>
-
                             {/* UI Card Result */}
                             <div className="relative h-full flex items-center justify-center">
-                                <div className="animate-float relative w-64 bg-[#1a3223] border border-[#346546] rounded-xl shadow-[0_20px_50px_rgba(0,0,0,0.5)] p-5 backdrop-blur-sm">
+                                <div className="animate-float relative w-full max-w-[260px] bg-[#1a3223] border border-[#346546] rounded-xl shadow-[0_20px_50px_rgba(0,0,0,0.5)] p-5 backdrop-blur-sm">
                                     <div className="flex items-center gap-3 mb-4">
-                                        <div className="w-10 h-10 rounded-full bg-green-900/50 flex items-center justify-center border border-green-800 overflow-hidden">
-                                            <img alt="Starbucks" className="w-full h-full object-cover" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBpAGFQJvpXw4H-EGpH83WRiwHvokBEpuKSh771Nlxf5BMbFmzunziWTzIa3yy9l0jaXqvPcrfJPyda_dFMd8dEtRwxhmpWTcXvENAaHWPiNUKRIDvA6NGbg0qs2vQL3-MjYvvTFhkhSn9Qbd73WXHsozFbgwf6yIS-OQvd1ZBjLtCH6HlWWBiySPUeh9bU4nVONkvp4RThY5x3BOoisKHdrmHLZnXM0ogYkTI5m7LcDlQh4vwd87LwtBKlyf3PHPPdA5tuSB-69g0" />
+                                        <div className="w-10 h-10 rounded-full bg-green-900/50 flex items-center justify-center border border-green-800 overflow-hidden text-white font-bold">
+                                            <span>S</span>
                                         </div>
                                         <div>
                                             <h4 className="text-white text-sm font-bold">Starbucks Coffee</h4>

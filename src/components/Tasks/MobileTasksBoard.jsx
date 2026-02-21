@@ -11,6 +11,8 @@ export default function MobileTasksBoard({
     formatDate,
     setIsModalOpen,
     setEditingTask,
+    filterDate,
+    setFilterDate,
 }) {
     const [activeTab, setActiveTab] = useState('todo')
 
@@ -23,6 +25,32 @@ export default function MobileTasksBoard({
                 <div className="mtk-header-top">
                     <h2 className="mtk-title">Afazeres</h2>
                     <div className="mtk-header-actions">
+                        <div className="filter-container mobile-filter-container">
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="filter-icon">
+                                <path strokeLinecap="round" strokeLinejoin="round" d="M6.75 3v2.25M17.25 3v2.25M3 18.75V7.5a2.25 2.25 0 012.25-2.25h13.5A2.25 2.25 0 0121 7.5v11.25m-18 0A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75m-18 0v-7.5A2.25 2.25 0 015.25 9h13.5A2.25 2.25 0 0121 11.25v7.5" />
+                            </svg>
+                            <div className="filter-input-wrapper">
+                                {!filterDate && <span className="filter-placeholder">Todos</span>}
+                                <input
+                                    type="date"
+                                    className={`filter-date-input ${!filterDate ? 'transparent-input' : ''}`}
+                                    value={filterDate}
+                                    onChange={(e) => setFilterDate(e.target.value)}
+                                    title="Filtrar por data"
+                                />
+                            </div>
+                            {filterDate && (
+                                <button
+                                    className="clear-filter-btn"
+                                    onClick={() => setFilterDate('')}
+                                    title="Mostrar Todos"
+                                >
+                                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor">
+                                        <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
+                                    </svg>
+                                </button>
+                            )}
+                        </div>
                         {activeTab === 'done' && doneNotes.length > 0 && (
                             <button
                                 className="mtk-icon-btn mtk-clear-btn"

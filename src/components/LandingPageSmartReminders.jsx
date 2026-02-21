@@ -8,7 +8,7 @@ const LandingPageSmartReminders = () => {
             {/* Animated Background Elements */}
             <div className="absolute inset-0 overflow-hidden pointer-events-none">
                 <div className="absolute top-[15%] left-[-5%] w-[600px] h-[600px] bg-[#10b19c]/15 rounded-full blur-[140px] animate-pulse"></div>
-                <div className="absolute bottom-[20%] right-[-10%] w-[700px] h-[700px] bg-[#1e3a8a]/20 rounded-full blur-[120px] animate-pulse" style={{animationDelay: '1.5s'}}></div>
+                <div className="absolute bottom-[20%] right-[-10%] w-[700px] h-[700px] bg-[#1e3a8a]/20 rounded-full blur-[120px] animate-pulse" style={{ animationDelay: '1.5s' }}></div>
                 <div className="absolute top-[50%] left-[30%] w-[400px] h-[400px] bg-cyan-500/5 rounded-full blur-[100px]"></div>
             </div>
 
@@ -22,7 +22,7 @@ const LandingPageSmartReminders = () => {
                     <div className="lg:col-span-7 order-2 lg:order-1">
                         <ScrollReveal variant="fadeInLeft">
                             <div className="relative bg-gradient-to-br from-[#111827]/80 to-[#0f1629]/60 border border-white/10 rounded-3xl p-10 lg:p-14 backdrop-blur-2xl shadow-2xl min-h-[600px] flex flex-col items-center justify-center hover:border-white/20 transition-all duration-500">
-                                
+
                                 {/* Inner glow effect */}
                                 <div className="absolute inset-0 bg-gradient-to-br from-[#10b19c]/5 via-transparent to-transparent rounded-3xl pointer-events-none"></div>
 
@@ -36,10 +36,10 @@ const LandingPageSmartReminders = () => {
                                             <div className="flex-1">
                                                 <div className="h-9 bg-[#2d3b4e] rounded-xl flex items-center px-4 gap-1.5 overflow-hidden">
                                                     {[...Array(10)].map((_, i) => (
-                                                        <div 
-                                                            key={i} 
+                                                        <div
+                                                            key={i}
                                                             className="waveform-bar w-1 bg-gradient-to-t from-[#10b19c] to-[#14d4bb] rounded-full"
-                                                            style={{ 
+                                                            style={{
                                                                 height: `${12 + Math.sin(i * 0.7) * 10}px`,
                                                                 animationDelay: `${i * 0.08}s`
                                                             }}
@@ -50,7 +50,7 @@ const LandingPageSmartReminders = () => {
                                             </div>
                                         </div>
                                     </div>
-                                    
+
                                     {/* AI Processing Bubble */}
                                     <div className="absolute -bottom-8 right-8 bg-gradient-to-r from-[#10b19c] to-[#0d9785] text-[#0B1120] text-sm font-semibold px-4 py-2.5 rounded-2xl rounded-tl-sm shadow-xl transform rotate-1 hover:rotate-0 transition-transform animate-bounce-gentle">
                                         "Lembra de pagar a escola..."
@@ -70,12 +70,12 @@ const LandingPageSmartReminders = () => {
 
                                 {/* Output Widgets Grid */}
                                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-8 w-full max-w-xl relative z-10">
-                                    
+
                                     {/* Reminder Widget - Enhanced */}
                                     <div className="relative group">
                                         {/* Connection line from center */}
                                         <div className="absolute bottom-full right-[30%] w-0.5 h-20 bg-gradient-to-t from-[#f59e0b]/60 to-transparent hidden lg:block"></div>
-                                        
+
                                         <div className="bg-gradient-to-br from-[#1a1a1a]/95 to-[#0f0f0f]/80 backdrop-blur-xl border-l-4 border-[#f59e0b] rounded-r-2xl p-5 shadow-2xl hover:shadow-[#f59e0b]/20 transform hover:-translate-y-2 transition-all duration-300">
                                             <div className="flex justify-between items-start mb-3">
                                                 <div className="flex items-center gap-2.5">
@@ -99,7 +99,7 @@ const LandingPageSmartReminders = () => {
                                     <div className="relative group">
                                         {/* Connection line from center */}
                                         <div className="absolute bottom-full left-[30%] w-0.5 h-20 bg-gradient-to-t from-[#10b19c]/60 to-transparent hidden lg:block"></div>
-                                        
+
                                         <div className="bg-gradient-to-br from-[#1a1a1a]/95 to-[#0f0f0f]/80 backdrop-blur-xl rounded-2xl border border-slate-700/50 p-5 shadow-2xl hover:shadow-[#10b19c]/20 transform hover:-translate-y-2 transition-all duration-300 hover:border-[#10b19c]/30">
                                             <div className="flex items-center justify-between mb-4 pb-3 border-b border-slate-800/80">
                                                 <h4 className="text-white font-bold text-base">Lista de Mercado</h4>
@@ -157,7 +157,7 @@ const LandingPageSmartReminders = () => {
                                         sua mente.
                                     </span>
                                     <svg className="absolute -bottom-2 left-0 w-full h-3 text-[#10b19c]/40" viewBox="0 0 200 12" preserveAspectRatio="none">
-                                        <path d="M0 6 Q 100 12 200 6" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round"/>
+                                        <path d="M0 6 Q 100 12 200 6" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" />
                                     </svg>
                                 </span>
                             </h2>
@@ -173,37 +173,37 @@ const LandingPageSmartReminders = () => {
                         {/* Features List */}
                         <div className="space-y-6 pt-4">
                             {[
-                                { 
-                                    icon: Bell, 
+                                {
+                                    icon: Bell,
                                     color: '#f59e0b',
-                                    title: 'Cobrança Amigável', 
-                                    desc: 'Receba lembretes gentis e inteligentes no momento certo, sem o estresse de notificações constantes.' 
+                                    title: 'Cobrança Amigável',
+                                    desc: 'Receba lembretes gentis e inteligentes no momento certo, sem o estresse de notificações constantes.'
                                 },
-                                { 
-                                    icon: List, 
+                                {
+                                    icon: List,
                                     color: '#10b19c',
-                                    title: 'Listas Dinâmicas', 
-                                    desc: 'Sua IA identifica itens em áudios e textos, organizando-os automaticamente em listas de tarefas ou compras.' 
+                                    title: 'Listas Dinâmicas',
+                                    desc: 'Sua IA identifica itens em áudios e textos, organizando-os automaticamente em listas de tarefas ou compras.'
                                 },
-                                { 
-                                    icon: Repeat, 
+                                {
+                                    icon: Repeat,
                                     color: '#6366f1',
-                                    title: 'Lembretes Recorrentes', 
-                                    desc: 'Configure pagamentos mensais ou hábitos diários com apenas um comando de voz simples.' 
+                                    title: 'Lembretes Recorrentes',
+                                    desc: 'Configure pagamentos mensais ou hábitos diários com apenas um comando de voz simples.'
                                 }
                             ].map((item, i) => (
                                 <ScrollReveal key={i} variant="fadeInUp" delay={0.3 + (i * 0.1)}>
                                     <div className="group flex gap-5 p-4 rounded-2xl hover:bg-white/5 transition-all duration-300 border border-transparent hover:border-white/10">
-                                        <div 
+                                        <div
                                             className="shrink-0 size-14 rounded-2xl border flex items-center justify-center transition-all duration-300 shadow-lg"
                                             style={{
                                                 backgroundColor: `${item.color}10`,
                                                 borderColor: `${item.color}30`,
                                             }}
                                         >
-                                            <item.icon 
-                                                size={26} 
-                                                strokeWidth={2} 
+                                            <item.icon
+                                                size={26}
+                                                strokeWidth={2}
                                                 style={{ color: item.color }}
                                             />
                                         </div>

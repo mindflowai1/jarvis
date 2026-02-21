@@ -90,12 +90,26 @@ const AdminDashboard = ({ session }) => {
         setProcessing(true)
 
         try {
+            // Obtém a sessão atual para pegar o JWT
+            const { data: { session }, error: sessionError } = await supabase.auth.getSession()
+            if (sessionError || !session) throw new Error("Sessão não encontrada. Faça login novamente.")
+
             const { data, error } = await supabase.functions.invoke('invite-user', {
                 body: {
                     email: newUserData.email,
                     name: newUserData.name
+                },
+                headers: {
+                    Authorization: `Bearer ${session.access_token}`
                 }
             })
+
+            // Diagnostic mode (because we set Edge Function to return 200 with _magic_error on fail)
+            if (data && data._magic_error) {
+                alert(`ERRO DIAGNÓSTICO:\n${data._magic_error}\n\nDetalhes:\n${JSON.stringify(data, null, 2)}`)
+                setProcessing(false)
+                return
+            }
 
             if (error) throw error
 
@@ -103,8 +117,6 @@ const AdminDashboard = ({ session }) => {
             setShowCreateModal(false)
             setNewUserData({ name: '', email: '' })
 
-            // Opcional: Atualizar lista (embora o usuário só apareça após aceitar, dependendo da config)
-            // Se o gatilho de 'handle_new_user' rodar na criação da auth, ele já pode aparecer.
             fetchUsers()
 
         } catch (error) {
@@ -113,24 +125,6 @@ const AdminDashboard = ({ session }) => {
         } finally {
             setProcessing(false)
         }
-    }
-
-    const confirmDelete = (user) => {
-        setSelectedUser(user)
-        setShowDeleteModal(true)
-    }
-
-    const handleDeleteUser = async () => {
-        if (!selectedUser) return
-        setProcessing(true)
-
-        // Implementação Mock
-        setTimeout(() => {
-            alert("⚠️ Requer Edge Function!\n\nExcluir um usuário da Autenticação requer privilégios de 'service_role'. Esta ação é atualmente simulada.")
-            setProcessing(false)
-            setShowDeleteModal(false)
-            setSelectedUser(null)
-        }, 1000)
     }
 
     const [filterRole, setFilterRole] = useState('all') // 'all', 'admin', 'user'
@@ -248,7 +242,6 @@ const AdminDashboard = ({ session }) => {
                                 <th>WhatsApp</th>
                                 <th>Status</th>
                                 <th>Vencimento</th>
-                                <th>Ações</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -339,20 +332,8 @@ const AdminDashboard = ({ session }) => {
                                                 color: user.subscription_expires_at && new Date(user.subscription_expires_at) < new Date() ? '#fca5a5' : '#e2e8f0', // Red if expired
                                                 borderRadius: '6px',
                                                 padding: '4px',
-                                                fontSize: '13px'
                                             }}
                                         />
-                                    </td>
-                                    <td>
-                                        <div style={{ display: 'flex', gap: '8px' }}>
-                                            <button
-                                                className="admin-action-btn delete"
-                                                title="Excluir Usuário"
-                                                onClick={() => confirmDelete(user)}
-                                            >
-                                                <Trash2 size={16} />
-                                            </button>
-                                        </div>
                                     </td>
                                 </tr>
                             ))}
@@ -400,33 +381,6 @@ const AdminDashboard = ({ session }) => {
                                     </button>
                                 </div>
                             </form>
-                        </motion.div>
-                    </div>
-                )}
-            </AnimatePresence>
-
-            {/* Modal de Exclusão */}
-            <AnimatePresence>
-                {showDeleteModal && (
-                    <div className="modal-overlay">
-                        <motion.div
-                            initial={{ scale: 0.9, opacity: 0 }}
-                            animate={{ scale: 1, opacity: 1 }}
-                            exit={{ scale: 0.9, opacity: 0 }}
-                            className="modal-content"
-                        >
-                            <div className="modal-header">
-                                <h2>Confirmar Exclusão</h2>
-                            </div>
-                            <p style={{ color: '#94a3b8', marginBottom: '24px' }}>
-                                Tem certeza que deseja excluir <strong>{selectedUser?.email}</strong>? Esta ação não pode ser desfeita.
-                            </p>
-                            <div className="admin-modal-actions">
-                                <button onClick={() => setShowDeleteModal(false)} className="admin-btn-secondary">Cancelar</button>
-                                <button onClick={handleDeleteUser} disabled={processing} className="admin-btn-primary" style={{ background: '#ef4444' }}>
-                                    {processing ? 'Excluindo...' : 'Excluir Usuário'}
-                                </button>
-                            </div>
                         </motion.div>
                     </div>
                 )}

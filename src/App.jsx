@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react'
-import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom'
+import { BrowserRouter, Routes, Route, Navigate, useNavigate, useLocation } from 'react-router-dom'
 import { supabase } from './supabaseClient'
 import './index.css'
 import LandingPage from './components/LandingPage'
@@ -9,6 +9,33 @@ import AdminDashboard from './pages/AdminDashboard'
 import SubscriptionGuard from './components/SubscriptionGuard'
 import AccessDenied from './pages/AccessDenied'
 import LandingPageTest from './pages/LandingPageTest'
+import Tests from './pages/Tests'
+
+// Componente independente para gerenciar redirecionamentos de autenticação
+function AuthRedirectHandler() {
+    const navigate = useNavigate();
+    const location = useLocation();
+
+    useEffect(() => {
+        // Verifica se aterrissamos na raiz com um hash de convite ou recuperacao
+        if (window.location.hash && (window.location.hash.includes('type=invite') || window.location.hash.includes('type=recovery'))) {
+            navigate('/dashboard', { replace: true });
+        }
+
+        // Escuta os eventos de Auth do Supabase (quando o token e processado)
+        const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
+            if (event === 'SIGNED_IN' || event === 'PASSWORD_RECOVERY') {
+                if (location.pathname === '/' || location.pathname === '/login') {
+                    navigate('/dashboard', { replace: true });
+                }
+            }
+        });
+
+        return () => subscription.unsubscribe();
+    }, [navigate, location.pathname]);
+
+    return null;
+}
 
 function App() {
     const [session, setSession] = useState(null)
@@ -71,6 +98,7 @@ function App() {
 
     return (
         <BrowserRouter>
+            <AuthRedirectHandler />
             <Routes>
                 <Route path="/" element={<LandingPage />} />
                 <Route
@@ -84,6 +112,10 @@ function App() {
                 <Route
                     path="/landing-page-test"
                     element={<LandingPageTest />}
+                />
+                <Route
+                    path="/tests"
+                    element={<Tests />}
                 />
                 <Route
                     path="/dashboard"

@@ -65,6 +65,25 @@
     font-weight: 600 !important;
 }
 
+.focus-now-btn {
+    width: 36px !important;
+    height: 36px !important;
+    padding: 0 !important;
+    background: rgba(239, 68, 68, 0.1) !important;
+    border: 1px solid rgba(239, 68, 68, 0.2) !important;
+    color: #ef4444 !important;
+}
+
+.focus-now-btn:hover {
+    background: rgba(239, 68, 68, 0.2) !important;
+    border-color: rgba(239, 68, 68, 0.4) !important;
+}
+
+.focus-now-btn svg {
+    width: 20px;
+    height: 20px;
+}
+
 .secondary-action-btn,
 .view-toggle-btn {
     width: auto !important;
@@ -406,6 +425,28 @@
     height: 120px;
     border-bottom: 1px solid rgba(255, 255, 255, 0.05);
     transition: background 0.2s;
+    position: relative;
+}
+
+.today-column {
+    background: rgba(59, 130, 246, 0.02);
+}
+
+.past-hour {
+    background: rgba(15, 23, 42, 0.2);
+    opacity: 0.6;
+}
+
+.current-hour-cell {
+    background: rgba(59, 130, 246, 0.08) !important;
+}
+
+.hour-focus-glow {
+    position: absolute;
+    inset: 0;
+    box-shadow: inset 0 0 40px rgba(59, 130, 246, 0.1);
+    border-left: 2px solid rgba(59, 130, 246, 0.3);
+    pointer-events: none;
 }
 
 .hour-cell:hover {
@@ -428,6 +469,50 @@
     backdrop-filter: blur(4px);
     z-index: 10;
     margin: 0 2px;
+}
+
+/* Current Time Indicator */
+.current-time-indicator {
+    position: absolute;
+    left: 0;
+    right: 0;
+    height: 2px;
+    z-index: 100;
+    pointer-events: none;
+    display: flex;
+    align-items: center;
+}
+
+.indicator-line {
+    flex: 1;
+    height: 2px;
+    background: #ef4444;
+    box-shadow: 0 0 10px rgba(239, 68, 68, 0.5);
+}
+
+.indicator-dot {
+    width: 10px;
+    height: 10px;
+    background: #ef4444;
+    border-radius: 50%;
+    position: absolute;
+    left: -5px;
+    box-shadow: 0 0 10px rgba(239, 68, 68, 0.8);
+    display: flex;
+    align-items: center;
+}
+
+.indicator-time {
+    position: absolute;
+    left: -65px;
+    background: #ef4444;
+    color: white;
+    font-size: 11px;
+    font-weight: 700;
+    padding: 2px 6px;
+    border-radius: 4px;
+    white-space: nowrap;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
 }
 
 .calendar-event:hover {
@@ -475,10 +560,12 @@
 
 /* Wrapper Visibility Control */
 .cal-desktop-wrapper {
-    display: block;
+    display: flex;
+    flex-direction: column;
     height: 100%;
     flex: 1;
-    overflow-y: auto;
+    overflow: hidden;
+    /* Fix: Evita que o wrapper scroll a página toda antes da grid */
 }
 
 .cal-mobile-wrapper {
