@@ -114,21 +114,9 @@ const PhoneNumberModal = ({ session, onSave, onClose }) => {
         }
     }
 
-    const handleClose = () => {
-        if (onClose) {
-            onClose()
-        }
-    }
-
     return (
         <div className="phone-modal-overlay">
             <div className="phone-modal">
-                {/* Botão de fechar */}
-                <button className="phone-modal-close" onClick={handleClose} disabled={loading}>
-                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor">
-                        <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
-                    </svg>
-                </button>
 
                 <div className="phone-modal-icon">
                     <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor">
