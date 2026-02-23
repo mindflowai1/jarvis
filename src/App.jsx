@@ -8,7 +8,6 @@ import Dashboard from './pages/Dashboard'
 import AdminDashboard from './pages/AdminDashboard'
 import SubscriptionGuard from './components/SubscriptionGuard'
 import AccessDenied from './pages/AccessDenied'
-import LandingPageTest from './pages/LandingPageTest'
 import Tests from './pages/Tests'
 
 // Componente independente para gerenciar redirecionamentos de autenticação
@@ -109,10 +108,7 @@ function App() {
                     path="/access-denied"
                     element={<AccessDenied />}
                 />
-                <Route
-                    path="/landing-page-test"
-                    element={<LandingPageTest />}
-                />
+
                 <Route
                     path="/tests"
                     element={<Tests />}
