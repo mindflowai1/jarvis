@@ -7,8 +7,8 @@ const LandingPageFooter = () => {
             <div className="max-w-7xl mx-auto">
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-12 mb-16">
                     <ScrollReveal variant="fadeInUp" className="flex flex-col gap-4">
-                        <div className="flex items-center gap-2 text-white font-display font-bold text-2xl tracking-tight">
-                            <span className="material-symbols-outlined text-primary text-3xl">mic</span>
+                        <div className="flex items-center gap-3 text-white font-display font-bold text-2xl tracking-tight">
+                            <img src="/logo-controle-c.png" alt="Controle-C Logo" className="h-10 sm:h-12 w-auto object-contain grayscale brightness-200" />
                             Controle-C
                         </div>
                         <p className="text-sm leading-relaxed max-w-xs">
@@ -39,7 +39,7 @@ const LandingPageFooter = () => {
                 </div>
 
                 <div className="pt-8 border-t border-white/5 flex flex-col md:flex-row justify-between items-center gap-4">
-                    <p className="text-xs">© 2024 Controle-C Tecnologia Ltda. Todos os direitos reservados.</p>
+                    <p className="text-xs">© 2026 Controle-C Tecnologia Ltda. Todos os direitos reservados.</p>
                     <p className="text-xs flex items-center gap-1">Feito com <span className="text-primary">💚</span> e 🤖 no Brasil.</p>
                 </div>
             </div>

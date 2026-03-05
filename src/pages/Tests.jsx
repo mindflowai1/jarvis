@@ -6,12 +6,8 @@ const Navbar = () => {
     <nav className="fixed top-0 left-0 right-0 z-50 px-4 md:px-6 py-4 transition-all duration-300">
       <div className="max-w-7xl mx-auto glass-panel rounded-full px-6 py-3 flex items-center justify-between">
         <div className="flex items-center gap-3">
-          <div className="size-8 text-primary">
-            <svg fill="none" viewBox="0 0 48 48" xmlns="http://www.w3.org/2000/svg">
-              <path d="M24 4C25.7818 14.2173 33.7827 22.2182 44 24C33.7827 25.7818 25.7818 33.7827 24 44C22.2182 33.7827 14.2173 25.7818 4 24C14.2173 22.2182 22.2182 14.2173 24 4Z" fill="currentColor"></path>
-            </svg>
-          </div>
-          <div className="flex items-baseline gap-2">
+          <img src="/logo-controle-c.png" alt="Controle-C Logo" className="h-10 sm:h-12 w-auto object-contain" />
+          <div className="hidden sm:flex items-baseline gap-2">
             <h2 className="text-white text-xl font-display font-bold tracking-tight">Controle-C</h2>
             <span className="px-2 py-0.5 rounded-full bg-primary/20 border border-primary/30 text-primary text-[10px] font-bold uppercase tracking-wider">v2.0 com IA</span>
           </div>
@@ -41,7 +37,7 @@ const Hero = () => {
     <div id="hero" className="relative min-h-screen flex items-center pt-32 pb-24 lg:pb-32 overflow-hidden bg-background-ocean">
       <div className="absolute top-0 right-0 w-3/4 h-3/4 bg-[radial-gradient(circle_at_50%_50%,_rgba(37,212,102,0.15)_0%,_rgba(2,12,27,0)_70%)] blur-3xl opacity-50 pointer-events-none -z-10"></div>
       <div className="absolute bottom-0 left-0 w-[500px] h-[500px] bg-primary/5 rounded-full blur-[100px] pointer-events-none -z-10"></div>
-      
+
       <div className="max-w-7xl mx-auto px-6 w-full grid lg:grid-cols-2 gap-12 lg:gap-20 items-center">
         <div className="flex flex-col gap-8 items-start relative z-10">
           <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full border border-primary/20 bg-primary/5 text-primary text-xs font-semibold animate-fade-in-up">
@@ -82,10 +78,10 @@ const Hero = () => {
 
         {/* Right Side - Phone Mockup */}
         <div className="relative flex justify-center lg:justify-end min-h-[680px] lg:h-[800px] items-center mt-12 lg:mt-0">
-          
+
           {/* Main Scale Wrapper for Responsiveness */}
           <div className="relative scale-90 sm:scale-100 transition-transform duration-300">
-            
+
             {/* Floating Widgets */}
             <div className="absolute top-10 left-0 lg:-left-8 z-20 animate-float glass-panel p-4 rounded-2xl flex items-center gap-4 max-w-[220px] shadow-2xl">
               <div className="size-10 rounded-full bg-blue-500/20 flex items-center justify-center text-blue-400">
@@ -133,11 +129,11 @@ const Hero = () => {
                     <span className="material-symbols-outlined">call</span>
                   </div>
                 </div>
-                
+
                 <div className="bg-[#0b141a] h-full p-4 flex flex-col gap-4 overflow-hidden relative">
                   {/* WhatsApp BG Image */}
                   <div className="absolute inset-0 z-0 opacity-10" style={{ backgroundImage: "url('https://lh3.googleusercontent.com/aida-public/AB6AXuC8U34eklfWkRgSoCuFKrV5nKCbsHvzzt2iXyH7n6y5R18TMmDnMbZaUP3w9wEJNnwxLNCT_WzfKEVJof2rOE1_GbDMp1U1tVnbhy5wFHCsIBaq1JLE8VL5ZBsJNlXTBDwV4yBiR2AGq02J5GxCarVcD1lJA1SDFAe5cwnOugBL73S5e6ojsNomsho-WIA1ETPqCOKDXfpJYl17jUI2MTb3S_WdUBA6dih5Z3MGEYkhCfzn8gy5z4RcJGXBbRRkrhwZLEu1Ym7Y48g')" }}></div>
-                  <div className="absolute inset-0 bg-[#0b141a]/95 z-0"></div> 
+                  <div className="absolute inset-0 bg-[#0b141a]/95 z-0"></div>
 
                   <div className="relative z-10 flex justify-center mb-2">
                     <span className="bg-[#182229] text-[#8696a0] text-[10px] px-3 py-1 rounded-lg shadow-sm">Hoje</span>
@@ -257,7 +253,7 @@ const Features = () => {
                 <svg className="absolute w-full h-3 -bottom-1 left-0 text-[#19e664]" preserveAspectRatio="none" viewBox="0 0 100 10">
                   <path d="M0 5 Q 50 10 100 5" fill="none" stroke="currentColor" strokeWidth="4"></path>
                 </svg>
-              </span> no seu dinheiro. <br className="hidden md:block"/>Não o contrário.
+              </span> no seu dinheiro. <br className="hidden md:block" />Não o contrário.
             </h2>
             <div className="space-y-4 text-lg text-slate-400 font-light leading-relaxed font-display">
               <p>
@@ -301,14 +297,14 @@ const Features = () => {
         <div className="lg:col-span-7 h-full min-h-[500px] relative order-1 lg:order-2 flex items-center">
           <div className="relative w-full h-[500px] glass-panel rounded-2xl overflow-hidden p-8 flex items-center justify-center bg-[linear-gradient(145deg,rgba(255,255,255,0.05)_0%,rgba(255,255,255,0.01)_100%)]">
             <div className="grid grid-cols-2 w-full h-full gap-8 relative z-10">
-              
+
               {/* Receipt Visual */}
               <div className="relative h-full flex items-center justify-center">
                 <div className="relative w-48 h-72 bg-white rotate-[-6deg] shadow-2xl overflow-hidden rounded-sm mx-auto">
                   <div className="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/crumpled-paper.png')] opacity-20 z-10 mix-blend-multiply pointer-events-none"></div>
                   <div className="p-4 flex flex-col items-center text-gray-800 text-[10px] font-mono leading-tight h-full">
                     <div className="font-bold text-sm mb-2">STARBUCKS COFFEE</div>
-                    <div className="mb-4 text-center">Rua Fictícia, 123<br/>São Paulo, SP</div>
+                    <div className="mb-4 text-center">Rua Fictícia, 123<br />São Paulo, SP</div>
                     <div className="w-full border-b border-dashed border-gray-400 mb-2"></div>
                     <div className="w-full flex justify-between"><span>1 Cappuccino</span><span>R$ 14,00</span></div>
                     <div className="w-full flex justify-between mb-2"><span>1 Cookie</span><span>R$ 4,50</span></div>
@@ -378,14 +374,14 @@ const Showcase = () => {
       <div className="w-full max-w-5xl glass-panel rounded-[2.5rem] p-8 md:p-12 relative overflow-hidden shadow-2xl border border-white/5">
         <div className="absolute top-0 right-0 w-[40%] h-[40%] bg-[#2bd4bd]/5 rounded-full blur-[100px] pointer-events-none"></div>
         <div className="absolute bottom-0 left-0 w-[40%] h-[40%] bg-blue-500/5 rounded-full blur-[100px] pointer-events-none"></div>
-        
+
         <div className="max-w-3xl mx-auto text-center mb-10 relative z-10">
           <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[#2bd4bd]/10 border border-[#2bd4bd]/20 text-[#2bd4bd] text-[10px] font-bold tracking-widest uppercase mb-6">
             <span className="w-1.5 h-1.5 rounded-full bg-[#2bd4bd] shrink-0"></span>
             WhatsApp Assistant
           </div>
           <h1 className="text-3xl md:text-5xl font-bold leading-tight mb-4 tracking-tight">
-            Sua agenda no WhatsApp. <br className="hidden sm:block"/>
+            Sua agenda no WhatsApp. <br className="hidden sm:block" />
             <span className="text-[#2bd4bd]">Simples assim.</span>
           </h1>
           <p className="text-base md:text-lg text-gray-400 max-w-xl mx-auto font-light">
@@ -523,11 +519,11 @@ const SmartReminders = () => {
 
       <div className="max-w-7xl mx-auto px-6 lg:px-20 relative z-10">
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-16 lg:gap-8 items-center">
-          
+
           {/* Visualization */}
           <div className="lg:col-span-7 relative order-2 lg:order-1">
             <div className="glass-panel rounded-2xl p-8 lg:p-12 relative min-h-[500px] flex flex-col items-center justify-center border border-white/5 bg-[#111827]/60">
-              
+
               {/* Voice Note Input */}
               <div className="relative w-full max-w-sm mb-16 self-center animate-float">
                 <div className="bg-[#1f2937] border border-slate-700 rounded-xl rounded-tr-none p-4 shadow-lg flex items-center gap-3">
@@ -536,9 +532,9 @@ const SmartReminders = () => {
                   </div>
                   <div className="flex-1">
                     <div className="h-8 bg-[#2d3b4e] rounded-full flex items-center px-3 gap-1 overflow-hidden">
-                       {[...Array(9)].map((_, i) => (
-                         <div key={i} className={`w-1 bg-[#10b19c] rounded-full animate-pulse`} style={{ height: Math.random() * 12 + 8 + 'px', animationDuration: Math.random() + 0.5 + 's' }}></div>
-                       ))}
+                      {[...Array(9)].map((_, i) => (
+                        <div key={i} className={`w-1 bg-[#10b19c] rounded-full animate-pulse`} style={{ height: Math.random() * 12 + 8 + 'px', animationDuration: Math.random() + 0.5 + 's' }}></div>
+                      ))}
                     </div>
                     <p className="text-xs text-slate-400 mt-1">Voice Note • 0:04</p>
                   </div>
@@ -555,7 +551,7 @@ const SmartReminders = () => {
 
               {/* Output Widgets */}
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 w-full max-w-lg mt-4">
-                
+
                 {/* Reminder Widget */}
                 <div className="relative group transform transition-all hover:-translate-y-1 duration-300">
                   <div className="absolute top-[-40px] right-[20%] w-px h-[40px] bg-gradient-to-t from-[#f59e0b]/50 to-transparent lg:block hidden"></div>
@@ -617,9 +613,9 @@ const SmartReminders = () => {
             </div>
             <div className="space-y-6 mt-4">
               {[
-                {icon: 'notifications_active', title: 'Cobrança Amigável', desc: 'Receba lembretes gentis e inteligentes no momento certo, sem o estresse de notificações constantes.'},
-                {icon: 'format_list_bulleted', title: 'Listas Dinâmicas', desc: 'Sua IA identifica itens em áudios e textos, organizando-os automaticamente em listas de tarefas ou compras.'},
-                {icon: 'all_inclusive', title: 'Lembretes Recorrentes', desc: 'Configure pagamentos mensais ou hábitos diários com apenas um comando de voz simples.'}
+                { icon: 'notifications_active', title: 'Cobrança Amigável', desc: 'Receba lembretes gentis e inteligentes no momento certo, sem o estresse de notificações constantes.' },
+                { icon: 'format_list_bulleted', title: 'Listas Dinâmicas', desc: 'Sua IA identifica itens em áudios e textos, organizando-os automaticamente em listas de tarefas ou compras.' },
+                { icon: 'all_inclusive', title: 'Lembretes Recorrentes', desc: 'Configure pagamentos mensais ou hábitos diários com apenas um comando de voz simples.' }
               ].map((item, i) => (
                 <div key={i} className="flex gap-4 group">
                   <div className="shrink-0 size-12 rounded-xl bg-slate-800/50 border border-slate-700 flex items-center justify-center group-hover:border-[#10b19c]/50 group-hover:bg-[#10b19c]/10 transition-colors duration-300">
@@ -646,10 +642,10 @@ const Dashboard = () => {
     <section className="relative min-h-screen w-full flex flex-col items-center justify-center py-20 overflow-hidden bg-[#0f172a]">
       {/* Background Glow */}
       <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[120vw] h-[120vh] bg-[#10b19c]/10 blur-[100px] rounded-full pointer-events-none z-0"></div>
-      
+
       <div className="relative z-10 max-w-4xl mx-auto text-center px-6 mb-16">
         <h2 className="text-4xl md:text-5xl lg:text-6xl font-bold text-white tracking-tight mb-6 leading-tight font-display">
-          O panorama completo <br/><span className="text-[#10b19c]">da sua vida.</span>
+          O panorama completo <br /><span className="text-[#10b19c]">da sua vida.</span>
         </h2>
         <p className="text-slate-400 text-lg md:text-xl font-normal leading-relaxed max-w-2xl mx-auto">
           Enquanto o WhatsApp é para a agilidade do dia a dia, o Dashboard é para sua visão estratégica de longo prazo.
@@ -670,7 +666,7 @@ const Dashboard = () => {
         {/* Laptop Frame */}
         <div className="relative mx-auto bg-[#0f172a] rounded-t-[1.5rem] p-1 pt-3 shadow-2xl ring-1 ring-white/10 w-full max-w-[1024px]">
           <div className="absolute top-0 left-1/2 -translate-x-1/2 h-4 w-32 bg-black rounded-b-lg z-30"></div>
-          
+
           <div className="bg-[#1e293b] aspect-[16/10] w-full rounded-lg overflow-hidden relative border border-white/5">
             {/* Header */}
             <div className="h-14 border-b border-white/10 flex items-center justify-between px-6 bg-[#0f172a]/50 backdrop-blur-sm sticky top-0 z-20">
@@ -687,46 +683,46 @@ const Dashboard = () => {
                 </nav>
               </div>
               <div className="flex items-center gap-4">
-                 <div className="h-8 w-8 rounded-full bg-[#10b19c]/20 flex items-center justify-center text-[#10b19c]">
-                   <span className="material-symbols-outlined text-sm">notifications</span>
-                 </div>
-                 <div className="h-8 w-8 rounded-full bg-slate-700 flex items-center justify-center overflow-hidden border border-white/10">
-                   <img alt="Avatar" className="h-full w-full object-cover" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDY-TFYW0E0U92bK7AmR3HrMp2JAOpIVHTXelauazfr-pJ8cQXGjqMwxTwIosQpPUadYM_Pz6u_wm2sBUFvgN9QrKNpNN2lqLlx0WDsjxdTIKpNzUZKEjMeoSfKdGSE0eYxz_5EGWgjQcA7QCoCYrxtvE0kkhvEqp7_Tbb_wCZGESTzwN9IHbceFSpldmtSC8Ne98GC40P4PiMKR8ub4cudttS4ZcW4RlBhU4MUuf2WhMbrviLb6ZSc6YICl9Y8T78q3OXLTuJVsjU" />
-                 </div>
+                <div className="h-8 w-8 rounded-full bg-[#10b19c]/20 flex items-center justify-center text-[#10b19c]">
+                  <span className="material-symbols-outlined text-sm">notifications</span>
+                </div>
+                <div className="h-8 w-8 rounded-full bg-slate-700 flex items-center justify-center overflow-hidden border border-white/10">
+                  <img alt="Avatar" className="h-full w-full object-cover" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDY-TFYW0E0U92bK7AmR3HrMp2JAOpIVHTXelauazfr-pJ8cQXGjqMwxTwIosQpPUadYM_Pz6u_wm2sBUFvgN9QrKNpNN2lqLlx0WDsjxdTIKpNzUZKEjMeoSfKdGSE0eYxz_5EGWgjQcA7QCoCYrxtvE0kkhvEqp7_Tbb_wCZGESTzwN9IHbceFSpldmtSC8Ne98GC40P4PiMKR8ub4cudttS4ZcW4RlBhU4MUuf2WhMbrviLb6ZSc6YICl9Y8T78q3OXLTuJVsjU" />
+                </div>
               </div>
             </div>
 
             {/* Dashboard Content */}
             <div className="p-6 h-[calc(100%-3.5rem)] overflow-y-auto">
               <div className="grid grid-cols-1 md:grid-cols-12 gap-6 h-full">
-                
+
                 {/* Main Chart */}
                 <div className="md:col-span-8 bg-[#151e2d] rounded-xl border border-white/5 p-6 flex flex-col justify-between shadow-sm">
-                   <div className="flex justify-between items-start mb-4">
-                     <div>
-                       <p className="text-slate-400 text-sm font-medium">Fluxo de Caixa</p>
-                       <h3 className="text-white text-3xl font-bold mt-1">R$ 12.450,00</h3>
-                       <div className="flex items-center gap-2 mt-2">
-                         <span className="text-[#10b19c] text-sm font-medium flex items-center bg-[#10b19c]/10 px-2 py-0.5 rounded">
-                           <span className="material-symbols-outlined text-sm mr-1">trending_up</span>+15%
-                         </span>
-                         <span className="text-slate-500 text-xs">vs. mês anterior</span>
-                       </div>
-                     </div>
-                   </div>
-                   <div className="relative h-48 w-full mt-auto">
-                     <svg className="w-full h-full overflow-visible" preserveAspectRatio="none" viewBox="0 0 100 40">
-                       <defs>
-                         <linearGradient id="gradientIncome" x1="0" x2="0" y1="0" y2="1">
-                           <stop offset="0%" stopColor="#10b19c" stopOpacity="0.3"></stop>
-                           <stop offset="100%" stopColor="#10b19c" stopOpacity="0"></stop>
-                         </linearGradient>
-                       </defs>
-                       <path d="M0,35 Q10,32 20,25 T40,15 T60,18 T80,10 T100,5 V40 H0 Z" fill="url(#gradientIncome)"></path>
-                       <path d="M0,35 Q10,32 20,25 T40,15 T60,18 T80,10 T100,5" fill="none" stroke="#10b19c" strokeLinecap="round" strokeWidth="0.8"></path>
-                       <path d="M0,38 Q15,36 30,30 T50,32 T70,28 T90,34 T100,30" fill="none" stroke="#ef4444" strokeDasharray="1,1" strokeLinecap="round" strokeWidth="0.8"></path>
-                     </svg>
-                   </div>
+                  <div className="flex justify-between items-start mb-4">
+                    <div>
+                      <p className="text-slate-400 text-sm font-medium">Fluxo de Caixa</p>
+                      <h3 className="text-white text-3xl font-bold mt-1">R$ 12.450,00</h3>
+                      <div className="flex items-center gap-2 mt-2">
+                        <span className="text-[#10b19c] text-sm font-medium flex items-center bg-[#10b19c]/10 px-2 py-0.5 rounded">
+                          <span className="material-symbols-outlined text-sm mr-1">trending_up</span>+15%
+                        </span>
+                        <span className="text-slate-500 text-xs">vs. mês anterior</span>
+                      </div>
+                    </div>
+                  </div>
+                  <div className="relative h-48 w-full mt-auto">
+                    <svg className="w-full h-full overflow-visible" preserveAspectRatio="none" viewBox="0 0 100 40">
+                      <defs>
+                        <linearGradient id="gradientIncome" x1="0" x2="0" y1="0" y2="1">
+                          <stop offset="0%" stopColor="#10b19c" stopOpacity="0.3"></stop>
+                          <stop offset="100%" stopColor="#10b19c" stopOpacity="0"></stop>
+                        </linearGradient>
+                      </defs>
+                      <path d="M0,35 Q10,32 20,25 T40,15 T60,18 T80,10 T100,5 V40 H0 Z" fill="url(#gradientIncome)"></path>
+                      <path d="M0,35 Q10,32 20,25 T40,15 T60,18 T80,10 T100,5" fill="none" stroke="#10b19c" strokeLinecap="round" strokeWidth="0.8"></path>
+                      <path d="M0,38 Q15,36 30,30 T50,32 T70,28 T90,34 T100,30" fill="none" stroke="#ef4444" strokeDasharray="1,1" strokeLinecap="round" strokeWidth="0.8"></path>
+                    </svg>
+                  </div>
                 </div>
 
                 {/* Right Panel */}
@@ -768,33 +764,33 @@ const Dashboard = () => {
                   </div>
                 </div>
 
-                 <div className="md:col-span-8 bg-[#151e2d] rounded-xl border border-white/5 p-6">
-                    <div className="flex justify-between items-center mb-4">
-                      <h4 className="text-white font-medium text-sm">Últimas Transações</h4>
-                      <a className="text-[#10b19c] text-xs hover:underline" href="#">Ver todas</a>
+                <div className="md:col-span-8 bg-[#151e2d] rounded-xl border border-white/5 p-6">
+                  <div className="flex justify-between items-center mb-4">
+                    <h4 className="text-white font-medium text-sm">Últimas Transações</h4>
+                    <a className="text-[#10b19c] text-xs hover:underline" href="#">Ver todas</a>
+                  </div>
+                  <div className="flex flex-col gap-3">
+                    <div className="flex items-center justify-between p-2 rounded-lg hover:bg-white/5 transition-colors cursor-pointer">
+                      <div className="flex items-center gap-3">
+                        <div className="bg-slate-800 p-2 rounded-lg text-white"><span className="material-symbols-outlined text-[20px]">directions_car</span></div>
+                        <div className="flex flex-col"><span className="text-white text-sm font-medium">Uber</span><span className="text-slate-500 text-xs">Transporte • Hoje, 08:30</span></div>
+                      </div>
+                      <span className="text-white text-sm font-medium">- R$ 24,90</span>
                     </div>
-                    <div className="flex flex-col gap-3">
-                       <div className="flex items-center justify-between p-2 rounded-lg hover:bg-white/5 transition-colors cursor-pointer">
-                         <div className="flex items-center gap-3">
-                           <div className="bg-slate-800 p-2 rounded-lg text-white"><span className="material-symbols-outlined text-[20px]">directions_car</span></div>
-                           <div className="flex flex-col"><span className="text-white text-sm font-medium">Uber</span><span className="text-slate-500 text-xs">Transporte • Hoje, 08:30</span></div>
-                         </div>
-                         <span className="text-white text-sm font-medium">- R$ 24,90</span>
-                       </div>
-                       <div className="flex items-center justify-between p-2 rounded-lg hover:bg-white/5 transition-colors cursor-pointer">
-                         <div className="flex items-center gap-3">
-                           <div className="bg-slate-800 p-2 rounded-lg text-white"><span className="material-symbols-outlined text-[20px]">restaurant</span></div>
-                           <div className="flex flex-col"><span className="text-white text-sm font-medium">iFood</span><span className="text-slate-500 text-xs">Alimentação • Ontem, 20:15</span></div>
-                         </div>
-                         <span className="text-white text-sm font-medium">- R$ 48,50</span>
-                       </div>
+                    <div className="flex items-center justify-between p-2 rounded-lg hover:bg-white/5 transition-colors cursor-pointer">
+                      <div className="flex items-center gap-3">
+                        <div className="bg-slate-800 p-2 rounded-lg text-white"><span className="material-symbols-outlined text-[20px]">restaurant</span></div>
+                        <div className="flex flex-col"><span className="text-white text-sm font-medium">iFood</span><span className="text-slate-500 text-xs">Alimentação • Ontem, 20:15</span></div>
+                      </div>
+                      <span className="text-white text-sm font-medium">- R$ 48,50</span>
                     </div>
-                 </div>
+                  </div>
+                </div>
 
               </div>
             </div>
           </div>
-          
+
           <div className="absolute bottom-0 left-0 w-full h-3 md:h-4 bg-[#1e293b] rounded-b-[1.5rem] shadow-inner"></div>
         </div>
         <div className="relative mx-auto w-[110%] md:w-[120%] h-3 md:h-4 bg-[#cbd5e1] rounded-b-xl md:rounded-b-2xl shadow-xl z-20 mt-[-2px] flex justify-center items-start overflow-hidden">
@@ -810,7 +806,7 @@ const Pricing = () => {
   return (
     <div id="pricing" className="bg-[#0a192f] text-[#ccd6f6] font-body relative flex flex-col items-center">
       <div className="absolute top-0 left-1/4 w-[500px] h-[500px] bg-[#13eca4]/5 rounded-full blur-[120px] pointer-events-none"></div>
-      
+
       <section className="w-full max-w-7xl px-4 py-20 md:py-32 flex flex-col items-center relative z-10">
         <div className="text-center mb-12">
           <h2 className="font-display text-3xl md:text-5xl font-bold text-white mb-4">Investimento <span className="text-[#13eca4]">Transparente</span></h2>
@@ -871,7 +867,7 @@ const Pricing = () => {
               <p className="text-xs text-[#13eca4] mt-2 font-medium">Cobrado R$ 358,80 anualmente</p>
             </div>
             <div className="flex-grow flex flex-col gap-4 mb-8">
-               {['Mensagens e Áudios Ilimitados', 'Dashboard Web Completo', 'Categorização automática com IA', 'Prioridade no suporte'].map((item, i) => (
+              {['Mensagens e Áudios Ilimitados', 'Dashboard Web Completo', 'Categorização automática com IA', 'Prioridade no suporte'].map((item, i) => (
                 <div key={i} className="flex items-start gap-3 text-sm font-medium text-white">
                   <span className="material-symbols-outlined text-[#13eca4] text-[20px]">check_circle</span>
                   <span>{item}</span>
@@ -892,10 +888,10 @@ const Pricing = () => {
         </div>
         <div className="flex flex-col gap-4">
           {[
-            {q: 'Meus dados e áudios estão seguros?', a: 'Sim, utilizamos criptografia de ponta a ponta. Seus áudios são processados apenas para extração de dados e não são armazenados permanentemente.'},
-            {q: 'Qual o limite de tamanho dos áudios?', a: 'No plano Pro, suportamos áudios de até 15 minutos de duração contínua.'},
-            {q: 'A IA entende gírias e sotaques?', a: 'Nossa IA é treinada especificamente com dados em português brasileiro, reconhecendo a maioria dos sotaques regionais e gírias comuns.'},
-            {q: 'Como funciona o cancelamento?', a: 'O cancelamento é simples e pode ser feito a qualquer momento diretamente no seu painel de controle.'}
+            { q: 'Meus dados e áudios estão seguros?', a: 'Sim, utilizamos criptografia de ponta a ponta. Seus áudios são processados apenas para extração de dados e não são armazenados permanentemente.' },
+            { q: 'Qual o limite de tamanho dos áudios?', a: 'No plano Pro, suportamos áudios de até 15 minutos de duração contínua.' },
+            { q: 'A IA entende gírias e sotaques?', a: 'Nossa IA é treinada especificamente com dados em português brasileiro, reconhecendo a maioria dos sotaques regionais e gírias comuns.' },
+            { q: 'Como funciona o cancelamento?', a: 'O cancelamento é simples e pode ser feito a qualquer momento diretamente no seu painel de controle.' }
           ].map((faq, i) => (
             <details key={i} className="group bg-[#112240]/70 backdrop-blur border border-white/5 rounded-xl overflow-hidden transition-all duration-300 open:bg-[#112240]">
               <summary className="flex cursor-pointer items-center justify-between p-6 text-white hover:text-[#13eca4] transition-colors">

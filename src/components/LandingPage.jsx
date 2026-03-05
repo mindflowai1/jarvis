@@ -339,9 +339,7 @@ const LandingPage = () => {
                 <div className="max-w-7xl mx-auto px-6 lg:px-8 flex items-center justify-between h-16 sm:h-20">
                     {/* Logo */}
                     <a href="#" className="flex items-center gap-3 group">
-                        <div className="w-9 h-9 rounded-xl bg-[#0cf2cd] flex items-center justify-center shadow-[0_0_20px_rgba(12,242,205,0.3)] group-hover:shadow-[0_0_30px_rgba(12,242,205,0.5)] transition-shadow">
-                            <span className="text-gray-950 font-black text-sm">C</span>
-                        </div>
+                        <img src="/logo-controle-c.png" alt="Controle-C Logo" className="h-10 sm:h-12 w-auto object-contain drop-shadow-[0_0_15px_rgba(12,242,205,0.2)] group-hover:drop-shadow-[0_0_25px_rgba(12,242,205,0.4)] transition-all" />
                         <span className="font-bold text-lg tracking-tight text-white">Controle-C</span>
                     </a>
 

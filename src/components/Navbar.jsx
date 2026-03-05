@@ -56,8 +56,9 @@ const Navbar = () => {
             onHoverEnd={() => !isMobile && setIsHovered(false)}
             onClick={handleNavClick}
         >
-            <div className="nav-logo">
-                <span className="logo-text">JARVIS</span>
+            <div className="nav-logo flex items-center gap-3">
+                <img src="/logo-controle-c.png" alt="Controle-C Logo" className="h-10 sm:h-12 w-auto object-contain" />
+                <span className="logo-text font-bold text-lg tracking-tight text-white">Controle-C</span>
             </div>
 
             <AnimatePresence>
