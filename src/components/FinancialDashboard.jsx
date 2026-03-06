@@ -3,7 +3,7 @@ import DesktopFinancialDashboard from './FinancialDashboard/DesktopFinancialDash
 import MobileFinancialDashboard from './FinancialDashboard/MobileFinancialDashboard'
 import './FinancialDashboard.css'
 
-const FinancialDashboard = () => {
+const FinancialDashboard = ({ userName }) => {
     const financialData = useFinancialData()
 
     return (
@@ -15,10 +15,10 @@ const FinancialDashboard = () => {
               window.matchMedia in the hook to conditionally render.
             */}
             <div className="desktop-wrapper">
-                <DesktopFinancialDashboard {...financialData} />
+                <DesktopFinancialDashboard {...financialData} userName={userName} />
             </div>
             <div className="mobile-wrapper">
-                <MobileFinancialDashboard {...financialData} />
+                <MobileFinancialDashboard {...financialData} userName={userName} />
             </div>
         </div>
     )

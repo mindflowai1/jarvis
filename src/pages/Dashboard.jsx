@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react'
 import { supabase } from '../supabaseClient'
 import CalendarAgenda from '../components/CalendarAgenda'
 import PhoneNumberModal from '../components/PhoneNumberModal'
-import VoiceAssistant from '../components/VoiceAssistant/VoiceAssistant'
+import HomeDashboard from '../components/HomeDashboard/HomeDashboard'
 import FinancialDashboard from '../components/FinancialDashboard'
 import Tasks from '../components/Tasks'
 import Settings from '../components/Settings'
@@ -11,8 +11,18 @@ import '../index.css'
 const Dashboard = ({ session }) => {
     const [showPhoneModal, setShowPhoneModal] = useState(false)
     const [userProfile, setUserProfile] = useState(null)
-    const [activeTab, setActiveTab] = useState('assistant')
+    const [activeTab, setActiveTab] = useState('home')
     const [imageError, setImageError] = useState(false)
+
+    useEffect(() => {
+        const searchParams = new URLSearchParams(window.location.search);
+        const tab = searchParams.get('tab');
+        if (tab && ['home', 'calendar', 'finance', 'tasks', 'settings'].includes(tab)) {
+            setActiveTab(tab);
+            // Optionally clean up the URL
+            window.history.replaceState({}, '', window.location.pathname);
+        }
+    }, [])
 
     useEffect(() => {
         if (session?.user?.id) {
@@ -90,9 +100,9 @@ const Dashboard = ({ session }) => {
             {/* Desktop Sidebar */}
             <aside className="sidebar">
                 <div className="sidebar-header">
-                    <div className="flex flex-col items-center gap-4 py-4 px-2">
+                    <div className="flex flex-col items-center gap-2 py-2 px-2">
                         <img src="/logo-controle-c.png" alt="Controle-C Logo" className="sidebar-logo object-contain" />
-                        <h2 className="text-white text-2xl font-bold tracking-[0.15em] uppercase whitespace-nowrap" style={{ fontFamily: "'Rajdhani', sans-serif" }}>CONTROLE-C</h2>
+                        <h2 className="text-white text-xl font-bold tracking-[0.10em] uppercase whitespace-nowrap" style={{ fontFamily: "'Rajdhani', sans-serif" }}>CONTROLE-C</h2>
                     </div>
                 </div>
 
@@ -125,13 +135,13 @@ const Dashboard = ({ session }) => {
                 <nav className="sidebar-nav">
                     <a
                         href="#"
-                        className={`nav-item ${activeTab === 'assistant' ? 'active' : ''}`}
-                        onClick={(e) => { e.preventDefault(); setActiveTab('assistant'); }}
+                        className={`nav-item ${activeTab === 'home' ? 'active' : ''}`}
+                        onClick={(e) => { e.preventDefault(); setActiveTab('home'); }}
                     >
                         <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor">
-                            <path strokeLinecap="round" strokeLinejoin="round" d="M12 18.75a6 6 0 006-6v-1.5m-6 7.5a6 6 0 01-6-6v-1.5m6 7.5v3.75m-3.75 0h7.5M12 15.75a3 3 0 01-3-3V4.5a3 3 0 116 0v8.25a3 3 0 01-3 3z" />
+                            <path strokeLinecap="round" strokeLinejoin="round" d="M2.25 12l8.954-8.955c.44-.439 1.152-.439 1.591 0L21.75 12M4.5 9.75v10.125c0 .621.504 1.125 1.125 1.125H9.75v-4.875c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125V21h4.125c.621 0 1.125-.504 1.125-1.125V9.75M8.25 21h8.25" />
                         </svg>
-                        Assistente
+                        Início
                     </a>
                     <a
                         href="#"
@@ -188,13 +198,13 @@ const Dashboard = ({ session }) => {
             <nav className="mobile-nav">
                 <a
                     href="#"
-                    className={`mobile-nav-item ${activeTab === 'assistant' ? 'active' : ''}`}
-                    onClick={(e) => { e.preventDefault(); setActiveTab('assistant'); }}
+                    className={`mobile-nav-item ${activeTab === 'home' ? 'active' : ''}`}
+                    onClick={(e) => { e.preventDefault(); setActiveTab('home'); }}
                 >
                     <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor">
-                        <path strokeLinecap="round" strokeLinejoin="round" d="M12 18.75a6 6 0 006-6v-1.5m-6 7.5a6 6 0 01-6-6v-1.5m6 7.5v3.75m-3.75 0h7.5M12 15.75a3 3 0 01-3-3V4.5a3 3 0 116 0v8.25a3 3 0 01-3 3z" />
+                        <path strokeLinecap="round" strokeLinejoin="round" d="M2.25 12l8.954-8.955c.44-.439 1.152-.439 1.591 0L21.75 12M4.5 9.75v10.125c0 .621.504 1.125 1.125 1.125H9.75v-4.875c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125V21h4.125c.621 0 1.125-.504 1.125-1.125V9.75M8.25 21h8.25" />
                     </svg>
-                    <span>Assistente</span>
+                    <span>Início</span>
                 </a>
                 <a
                     href="#"
@@ -240,9 +250,9 @@ const Dashboard = ({ session }) => {
             </nav>
 
             <main className="main-content">
-                {activeTab === 'assistant' && <VoiceAssistant session={session} />}
+                {activeTab === 'home' && <HomeDashboard session={session} userName={userProfile?.name} onNavigate={setActiveTab} />}
                 {activeTab === 'calendar' && <CalendarAgenda session={session} />}
-                {activeTab === 'finance' && <FinancialDashboard />}
+                {activeTab === 'finance' && <FinancialDashboard userName={userProfile?.name || session?.user?.user_metadata?.full_name || session?.user?.email} />}
                 {activeTab === 'tasks' && <Tasks session={session} />}
                 {activeTab === 'settings' && <Settings session={session} />}
             </main>

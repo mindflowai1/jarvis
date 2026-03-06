@@ -1,7 +1,30 @@
 .settings-container {
-    max-width: 800px;
+    width: 100%;
+    max-width: 1400px;
     margin: 0 auto;
+    padding-bottom: 3rem;
     animation: fadeIn 0.5s ease-out;
+}
+
+@media (max-width: 768px) {
+    .settings-container {
+        margin-bottom: 120px;
+        padding-top: 1rem;
+        padding-bottom: 0px;
+    }
+}
+
+.settings-grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: var(--space-lg);
+    align-items: stretch;
+}
+
+@media (min-width: 1024px) {
+    .settings-grid {
+        grid-template-columns: repeat(3, 1fr);
+    }
 }
 
 .settings-title {
@@ -20,7 +43,6 @@
     backdrop-filter: blur(12px);
     border-radius: 20px;
     padding: var(--space-lg);
-    margin-bottom: var(--space-lg);
 }
 
 .section-title {

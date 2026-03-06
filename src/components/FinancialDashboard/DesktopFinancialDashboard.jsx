@@ -2,6 +2,7 @@ import { useState } from 'react'
 import TransactionModal from '../TransactionModal'
 import RecurringReminders from '../RecurringReminders'
 import ExpensePieChart from '../ExpensePieChart'
+import { exportFinancialPDF } from '../../utils/exportFinancialPDF'
 import '../FinancialDashboard.css' // Reusing original styles for desktop
 
 const DesktopFinancialDashboard = ({
@@ -12,7 +13,8 @@ const DesktopFinancialDashboard = ({
     categories,
     handleFilterChange,
     deleteTransaction,
-    saveTransaction
+    saveTransaction,
+    userName
 }) => {
     // UI State local to this view
     const [isModalOpen, setIsModalOpen] = useState(false)
@@ -82,6 +84,16 @@ const DesktopFinancialDashboard = ({
                             <path strokeLinecap="round" strokeLinejoin="round" d="M6.75 3v2.25M17.25 3v2.25M3 18.75V7.5a2.25 2.25 0 012.25-2.25h13.5A2.25 2.25 0 0121 7.5v11.25m-18 0A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75m-18 0v-7.5A2.25 2.25 0 015.25 9h13.5A2.25 2.25 0 0121 11.25v7.5" />
                         </svg>
                         <span className="btn-label">Lembretes</span>
+                    </button>
+                    <button
+                        onClick={() => exportFinancialPDF(transactions, stats, filters, userName)}
+                        className="header-btn"
+                        title="Exportar Relatório PDF"
+                    >
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor">
+                            <path strokeLinecap="round" strokeLinejoin="round" d="M19.5 14.25v-2.625a3.375 3.375 0 00-3.375-3.375h-1.5A1.125 1.125 0 0113.5 7.125v-1.5a3.375 3.375 0 00-3.375-3.375H8.25m3.75 9v6m3-3H9m1.5-12H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 00-9-9z" />
+                        </svg>
+                        <span className="btn-label">Exportar</span>
                     </button>
                     <button
                         onClick={() => { setEditingTransaction(null); setIsModalOpen(true); }}

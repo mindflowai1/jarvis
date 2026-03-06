@@ -16,9 +16,96 @@ const Settings = ({ session }) => {
     const [passwordError, setPasswordError] = useState(null)
     const [passwordSuccess, setPasswordSuccess] = useState('')
 
+    // Calendar Integration State
+    const [isCalendarConnected, setIsCalendarConnected] = useState(false)
+    const [checkingConnection, setCheckingConnection] = useState(true)
+    const [connectingCalendar, setConnectingCalendar] = useState(false)
+
     useEffect(() => {
         fetchProfile()
+        checkCalendarConnection()
+
+        const handleVisibilityChange = () => {
+            if (!document.hidden) {
+                checkCalendarConnection()
+            }
+        }
+        document.addEventListener('visibilitychange', handleVisibilityChange)
+        return () => document.removeEventListener('visibilitychange', handleVisibilityChange)
     }, [session])
+
+    const checkCalendarConnection = async () => {
+        try {
+            const { data, error } = await supabase
+                .from('user_integrations')
+                .select('refresh_token')
+                .eq('user_id', session.user.id)
+                .eq('provider', 'google')
+                .maybeSingle()
+
+            if (error) {
+                console.error('Error checking calendar connection:', error)
+                setCheckingConnection(false)
+                return false
+            }
+
+            const isConnected = !!data?.refresh_token
+            setIsCalendarConnected(isConnected)
+            return isConnected
+        } catch (err) {
+            console.error('Error:', err)
+            setCheckingConnection(false)
+            return false
+        } finally {
+            setCheckingConnection(false)
+        }
+    }
+
+    const handleConnectGoogle = async () => {
+        setConnectingCalendar(true)
+        try {
+            const { error } = await supabase.auth.signInWithOAuth({
+                provider: 'google',
+                options: {
+                    redirectTo: `${window.location.origin}/dashboard?tab=settings`,
+                    scopes: 'https://www.googleapis.com/auth/calendar',
+                    queryParams: {
+                        access_type: 'offline',
+                        prompt: 'consent',
+                    },
+                },
+            })
+
+            if (error) throw error
+        } catch (err) {
+            console.error('Error:', err)
+            alert('Erro ao conectar com Google Calendar')
+        } finally {
+            setConnectingCalendar(false)
+        }
+    }
+
+    const handleDisconnectGoogle = async () => {
+        if (!confirm('Tem certeza que deseja desconectar o Google Calendar? Seus agendamentos continuarão lá, mas a plataforma não poderá mais acessá-los.')) return;
+
+        setConnectingCalendar(true)
+        try {
+            const { error } = await supabase
+                .from('user_integrations')
+                .delete()
+                .eq('user_id', session.user.id)
+                .eq('provider', 'google')
+
+            if (error) throw error
+
+            setIsCalendarConnected(false)
+        } catch (err) {
+            console.error('Error disconnecting calendar:', err)
+            alert('Erro ao desconectar do Google Calendar')
+        } finally {
+            setConnectingCalendar(false)
+        }
+    }
 
     const fetchProfile = async () => {
         try {
@@ -168,92 +255,149 @@ const Settings = ({ session }) => {
         <div className="settings-container">
             <h2 className="settings-title">Configurações</h2>
 
-            <div className="settings-card">
-                <h3 className="section-title">Perfil</h3>
+            <div className="settings-grid">
+                <div className="settings-card">
+                    <h3 className="section-title">Perfil</h3>
 
-                <div className="input-group">
-                    <label>Número de WhatsApp</label>
-                    <div className="phone-input-wrapper-settings">
-                        <div className="country-code-badge">🇧🇷 +55</div>
+                    <div className="input-group">
+                        <label>Número de WhatsApp</label>
+                        <div className="phone-input-wrapper-settings">
+                            <div className="country-code-badge">🇧🇷 +55</div>
+                            <input
+                                type="tel"
+                                className={`settings-input ${error ? 'input-error' : ''}`}
+                                placeholder="(11) 99999-9999"
+                                value={phone}
+                                onChange={handleChange}
+                                disabled={loading}
+                            />
+                        </div>
+                        <p className="helper-text">Este número será usado para integração com assistente.</p>
+                    </div>
+
+                    {error && (
+                        <div className="error-message-settings">
+                            {error}
+                        </div>
+                    )}
+
+                    {successMessage && (
+                        <div className="success-message-settings">
+                            {successMessage}
+                        </div>
+                    )}
+
+                    <button
+                        className="save-settings-btn"
+                        onClick={handleSave}
+                        disabled={loading || phone.length < 15}
+                    >
+                        {loading ? 'Salvando...' : 'Salvar Alterações'}
+                    </button>
+                </div>
+
+                <div className="settings-card">
+                    <h3 className="section-title">Segurança</h3>
+
+                    <div className="input-group">
+                        <label>Nova Senha</label>
                         <input
-                            type="tel"
-                            className={`settings-input ${error ? 'input-error' : ''}`}
-                            placeholder="(11) 99999-9999"
-                            value={phone}
-                            onChange={handleChange}
-                            disabled={loading}
+                            type="password"
+                            className={`settings-input ${passwordError ? 'input-error' : ''}`}
+                            placeholder="Nova senha (mínimo 6 caracteres)"
+                            value={newPassword}
+                            onChange={(e) => setNewPassword(e.target.value)}
+                            disabled={loadingPassword}
                         />
                     </div>
-                    <p className="helper-text">Este número será usado para integração com assistente.</p>
+
+                    <div className="input-group">
+                        <label>Confirmar Senha</label>
+                        <input
+                            type="password"
+                            className={`settings-input ${passwordError ? 'input-error' : ''}`}
+                            placeholder="Confirme a nova senha"
+                            value={confirmPassword}
+                            onChange={(e) => setConfirmPassword(e.target.value)}
+                            disabled={loadingPassword}
+                        />
+                    </div>
+
+                    {passwordError && (
+                        <div className="error-message-settings">
+                            {passwordError}
+                        </div>
+                    )}
+
+                    {passwordSuccess && (
+                        <div className="success-message-settings">
+                            {passwordSuccess}
+                        </div>
+                    )}
+
+                    <button
+                        className="save-settings-btn"
+                        onClick={handleUpdatePassword}
+                        disabled={loadingPassword || !newPassword}
+                    >
+                        {loadingPassword ? 'Atualizando...' : 'Alterar Senha'}
+                    </button>
                 </div>
 
-                {error && (
-                    <div className="error-message-settings">
-                        {error}
+                <div className="settings-card">
+                    <h3 className="section-title">Integrações</h3>
+
+                    <div className="calendar-status-wrapper">
+                        <div className="calendar-status-info">
+                            <div className="calendar-icon">📅</div>
+                            <div>
+                                <h4 className="calendar-status-label">Google Calendar</h4>
+                                <p className="calendar-status-description">
+                                    Sincronize seus agendamentos e eventos.
+                                </p>
+                            </div>
+                        </div>
+                        <div className={`calendar-status-badge ${isCalendarConnected ? 'connected' : 'disconnected'}`}>
+                            <div className="status-dot"></div>
+                            {isCalendarConnected ? 'Conectado' : 'Desconectado'}
+                        </div>
                     </div>
-                )}
 
-                {successMessage && (
-                    <div className="success-message-settings">
-                        {successMessage}
+                    <div className="calendar-actions">
+                        {checkingConnection ? (
+                            <button className="connect-calendar-btn" style={{ background: 'rgba(51, 65, 85, 0.4)', color: '#94a3b8', border: '1px solid rgba(255, 255, 255, 0.05)' }} disabled>
+                                Verificando status...
+                            </button>
+                        ) : isCalendarConnected ? (
+                            <button
+                                className="disconnect-calendar-btn"
+                                onClick={handleDisconnectGoogle}
+                                disabled={connectingCalendar}
+                            >
+                                {connectingCalendar ? 'Processando...' : 'Desconectar Agenda'}
+                            </button>
+                        ) : (
+                            <button
+                                className="connect-calendar-btn"
+                                onClick={handleConnectGoogle}
+                                disabled={connectingCalendar}
+                            >
+                                <svg className="google-icon-small" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48">
+                                    <path fill="#FFC107" d="M43.611,20.083H42V20H24v8h11.303c-1.649,4.657-6.08,8-11.303,8c-6.627,0-12-5.373-12-12c0-6.627,5.373-12,12-12c3.059,0,5.842,1.154,7.961,3.039l5.657-5.657C34.046,6.053,29.268,4,24,4C12.955,4,4,12.955,4,24c0,11.045,8.955,20,20,20c11.045,0,20-8.955,20-20C44,22.659,43.862,21.35,43.611,20.083z" />
+                                    <path fill="#FF3D00" d="M6.306,14.691l6.571,4.819C14.655,15.108,18.961,12,24,12c3.059,0,5.842,1.154,7.961,3.039l5.657-5.657C34.046,6.053,29.268,4,24,4C16.318,4,9.656,8.337,6.306,14.691z" />
+                                    <path fill="#4CAF50" d="M24,44c5.166,0,9.86-1.977,13.409-5.192l-6.19-5.238C29.211,35.091,26.715,36,24,36c-5.202,0-9.619-3.317-11.283-7.946l-6.522,5.025C9.505,39.556,16.227,44,24,44z" />
+                                    <path fill="#1976D2" d="M43.611,20.083H42V20H24v8h11.303c-0.792,2.237-2.231,4.166-4.087,5.571c0.001-0.001,0.002-0.001,0.003-0.002l6.19,5.238C36.971,39.205,44,34,44,24C44,22.659,43.862,21.35,43.611,20.083z" />
+                                </svg>
+                                {connectingCalendar ? 'Conectando...' : 'Conectar com Google'}
+                            </button>
+                        )}
                     </div>
-                )}
-
-                <button
-                    className="save-settings-btn"
-                    onClick={handleSave}
-                    disabled={loading || phone.length < 15}
-                >
-                    {loading ? 'Salvando...' : 'Salvar Alterações'}
-                </button>
-            </div>
-
-            <div className="settings-card">
-                <h3 className="section-title">Segurança</h3>
-
-                <div className="input-group">
-                    <label>Nova Senha</label>
-                    <input
-                        type="password"
-                        className={`settings-input ${passwordError ? 'input-error' : ''}`}
-                        placeholder="Nova senha (mínimo 6 caracteres)"
-                        value={newPassword}
-                        onChange={(e) => setNewPassword(e.target.value)}
-                        disabled={loadingPassword}
-                    />
+                    {!isCalendarConnected && (
+                        <p className="calendar-helper-text">
+                            A integração permite que seus agendamentos sejam criados e gerenciados diretamente pela plataforma e pelo assistente IA.
+                        </p>
+                    )}
                 </div>
-
-                <div className="input-group">
-                    <label>Confirmar Senha</label>
-                    <input
-                        type="password"
-                        className={`settings-input ${passwordError ? 'input-error' : ''}`}
-                        placeholder="Confirme a nova senha"
-                        value={confirmPassword}
-                        onChange={(e) => setConfirmPassword(e.target.value)}
-                        disabled={loadingPassword}
-                    />
-                </div>
-
-                {passwordError && (
-                    <div className="error-message-settings">
-                        {passwordError}
-                    </div>
-                )}
-
-                {passwordSuccess && (
-                    <div className="success-message-settings">
-                        {passwordSuccess}
-                    </div>
-                )}
-
-                <button
-                    className="save-settings-btn"
-                    onClick={handleUpdatePassword}
-                    disabled={loadingPassword || !newPassword}
-                >
-                    {loadingPassword ? 'Atualizando...' : 'Alterar Senha'}
-                </button>
             </div>
         </div>
     )
