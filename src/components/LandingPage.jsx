@@ -1000,15 +1000,18 @@ const LandingPage = () => {
                                     ))}
                                 </ul>
 
-                                <button
-                                    className={`w-full py-4 rounded-xl font-bold text-base transition-all duration-300 cursor-pointer ${plan.popular
+                                <a
+                                    href="https://pay.zouti.com.br/checkout?product_offer_id=prod_offer_ydek6nmp28nqr06wkqifds"
+                                    target="_blank"
+                                    rel="noreferrer"
+                                    className={`w-full py-4 rounded-xl font-bold text-base transition-all duration-300 cursor-pointer flex items-center justify-center ${plan.popular
                                         ? 'bg-[#0cf2cd] hover:bg-[#1efadb] text-gray-950 shadow-[0_0_25px_rgba(12,242,205,0.25)] hover:shadow-[0_0_40px_rgba(12,242,205,0.45)]'
                                         : 'bg-white/5 hover:bg-white/10 text-white border border-white/10 hover:border-white/20'
                                         }`
                                     }
                                 >
                                     {plan.popular ? 'Assinar Plano Anual' : 'Assinar Plano Mensal'}
-                                </button>
+                                </a>
                             </motion.div>
                         ))}
                     </div>

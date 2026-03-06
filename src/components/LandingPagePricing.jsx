@@ -77,7 +77,7 @@ const LandingPagePricing = () => {
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-8 w-full max-w-5xl px-4">
 
                     {/* Starter Plan */}
-                    <ScrollReveal variant="fadeInUp" delay={0.2}>
+                    <ScrollReveal variant="fadeInUp" delay={0.2} className="order-2 md:order-1">
                         <div className="group relative flex flex-col h-full rounded-3xl border border-white/10 bg-gradient-to-br from-[#112240]/60 to-[#0d1a2d]/40 backdrop-blur-xl p-10 hover:border-white/20 hover:shadow-2xl transition-all duration-500 hover:-translate-y-2">
                             {/* Glow Effect */}
                             <div className="absolute inset-0 bg-gradient-to-br from-[#13eca4]/0 via-[#13eca4]/0 to-[#13eca4]/5 opacity-0 group-hover:opacity-100 transition-opacity duration-500 rounded-3xl pointer-events-none"></div>
@@ -117,18 +117,20 @@ const LandingPagePricing = () => {
                                 </div>
 
                                 {/* CTA Button */}
-                                <button
-                                    onClick={() => window.open('https://wa.me/5511999999999', '_blank')}
-                                    className="w-full py-4 rounded-xl border-2 border-white/20 text-white font-display font-bold hover:bg-white/5 hover:border-white/30 transition-all duration-300 transform hover:-translate-y-1 shadow-lg hover:shadow-xl text-base"
+                                <a
+                                    href="https://pay.zouti.com.br/checkout?product_offer_id=prod_offer_ydek6nmp28nqr06wkqifds"
+                                    target="_blank"
+                                    rel="noreferrer"
+                                    className="w-full py-4 rounded-xl border-2 border-white/20 text-white font-display font-bold hover:bg-white/5 hover:border-white/30 transition-all duration-300 transform hover:-translate-y-1 shadow-lg hover:shadow-xl text-base flex justify-center items-center"
                                 >
                                     Começar Grátis
-                                </button>
+                                </a>
                             </div>
                         </div>
                     </ScrollReveal>
 
                     {/* Pro Plan - Featured */}
-                    <ScrollReveal variant="fadeInUp" delay={0.3}>
+                    <ScrollReveal variant="fadeInUp" delay={0.3} className="order-1 md:order-2">
                         <div className="group relative flex flex-col h-full rounded-3xl border-2 border-[#13eca4]/50 bg-gradient-to-br from-[#112240]/90 to-[#0f2e2a]/70 backdrop-blur-2xl p-10 shadow-[0_0_40px_rgba(19,236,164,0.2)] transform md:-translate-y-4 hover:-translate-y-6 transition-all duration-500 hover:shadow-[0_0_60px_rgba(19,236,164,0.4)]">
 
                             {/* Recommended Badge */}
@@ -193,13 +195,15 @@ const LandingPagePricing = () => {
                                 </div>
 
                                 {/* CTA Button */}
-                                <button
-                                    onClick={() => window.open('https://wa.me/5511999999999', '_blank')}
+                                <a
+                                    href="https://pay.zouti.com.br/checkout?product_offer_id=prod_offer_ydek6nmp28nqr06wkqifds"
+                                    target="_blank"
+                                    rel="noreferrer"
                                     className="w-full py-4 rounded-xl bg-gradient-to-r from-[#13eca4] to-[#0fb880] text-[#0a192f] font-display font-black hover:from-[#0fb880] hover:to-[#0da872] transition-all duration-300 transform hover:-translate-y-1 shadow-[0_8px_30px_rgba(19,236,164,0.4)] hover:shadow-[0_12px_40px_rgba(19,236,164,0.6)] text-base flex items-center justify-center gap-2"
                                 >
                                     Começar Agora
                                     <ArrowRight size={18} strokeWidth={3} />
-                                </button>
+                                </a>
                             </div>
                         </div>
                     </ScrollReveal>
@@ -279,13 +283,15 @@ const LandingPagePricing = () => {
                                 </p>
                             </div>
                             <div className="flex-shrink-0">
-                                <button
-                                    onClick={() => window.open('https://wa.me/5511999999999', '_blank')}
-                                    className="group px-10 py-5 bg-gradient-to-r from-[#13eca4] to-[#0fb880] hover:from-[#0fb880] hover:to-[#0da872] text-[#0a192f] font-display font-black rounded-2xl shadow-[0_0_40px_rgba(19,236,164,0.5)] transition-all transform hover:-translate-y-2 hover:shadow-[0_0_60px_rgba(19,236,164,0.7)] text-lg flex items-center gap-3"
+                                <a
+                                    href="https://pay.zouti.com.br/checkout?product_offer_id=prod_offer_ydek6nmp28nqr06wkqifds"
+                                    target="_blank"
+                                    rel="noreferrer"
+                                    className="group px-10 py-5 bg-gradient-to-r from-[#13eca4] to-[#0fb880] hover:from-[#0fb880] hover:to-[#0da872] text-[#0a192f] font-display font-black rounded-2xl shadow-[0_0_40px_rgba(19,236,164,0.5)] transition-all transform hover:-translate-y-2 hover:shadow-[0_0_60px_rgba(19,236,164,0.7)] text-lg flex items-center justify-center gap-3"
                                 >
                                     Começar Teste Grátis
                                     <ArrowRight size={22} className="group-hover:translate-x-1 transition-transform" strokeWidth={3} />
-                                </button>
+                                </a>
                             </div>
                         </div>
                     </div>
