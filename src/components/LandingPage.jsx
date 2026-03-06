@@ -1,5 +1,5 @@
 import React, { Suspense, useState, useEffect } from 'react';
-import { motion } from 'framer-motion';
+import { motion, AnimatePresence } from 'framer-motion';
 import ParticleWave3D from './ParticleWave3D';
 
 // ── Componentes Utilitários ──────────────────────────────────────────
@@ -373,17 +373,27 @@ const LandingPage = () => {
                 </div>
 
                 {/* Mobile Drawer */}
-                {mobileMenuOpen && (
-                    <div className="md:hidden border-t border-white/5 bg-gray-950/95 backdrop-blur-xl px-6 pb-6 pt-4 flex flex-col gap-4 animate-in slide-in-from-top">
-                        <a href="#recursos" onClick={() => setMobileMenuOpen(false)} className="text-slate-300 hover:text-white py-2 text-base">Recursos</a>
-                        <a href="#precos" onClick={() => setMobileMenuOpen(false)} className="text-slate-300 hover:text-white py-2 text-base">Preços</a>
-                        <a href="#faq" onClick={() => setMobileMenuOpen(false)} className="text-slate-300 hover:text-white py-2 text-base">FAQ</a>
-                        <a href="/login" onClick={() => setMobileMenuOpen(false)} className="text-slate-300 hover:text-white py-2 text-base border-t border-white/5 pt-4">Entrar</a>
-                        <a href="#precos" onClick={() => setMobileMenuOpen(false)} className="mt-2 text-center bg-[#0cf2cd] text-gray-950 font-bold py-3 px-6 rounded-xl">
-                            Assinar Agora
-                        </a>
-                    </div>
-                )}
+                <AnimatePresence>
+                    {mobileMenuOpen && (
+                        <motion.div
+                            initial={{ opacity: 0, height: 0 }}
+                            animate={{ opacity: 1, height: 'auto' }}
+                            exit={{ opacity: 0, height: 0 }}
+                            transition={{ duration: 0.3, ease: 'easeInOut' }}
+                            className="md:hidden border-t border-white/5 bg-gray-950/95 backdrop-blur-xl flex flex-col overflow-hidden"
+                        >
+                            <div className="px-6 pb-6 pt-4 flex flex-col gap-4">
+                                <a href="#recursos" onClick={() => setMobileMenuOpen(false)} className="text-slate-300 hover:text-white py-2 text-base">Recursos</a>
+                                <a href="#precos" onClick={() => setMobileMenuOpen(false)} className="text-slate-300 hover:text-white py-2 text-base">Preços</a>
+                                <a href="#faq" onClick={() => setMobileMenuOpen(false)} className="text-slate-300 hover:text-white py-2 text-base">FAQ</a>
+                                <a href="/login" onClick={() => setMobileMenuOpen(false)} className="text-slate-300 hover:text-white py-2 text-base border-t border-white/5 pt-4">Entrar</a>
+                                <a href="#precos" onClick={() => setMobileMenuOpen(false)} className="mt-2 text-center bg-[#0cf2cd] text-gray-950 font-bold py-3 px-6 rounded-xl">
+                                    Assinar Agora
+                                </a>
+                            </div>
+                        </motion.div>
+                    )}
+                </AnimatePresence>
             </nav>
 
             {/* ═══════════════ HERO ═══════════════ */}
