@@ -113,7 +113,9 @@ const AdminDashboard = ({ session }) => {
 
             if (error) throw error
 
-            alert(`Convite enviado para ${newUserData.email} com sucesso!`)
+            const generatedPassword = data.tempPassword || '123456';
+            alert(`Usuário criado com sucesso!\n\nEmail: ${newUserData.email}\nSenha Padrão: ${generatedPassword}\n\nO usuário já pode fazer login e começar a utilizar a plataforma.`);
+            
             setShowCreateModal(false)
             setNewUserData({ name: '', email: '' })
 

@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import TransactionModal from '../TransactionModal'
 import RecurringReminders from '../RecurringReminders'
+import ExpenseLimits from '../ExpenseLimits'
 import ExpensePieChart from '../ExpensePieChart'
 import { exportFinancialPDF } from '../../utils/exportFinancialPDF'
 import '../FinancialDashboard.css' // Reusing original styles for desktop
@@ -20,6 +21,7 @@ const DesktopFinancialDashboard = ({
     const [isModalOpen, setIsModalOpen] = useState(false)
     const [editingTransaction, setEditingTransaction] = useState(null)
     const [isRemindersOpen, setIsRemindersOpen] = useState(false)
+    const [isLimitsOpen, setIsLimitsOpen] = useState(false)
 
     // Helpers
     const formatCurrency = (value) => {
@@ -84,6 +86,16 @@ const DesktopFinancialDashboard = ({
                             <path strokeLinecap="round" strokeLinejoin="round" d="M6.75 3v2.25M17.25 3v2.25M3 18.75V7.5a2.25 2.25 0 012.25-2.25h13.5A2.25 2.25 0 0121 7.5v11.25m-18 0A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75m-18 0v-7.5A2.25 2.25 0 015.25 9h13.5A2.25 2.25 0 0121 11.25v7.5" />
                         </svg>
                         <span className="btn-label">Lembretes</span>
+                    </button>
+                    <button
+                        onClick={() => setIsLimitsOpen(true)}
+                        className="header-btn"
+                        title="Limites de Gastos"
+                    >
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor">
+                            <path strokeLinecap="round" strokeLinejoin="round" d="M12 6v12m-3-2.818l.879.659c1.171.879 3.07.879 4.242 0 1.172-.879 1.172-2.303 0-3.182C13.536 12.219 12.768 12 12 12c-.725 0-1.45-.22-2.003-.659-1.106-.879-1.106-2.303 0-3.182s2.9-.879 4.006 0l.415.33M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                        </svg>
+                        <span className="btn-label">Limites</span>
                     </button>
                     <button
                         onClick={() => exportFinancialPDF(transactions, stats, filters, userName)}
@@ -278,6 +290,13 @@ const DesktopFinancialDashboard = ({
             <RecurringReminders
                 isOpen={isRemindersOpen}
                 onClose={() => setIsRemindersOpen(false)}
+            />
+
+            <ExpenseLimits
+                isOpen={isLimitsOpen}
+                onClose={() => setIsLimitsOpen(false)}
+                transactions={transactions}
+                categories={categories}
             />
         </div>
     )

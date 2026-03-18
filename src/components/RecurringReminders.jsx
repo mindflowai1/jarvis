@@ -7,7 +7,7 @@ const RecurringReminders = ({ isOpen, onClose }) => {
     const [reminders, setReminders] = useState([])
     const [loading, setLoading] = useState(true)
     const [editingId, setEditingId] = useState(null)
-    const [formData, setFormData] = useState({ summary: '', due_day: 1 })
+    const [formData, setFormData] = useState({ summary: '', due_day: 1, amount: '' })
     const [isAdding, setIsAdding] = useState(false)
 
     useEffect(() => {
@@ -46,7 +46,8 @@ const RecurringReminders = ({ isOpen, onClose }) => {
                     .from('recurring_reminders')
                     .update({
                         summary: formData.summary,
-                        due_day: formData.due_day
+                        due_day: formData.due_day,
+                        amount: formData.amount ? parseFloat(formData.amount) : null
                     })
                     .eq('id', editingId)
 
@@ -58,13 +59,14 @@ const RecurringReminders = ({ isOpen, onClose }) => {
                     .insert({
                         user_id: user.id,
                         summary: formData.summary,
-                        due_day: formData.due_day
+                        due_day: formData.due_day,
+                        amount: formData.amount ? parseFloat(formData.amount) : null
                     })
 
                 if (error) throw error
             }
 
-            setFormData({ summary: '', due_day: 1 })
+            setFormData({ summary: '', due_day: 1, amount: '' })
             setEditingId(null)
             setIsAdding(false)
             loadReminders()
@@ -75,7 +77,7 @@ const RecurringReminders = ({ isOpen, onClose }) => {
     }
 
     const handleEdit = (reminder) => {
-        setFormData({ summary: reminder.summary, due_day: reminder.due_day })
+        setFormData({ summary: reminder.summary, due_day: reminder.due_day, amount: reminder.amount || '' })
         setEditingId(reminder.id)
         setIsAdding(true)
     }
@@ -98,7 +100,7 @@ const RecurringReminders = ({ isOpen, onClose }) => {
     }
 
     const cancelEdit = () => {
-        setFormData({ summary: '', due_day: 1 })
+        setFormData({ summary: '', due_day: 1, amount: '' })
         setEditingId(null)
         setIsAdding(false)
     }
@@ -148,22 +150,45 @@ const RecurringReminders = ({ isOpen, onClose }) => {
                                         animate={{ height: 'auto', opacity: 1 }}
                                         exit={{ height: 0, opacity: 0 }}
                                     >
-                                        <input
-                                            type="text"
-                                            placeholder="Ex: Aluguel, Netflix, Plano de Celular..."
-                                            value={formData.summary}
-                                            onChange={(e) => setFormData({ ...formData, summary: e.target.value })}
-                                            autoFocus
-                                        />
-                                        <div className="day-selector">
-                                            <label>Dia do vencimento:</label>
-                                            <input
-                                                type="number"
-                                                min="1"
-                                                max="31"
-                                                value={formData.due_day}
-                                                onChange={(e) => setFormData({ ...formData, due_day: parseInt(e.target.value) || 1 })}
-                                            />
+                                        <div className="form-group">
+                                            <label>Descrição da Conta</label>
+                                            <div className="input-wrapper">
+                                                <span className="input-prefix">📝</span>
+                                                <input
+                                                    type="text"
+                                                    placeholder="Ex: Aluguel, Netflix, Internet..."
+                                                    value={formData.summary}
+                                                    onChange={(e) => setFormData({ ...formData, summary: e.target.value })}
+                                                    autoFocus
+                                                />
+                                            </div>
+                                        </div>
+
+                                        <div className="form-group">
+                                            <label>Valor Previsto <span className="optional-badge">Opcional</span></label>
+                                            <div className="input-wrapper amount-wrapper">
+                                                <span className="input-prefix currency-prefix">R$</span>
+                                                <input
+                                                    type="number"
+                                                    step="0.01"
+                                                    placeholder="0,00"
+                                                    value={formData.amount}
+                                                    onChange={(e) => setFormData({ ...formData, amount: e.target.value })}
+                                                />
+                                            </div>
+                                        </div>
+
+                                        <div className="form-group day-group">
+                                            <label>Vence todo dia:</label>
+                                            <div className="day-selector">
+                                                <input
+                                                    type="number"
+                                                    min="1"
+                                                    max="31"
+                                                    value={formData.due_day}
+                                                    onChange={(e) => setFormData({ ...formData, due_day: parseInt(e.target.value) || 1 })}
+                                                />
+                                            </div>
                                         </div>
                                         <div className="form-actions">
                                             <button className="cancel-btn" onClick={cancelEdit}>Cancelar</button>
@@ -211,6 +236,12 @@ const RecurringReminders = ({ isOpen, onClose }) => {
                                             <div className="reminder-info">
                                                 <h3>{reminder.summary}</h3>
                                                 <p>Vence todo dia {reminder.due_day}</p>
+                                                {reminder.amount && (
+                                                    <div className="reminder-amount-badge">
+                                                        <span className="currency">R$</span>
+                                                        <span className="value">{parseFloat(reminder.amount).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</span>
+                                                    </div>
+                                                )}
                                             </div>
                                             <div className="reminder-actions">
                                                 <button

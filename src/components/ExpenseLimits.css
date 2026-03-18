@@ -1,0 +1,395 @@
+/* ExpenseLimits.css */
+
+/* Backdrop reusing drawer logic */
+.limits-backdrop {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.6);
+    backdrop-filter: blur(4px);
+    z-index: 999;
+}
+
+/* Drawer */
+.limits-drawer {
+    position: fixed;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    width: 90%;
+    max-width: 500px;
+    background: linear-gradient(180deg, #1e293b 0%, #0f172a 100%);
+    border-left: 1px solid rgba(255, 255, 255, 0.1);
+    box-shadow: -10px 0 40px rgba(0, 0, 0, 0.5);
+    z-index: 1000;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+}
+
+.limits-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    padding: 32px 24px 24px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    background: rgba(30, 41, 59, 0.5);
+}
+
+.limits-header h2 {
+    margin: 0 0 8px 0;
+    font-size: 24px;
+    font-weight: 600;
+    color: #f8fafc;
+}
+
+.limits-header p {
+    margin: 0;
+    font-size: 14px;
+    color: #94a3b8;
+}
+
+.close-btn {
+    background: rgba(148, 163, 184, 0.1);
+    border: none;
+    padding: 8px;
+    border-radius: 8px;
+    cursor: pointer;
+    color: #94a3b8;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s;
+}
+
+.close-btn:hover {
+    background: rgba(148, 163, 184, 0.2);
+    color: #f8fafc;
+}
+
+.limits-content {
+    flex: 1;
+    overflow-y: auto;
+    padding: 24px;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+/* Add Button */
+.add-limit-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    width: 100%;
+    padding: 16px;
+    background: rgba(16, 185, 129, 0.1);
+    border: 2px dashed rgba(16, 185, 129, 0.3);
+    border-radius: 12px;
+    color: #34d399;
+    font-size: 15px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.add-limit-btn svg {
+    width: 20px;
+    height: 20px;
+    flex-shrink: 0;
+}
+
+.add-limit-btn:hover {
+    background: rgba(16, 185, 129, 0.15);
+    border-color: rgba(16, 185, 129, 0.5);
+    transform: translateY(-2px);
+}
+
+.limit-form {
+    background: rgba(15, 23, 42, 0.4);
+    border: 1px solid rgba(255, 255, 255, 0.05);
+    border-radius: 16px;
+    padding: 24px;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+    backdrop-filter: blur(10px);
+}
+
+.form-group {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.form-group label {
+    color: #e2e8f0;
+    font-size: 14px;
+    font-weight: 500;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.input-wrapper {
+    position: relative;
+    display: flex;
+    align-items: center;
+    background: rgba(15, 23, 42, 0.6);
+    border: 1px solid rgba(148, 163, 184, 0.2);
+    border-radius: 10px;
+    overflow: hidden;
+    transition: all 0.2s;
+}
+
+.input-wrapper:focus-within {
+    border-color: #3b82f6;
+    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+    background: rgba(15, 23, 42, 0.8);
+}
+
+.input-prefix {
+    padding: 0 0 0 16px;
+    color: #64748b;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 16px;
+}
+
+.currency-prefix {
+    font-weight: 700;
+    color: #ef4444;
+    font-size: 15px;
+}
+
+.amount-wrapper:focus-within {
+    border-color: #10b981;
+    box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.15);
+}
+
+.limit-form input,
+.limit-form select {
+    flex: 1;
+    width: 100%;
+    background: transparent !important;
+    border: none !important;
+    box-shadow: none !important;
+    padding: 14px 16px;
+    color: #fff;
+    font-size: 16px;
+    font-weight: 500;
+    outline: none !important;
+    appearance: none;
+}
+
+.limit-form input::placeholder {
+    color: #475569;
+}
+
+.limit-form option {
+    background: #1e293b;
+    color: #fff;
+}
+
+.form-actions {
+    display: flex;
+    gap: 12px;
+    justify-content: flex-end;
+}
+
+.form-actions .save-btn {
+    padding: 10px 20px;
+    background: linear-gradient(135deg, #10b981, #059669);
+    border: none;
+    border-radius: 8px;
+    color: white;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.form-actions .save-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);
+}
+
+.form-actions .cancel-btn {
+    padding: 10px 20px;
+    background: rgba(148, 163, 184, 0.1);
+    border: none;
+    border-radius: 8px;
+    color: #94a3b8;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.form-actions .cancel-btn:hover {
+    background: rgba(148, 163, 184, 0.2);
+}
+
+/* Card Tracking */
+.limits-list {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
+.limit-card {
+    background: rgba(30, 41, 59, 0.4);
+    border: 1px solid rgba(148, 163, 184, 0.1);
+    border-radius: 16px;
+    padding: 20px;
+    transition: all 0.2s;
+    position: relative;
+    overflow: hidden;
+}
+
+.limit-card:hover {
+    background: rgba(30, 41, 59, 0.6);
+    border-color: rgba(148, 163, 184, 0.2);
+    transform: translateY(-2px);
+}
+
+.limit-header-info {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 16px;
+}
+
+.limit-cat {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 16px;
+    font-weight: 600;
+    color: #f8fafc;
+}
+
+.limit-cat-icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 36px;
+    height: 36px;
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 10px;
+    font-size: 18px;
+}
+
+.limit-actions {
+    display: flex;
+    gap: 8px;
+}
+
+.limit-actions button {
+    background: rgba(148, 163, 184, 0.05);
+    border: none;
+    padding: 6px;
+    border-radius: 6px;
+    color: #94a3b8;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.limit-actions button:hover {
+    background: rgba(255, 255, 255, 0.1);
+    color: #fff;
+}
+
+/* Progress Bar */
+.progress-container {
+    width: 100%;
+}
+
+.progress-stats {
+    display: flex;
+    justify-content: space-between;
+    font-size: 13px;
+    color: #cbd5e1;
+    margin-bottom: 8px;
+}
+
+.progress-stats .spent {
+    font-weight: 600;
+}
+
+.progress-track {
+    width: 100%;
+    height: 8px;
+    background: rgba(15, 23, 42, 0.6);
+    border-radius: 4px;
+    overflow: hidden;
+    position: relative;
+}
+
+.progress-fill {
+    height: 100%;
+    border-radius: 4px;
+    transition: width 0.5s ease-out, background-color 0.3s;
+}
+
+/* Colors for semantic status */
+.status-good .progress-fill {
+    background: linear-gradient(90deg, #10b981, #34d399);
+}
+.status-warning .progress-fill {
+    background: linear-gradient(90deg, #f59e0b, #fbbf24);
+}
+.status-danger .progress-fill {
+    background: linear-gradient(90deg, #ef4444, #f87171);
+}
+
+.status-good .spent { color: #34d399; }
+.status-warning .spent { color: #fbbf24; }
+.status-danger .spent { color: #f87171; }
+
+@media (max-width: 768px) {
+    .limits-drawer {
+        width: 100%;
+        max-width: 100%;
+        border-left: none;
+    }
+    
+    .limits-header {
+        padding: 24px 20px 20px;
+    }
+    
+    .limits-header h2 {
+        font-size: 20px;
+    }
+    
+    .limits-content {
+        padding: 20px;
+        gap: 16px;
+    }
+
+    .limit-form {
+        padding: 20px;
+        gap: 16px;
+    }
+
+    .limit-card {
+        padding: 16px;
+        border-radius: 12px;
+    }
+
+    .form-actions .cancel-btn,
+    .form-actions .save-btn {
+        flex: 1;
+        padding: 12px;
+        font-size: 15px;
+    }
+    
+    .input-wrapper {
+        border-radius: 8px;
+    }
+}

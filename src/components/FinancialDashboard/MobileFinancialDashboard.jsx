@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import TransactionModal from '../TransactionModal'
 import RecurringReminders from '../RecurringReminders'
+import ExpenseLimits from '../ExpenseLimits'
 import ExpensePieChart from '../ExpensePieChart'
 import { exportFinancialPDF } from '../../utils/exportFinancialPDF'
 import './MobileFinancialDashboard.css'
@@ -20,7 +21,9 @@ const MobileFinancialDashboard = ({
     const [isModalOpen, setIsModalOpen] = useState(false)
     const [editingTransaction, setEditingTransaction] = useState(null)
     const [isRemindersOpen, setIsRemindersOpen] = useState(false)
+    const [isLimitsOpen, setIsLimitsOpen] = useState(false)
     const [isFiltersOpen, setIsFiltersOpen] = useState(false)
+    const [isMenuOpen, setIsMenuOpen] = useState(false)
     const [showBalance, setShowBalance] = useState(true)
     const [activeTab, setActiveTab] = useState('transactions') // 'transactions' | 'charts'
 
@@ -68,17 +71,60 @@ const MobileFinancialDashboard = ({
                         </button>
                     </div>
                     <div className="header-actions">
-                        <button className="icon-btn" onClick={() => exportFinancialPDF(transactions, stats, filters, userName)} title="Exportar PDF">
-                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" width="20" height="20">
-                                <path strokeLinecap="round" strokeLinejoin="round" d="M19.5 14.25v-2.625a3.375 3.375 0 00-3.375-3.375h-1.5A1.125 1.125 0 0113.5 7.125v-1.5a3.375 3.375 0 00-3.375-3.375H8.25m3.75 9v6m3-3H9m1.5-12H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 00-9-9z" />
-                            </svg>
-                        </button>
-                        <button className="icon-btn" onClick={() => setIsRemindersOpen(true)}>
-                            📅
-                        </button>
-                        <button className="icon-btn" onClick={() => setIsFiltersOpen(true)}>
-                            🔍
-                        </button>
+                        <div className="dropdown-container">
+                            <button className="icon-btn" onClick={() => setIsMenuOpen(!isMenuOpen)} title="Menu">
+                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" width="24" height="24">
+                                    <path strokeLinecap="round" strokeLinejoin="round" d="M12 6.75a.75.75 0 110-1.5.75.75 0 010 1.5zM12 12.75a.75.75 0 110-1.5.75.75 0 010 1.5zM12 18.75a.75.75 0 110-1.5.75.75 0 010 1.5z" />
+                                </svg>
+                            </button>
+
+                            <AnimatePresence>
+                                {isMenuOpen && (
+                                    <>
+                                        <motion.div 
+                                            className="menu-backdrop-transparent" 
+                                            initial={{ opacity: 0 }} 
+                                            animate={{ opacity: 1 }} 
+                                            exit={{ opacity: 0 }}
+                                            onClick={() => setIsMenuOpen(false)}
+                                        />
+                                        <motion.div 
+                                            className="modern-dropdown"
+                                            initial={{ opacity: 0, scale: 0.9, y: -10 }}
+                                            animate={{ opacity: 1, scale: 1, y: 0 }}
+                                            exit={{ opacity: 0, scale: 0.9, y: -10 }}
+                                            transition={{ type: "spring", stiffness: 400, damping: 25 }}
+                                        >
+                                            <button className="dropdown-item" onClick={() => { setIsFiltersOpen(true); setIsMenuOpen(false); }}>
+                                                <span className="icon">🔍</span>
+                                                <span>Filtrar Transações</span>
+                                            </button>
+                                            <button className="dropdown-item" onClick={() => { setIsRemindersOpen(true); setIsMenuOpen(false); }}>
+                                                <span className="icon">📅</span>
+                                                <span>Lembretes Recorrentes</span>
+                                            </button>
+                                            <button className="dropdown-item" onClick={() => { setIsLimitsOpen(true); setIsMenuOpen(false); }}>
+                                                <span className="icon">
+                                                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" width="18" height="18">
+                                                        <path strokeLinecap="round" strokeLinejoin="round" d="M12 6v12m-3-2.818l.879.659c1.171.879 3.07.879 4.242 0 1.172-.879 1.172-2.303 0-3.182C13.536 12.219 12.768 12 12 12c-.725 0-1.45-.22-2.003-.659-1.106-.879-1.106-2.303 0-3.182s2.9-.879 4.006 0l.415.33M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                                    </svg>
+                                                </span>
+                                                <span>Limites de Gastos</span>
+                                            </button>
+                                            <div className="dropdown-divider"></div>
+                                            <button className="dropdown-item" onClick={() => { exportFinancialPDF(transactions, stats, filters, userName); setIsMenuOpen(false); }}>
+                                                <span className="icon">
+                                                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" width="18" height="18">
+                                                        <path strokeLinecap="round" strokeLinejoin="round" d="M19.5 14.25v-2.625a3.375 3.375 0 00-3.375-3.375h-1.5A1.125 1.125 0 0113.5 7.125v-1.5a3.375 3.375 0 00-3.375-3.375H8.25m3.75 9v6m3-3H9m1.5-12H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 00-9-9z" />
+                                                    </svg>
+                                                </span>
+                                                <span>Exportar Relatório PDF</span>
+                                            </button>
+                                        </motion.div>
+                                    </>
+                                )}
+                            </AnimatePresence>
+                        </div>
                     </div>
                 </div>
 
@@ -282,6 +328,13 @@ const MobileFinancialDashboard = ({
             <RecurringReminders
                 isOpen={isRemindersOpen}
                 onClose={() => setIsRemindersOpen(false)}
+            />
+
+            <ExpenseLimits
+                isOpen={isLimitsOpen}
+                onClose={() => setIsLimitsOpen(false)}
+                transactions={transactions}
+                categories={categories}
             />
         </div>
     )
