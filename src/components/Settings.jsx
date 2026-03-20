@@ -205,7 +205,27 @@ const Settings = ({ session }) => {
 
             setSuccessMessage('Número salvo com sucesso!')
 
-            // Refresh user profile in parent if needed (handled by Dashboard effect usually)
+            // ⚡ Dispara o Webhook do n8n com o número atualizado
+            const webhookUrl = import.meta.env.VITE_N8N_WEBHOOK_URL
+            if (webhookUrl) {
+                try {
+                    const userName = session.user.user_metadata?.full_name || session.user.email?.split('@')[0] || 'Usuário'
+                    await fetch(webhookUrl, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({
+                            userId: session.user.id,
+                            name: userName,
+                            email: session.user.email,
+                            whatsapp_number: whatsappNumber,
+                            event: 'phone_number_updated'
+                        })
+                    })
+                    console.log('🚀 Webhook n8n disparado com sucesso (número atualizado)!')
+                } catch (webhookErr) {
+                    console.error('⚠️ Falha ao disparar o webhook do n8n:', webhookErr)
+                }
+            }
 
         } catch (err) {
             console.error('Error saving phone:', err)
