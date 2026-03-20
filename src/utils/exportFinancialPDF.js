@@ -1,26 +1,60 @@
 import jsPDF from 'jspdf'
 import autoTable from 'jspdf-autotable'
 
-export const exportFinancialPDF = (transactions, stats, filters, userName) => {
+const loadImage = (url) => {
+    return new Promise((resolve, reject) => {
+        const img = new Image();
+        img.crossOrigin = 'Anonymous'; // Help with CORS if applicable
+        img.src = url;
+        img.onload = () => resolve(img);
+        img.onerror = (e) => reject(e);
+    });
+};
+
+export const exportFinancialPDF = async (transactions, stats, filters, userName) => {
     const doc = new jsPDF()
 
-    // Title
-    doc.setFontSize(20)
-    doc.setTextColor(40, 40, 40)
-    doc.text('Relatório Financeiro', 14, 22)
+    let startY = 32
+    let textStartX = 14
 
-    let currentY = 32
+    try {
+        const logoImg = await loadImage('/logo-controle-c.png')
+        // Calculate dimensions to keep aspect ratio. Max width 30.
+        const targetWidth = 35
+        const targetHeight = (logoImg.height * targetWidth) / logoImg.width
+        
+        // Draw the logo (x, y, width, height)
+        doc.addImage(logoImg, 'PNG', 14, 12, targetWidth, targetHeight, undefined, 'FAST')
+        
+        // Offset text to the right of the logo
+        textStartX = 14 + targetWidth + 6
+        
+        // If the logo takes more vertical space, push the content down
+        if (12 + targetHeight + 10 > startY) {
+            startY = 12 + targetHeight + 10
+        }
+    } catch (e) {
+        console.warn('Could not load logo for PDF:', e)
+    }
+
+    let currentY = startY
+
+    // Title
+    doc.setFontSize(22)
+    doc.setTextColor(30, 41, 59)
+    doc.setFont(undefined, 'bold')
+    doc.text('Relatório Financeiro', textStartX, 22)
 
     if (userName) {
         doc.setFontSize(11)
-        doc.setTextColor(60, 60, 60)
-        doc.text(`Gerado para: ${userName}`, 14, currentY)
-        currentY += 8
+        doc.setTextColor(100, 116, 139)
+        doc.setFont(undefined, 'normal')
+        doc.text(`Gerado para: ${userName}`, textStartX, 22 + 7)
     }
 
     // Subtitle & Filters Info
-    doc.setFontSize(10)
-    doc.setTextColor(100, 100, 100)
+    doc.setFontSize(9)
+    doc.setTextColor(148, 163, 184)
 
     const formatDate = (dateString) => {
         if (!dateString) return ''

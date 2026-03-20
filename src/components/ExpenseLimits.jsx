@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { supabase } from '../supabaseClient'
+import { STANDARD_CATEGORIES } from '../utils/constants'
 import './ExpenseLimits.css'
 
 const ExpenseLimits = ({ isOpen, onClose, transactions, categories }) => {
@@ -37,9 +38,9 @@ const ExpenseLimits = ({ isOpen, onClose, transactions, categories }) => {
             // Reset state
             setIsAdding(false)
             setEditingId(null)
-            setFormData({ category: categories[0] || '', amount: '' })
+            setFormData({ category: '', amount: '' })
         }
-    }, [isOpen, categories])
+    }, [isOpen])
 
     // Compute progress matching transactions array
     const getLimitProgress = (limitCategory, maxAmount) => {
@@ -85,7 +86,7 @@ const ExpenseLimits = ({ isOpen, onClose, transactions, categories }) => {
                 if (error) throw error
             }
 
-            setFormData({ category: categories[0] || '', amount: '' })
+            setFormData({ category: '', amount: '' })
             setEditingId(null)
             setIsAdding(false)
             loadLimits()
@@ -120,7 +121,15 @@ const ExpenseLimits = ({ isOpen, onClose, transactions, categories }) => {
             case 'saúde':
             case 'farmácia': return '💊'
             case 'moradia': return '🏠'
-            case 'compras': return '🛍️'
+            case 'compras': 
+            case 'shopping': return '🛍️'
+            case 'cuidados pessoais': return '💆'
+            case 'supermercado': return '🛒'
+            case 'banco':
+            case 'investimentos':
+            case 'salário': return '🏦'
+            case 'educação': return '📚'
+            case 'impostos': return '🧾'
             default: return '💸'
         }
     }
@@ -159,7 +168,7 @@ const ExpenseLimits = ({ isOpen, onClose, transactions, categories }) => {
                             {!isAdding ? (
                                 <button className="add-limit-btn" onClick={() => {
                                     setIsAdding(true)
-                                    setFormData({ category: categories[0] || '', amount: '' })
+                                    setFormData({ category: '', amount: '' })
                                 }}>
                                     <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor">
                                         <path strokeLinecap="round" strokeLinejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
@@ -180,7 +189,8 @@ const ExpenseLimits = ({ isOpen, onClose, transactions, categories }) => {
                                                 value={formData.category} 
                                                 onChange={(e) => setFormData({...formData, category: e.target.value})}
                                             >
-                                                {categories.map(cat => (
+                                                <option value="" disabled>Selecione uma categoria...</option>
+                                                {STANDARD_CATEGORIES.filter(cat => cat !== 'Recebimento').sort().map(cat => (
                                                     <option key={cat} value={cat}>{cat}</option>
                                                 ))}
                                             </select>

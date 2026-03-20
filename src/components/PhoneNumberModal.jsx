@@ -104,6 +104,30 @@ const PhoneNumberModal = ({ session, onSave, onClose }) => {
 
             console.log('✅ Phone saved successfully:', data[0])
 
+            // ⚡ Dispara o Webhook do n8n com o número do WhatsApp salvando o usuário novo!
+            const webhookUrl = import.meta.env.VITE_N8N_WEBHOOK_URL
+            if (webhookUrl) {
+                try {
+                    // Fire and forget (com leve await mas erro encapsulado pra não travar a UI)
+                    await fetch(webhookUrl, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify({
+                            userId: session.user.id,
+                            name: userName,
+                            email: session.user.email,
+                            whatsapp_number: whatsappNumber,
+                            event: 'new_user_onboarded'
+                        })
+                    })
+                    console.log('🚀 Webhook n8n de boas-vindas disparado com sucesso!')
+                } catch (webhookErr) {
+                    console.error('⚠️ Falha ao disparar o webhook do n8n (o fluxo seguiu normal):', webhookErr)
+                }
+            }
+
             if (onSave) onSave()
 
         } catch (err) {
