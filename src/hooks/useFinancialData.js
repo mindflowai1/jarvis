@@ -120,6 +120,18 @@ export const useFinancialData = () => {
         try {
             const { data: { user } } = await supabase.auth.getUser()
 
+            // Previne falha de fuso horário salvando sempre a transação no meio-dia UTC
+            // Isso garante que mesmo com oscilações de fuso, o dia "calendário" não mude.
+            let parsedDate;
+            if (data.created_at) {
+                // Se já tem T (ISO), usamos, senão montamos o dia com meio-dia UTC
+                parsedDate = data.created_at.includes('T') 
+                    ? data.created_at 
+                    : `${data.created_at}T12:00:00Z`;
+            } else {
+                parsedDate = new Date().toISOString();
+            }
+
             if (editingId) {
                 // Update
                 const { error } = await supabase
@@ -129,7 +141,7 @@ export const useFinancialData = () => {
                         tipo: data.tipo,
                         categoria: data.categoria,
                         summary: data.summary,
-                        created_at: data.created_at ? new Date(data.created_at).toISOString() : new Date().toISOString()
+                        created_at: parsedDate
                     })
                     .eq('id', editingId)
 
@@ -144,7 +156,7 @@ export const useFinancialData = () => {
                         tipo: data.tipo,
                         categoria: data.categoria,
                         summary: data.summary,
-                        created_at: data.created_at ? new Date(data.created_at).toISOString() : new Date().toISOString()
+                        created_at: parsedDate
                     })
 
                 if (error) throw error

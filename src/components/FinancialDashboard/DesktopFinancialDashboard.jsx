@@ -31,12 +31,12 @@ const DesktopFinancialDashboard = ({
         }).format(value)
     }
 
-    const formatDate = (dateString) => {
-        return new Date(dateString).toLocaleDateString('pt-BR', {
-            day: '2-digit',
-            month: '2-digit',
-            year: 'numeric'
-        })
+    const formatDate = (dateString = "") => {
+        if (!dateString) return ""
+        // Extrai data ignorando fuso (YYYY-MM-DD...)
+        const [datePart] = dateString.split(/[T ]/)
+        const [year, month, day] = datePart.split("-")
+        return `${day}/${month}/${year}`
     }
 
     const getIconForCategory = (category, type) => {

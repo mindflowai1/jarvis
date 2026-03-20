@@ -83,13 +83,27 @@ const getIconForCategory = (category) => {
     }
 }
 
+// Pega a data no formato YYYY-MM-DD ignorando fuso
+const getLocalYMD = (dateString = null) => {
+    if (dateString) {
+        // Separa '2026-03-01 00:00:00+00' por espaço ou T e pega a parte YYYY-MM-DD
+        const [datePart] = dateString.split(/[T ]/);
+        return datePart;
+    }
+    const date = new Date();
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, '0');
+    const day = String(date.getDate()).padStart(2, '0');
+    return `${year}-${month}-${day}`;
+};
+
 const TransactionModal = ({ isOpen, onClose, onSave, transaction }) => {
     const [formData, setFormData] = useState({
         valor: '',
         tipo: 'saida',
         categoria: '',
         summary: '',
-        created_at: new Date().toISOString().split('T')[0]
+        created_at: getLocalYMD()
     })
     const [loading, setLoading] = useState(false)
 
@@ -101,7 +115,7 @@ const TransactionModal = ({ isOpen, onClose, onSave, transaction }) => {
                 tipo: transaction.tipo,
                 categoria: transaction.categoria,
                 summary: transaction.summary || '',
-                created_at: transaction.created_at.split('T')[0]
+                created_at: getLocalYMD(transaction.created_at)
             })
         } else if (isOpen) {
             // Reset for new transaction
@@ -110,7 +124,7 @@ const TransactionModal = ({ isOpen, onClose, onSave, transaction }) => {
                 tipo: 'saida',
                 categoria: '',
                 summary: '',
-                created_at: new Date().toISOString().split('T')[0]
+                created_at: getLocalYMD()
             })
         }
     }, [transaction, isOpen])

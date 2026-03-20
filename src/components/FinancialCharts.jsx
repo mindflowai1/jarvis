@@ -63,14 +63,15 @@ const FinancialCharts = ({ transactions }) => {
         return Array.from(dailyBalances.entries())
             .sort((a, b) => new Date(a[0]) - new Date(b[0]))
             .map(([dateKey, balance]) => {
-                const dateObj = new Date(dateKey + 'T00:00:00')
+                const dateObj = new Date(dateKey + 'T12:00:00Z')
 
                 return {
                     date: dateObj.toLocaleDateString('pt-BR', {
                         day: '2-digit',
-                        month: 'short'
+                        month: 'short',
+                        timeZone: 'UTC'
                     }),
-                    fullDate: dateObj.toLocaleDateString('pt-BR'),
+                    fullDate: dateObj.toLocaleDateString('pt-BR', { timeZone: 'UTC' }),
                     balance: parseFloat(balance.toFixed(2))
                 }
             })

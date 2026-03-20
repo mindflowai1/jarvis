@@ -214,7 +214,11 @@ const MobileFinancialDashboard = ({
                                         <div className="card-details">
                                             <span className="card-title">{tx.summary || tx.categoria}</span>
                                             <span className="card-date">
-                                                {new Date(tx.created_at).toLocaleDateString('pt-BR', { day: 'numeric', month: 'short' })}
+                                                {(() => {
+                                                    const [datePart] = tx.created_at.split(/[T ]/);
+                                                    const [y, m, d] = datePart.split("-");
+                                                    return `${d}/${m}`;
+                                                })()}
                                             </span>
                                         </div>
                                         <div className={`card-amount ${tx.tipo}`}>
