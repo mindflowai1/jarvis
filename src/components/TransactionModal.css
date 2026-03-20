@@ -243,6 +243,34 @@
     flex-shrink: 0;
 }
 
+.btn-delete-modal {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 10px 12px;
+    border-radius: 10px;
+    background: transparent;
+    border: 1px solid rgba(239, 68, 68, 0.2);
+    color: #ef4444;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.btn-delete-modal:hover {
+    background: rgba(239, 68, 68, 0.15);
+    border-color: rgba(239, 68, 68, 0.4);
+}
+
+.btn-delete-modal:active {
+    transform: scale(0.95);
+}
+
+.btn-delete-modal:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+    transform: none;
+}
+
 .btn-cancel {
     flex: 1;
     padding: 12px;

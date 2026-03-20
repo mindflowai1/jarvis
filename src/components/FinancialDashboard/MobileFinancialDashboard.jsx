@@ -81,14 +81,14 @@ const MobileFinancialDashboard = ({
                             <AnimatePresence>
                                 {isMenuOpen && (
                                     <>
-                                        <motion.div 
-                                            className="menu-backdrop-transparent" 
-                                            initial={{ opacity: 0 }} 
-                                            animate={{ opacity: 1 }} 
+                                        <motion.div
+                                            className="menu-backdrop-transparent"
+                                            initial={{ opacity: 0 }}
+                                            animate={{ opacity: 1 }}
                                             exit={{ opacity: 0 }}
                                             onClick={() => setIsMenuOpen(false)}
                                         />
-                                        <motion.div 
+                                        <motion.div
                                             className="modern-dropdown"
                                             initial={{ opacity: 0, scale: 0.9, y: -10 }}
                                             animate={{ opacity: 1, scale: 1, y: 0 }}
@@ -327,6 +327,7 @@ const MobileFinancialDashboard = ({
                 onSave={onSaveTransaction}
                 transaction={editingTransaction}
                 categories={categories}
+                onDelete={deleteTransaction}
             />
 
             <RecurringReminders

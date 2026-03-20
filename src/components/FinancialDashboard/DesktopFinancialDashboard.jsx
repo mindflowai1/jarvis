@@ -285,6 +285,7 @@ const DesktopFinancialDashboard = ({
                 onSave={onSaveTransaction}
                 transaction={editingTransaction}
                 categories={categories}
+                onDelete={deleteTransaction}
             />
 
             <RecurringReminders
