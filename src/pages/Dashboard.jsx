@@ -14,6 +14,8 @@ const Dashboard = ({ session }) => {
     const [activeTab, setActiveTab] = useState('home')
     const [imageError, setImageError] = useState(false)
 
+    const [isDashboardLoading, setIsDashboardLoading] = useState(true)
+
     useEffect(() => {
         const searchParams = new URLSearchParams(window.location.search);
         const tab = searchParams.get('tab');
@@ -27,17 +29,25 @@ const Dashboard = ({ session }) => {
     useEffect(() => {
         if (session?.user?.id) {
             checkUserProfile(session.user.id)
+        } else {
+            setIsDashboardLoading(false)
         }
     }, [session])
 
     const checkUserProfile = async (userId) => {
         console.log('🔍 Checking user profile for:', userId)
+        
+        // Timer to ensure a minimum display time for the smooth animation (visual polish)
+        const minLoadingTime = new Promise(resolve => setTimeout(resolve, 800))
+        
         try {
-            const { data, error } = await supabase
+            const profileReq = supabase
                 .from('user_profiles')
                 .select('*')
                 .eq('user_id', userId)
                 .single()
+            
+            const [{ data, error }] = await Promise.all([profileReq, minLoadingTime])
 
             if (error && error.code !== 'PGRST116') {
                 console.error('Error checking profile:', error)
@@ -54,6 +64,8 @@ const Dashboard = ({ session }) => {
             }
         } catch (err) {
             console.error('Unexpected error checking profile:', err)
+        } finally {
+            setIsDashboardLoading(false)
         }
     }
 
@@ -85,6 +97,18 @@ const Dashboard = ({ session }) => {
         if (session?.user?.id) {
             checkUserProfile(session.user.id)
         }
+    }
+
+    if (isDashboardLoading) {
+        return (
+            <div className="dashboard-global-loader">
+                <div className="loader-content">
+                    <img src="/logo-controle-c.png" alt="Controle-C" className="loader-logo-animated" />
+                    <h2 className="loader-title" style={{ fontFamily: "'Rajdhani', sans-serif" }}>CONTROLE-C</h2>
+                    <div className="modern-spinner"></div>
+                </div>
+            </div>
+        )
     }
 
     return (

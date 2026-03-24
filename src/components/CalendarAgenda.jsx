@@ -259,7 +259,7 @@ const CalendarAgenda = ({ session }) => {
     const handleCreateEvent = async (eventData) => {
         try {
             const accessToken = await getValidAccessToken()
-            const response = await fetch('https://www.googleapis.com/calendar/v3/calendars/primary/events', {
+            const response = await fetch('https://www.googleapis.com/calendar/v3/calendars/primary/events?conferenceDataVersion=1', {
                 method: 'POST',
                 headers: {
                     'Authorization': `Bearer ${accessToken}`,
@@ -283,7 +283,7 @@ const CalendarAgenda = ({ session }) => {
 
         try {
             const accessToken = await getValidAccessToken()
-            const response = await fetch(`https://www.googleapis.com/calendar/v3/calendars/primary/events/${selectedEvent.id}`, {
+            const response = await fetch(`https://www.googleapis.com/calendar/v3/calendars/primary/events/${selectedEvent.id}?conferenceDataVersion=1`, {
                 method: 'PUT',
                 headers: {
                     'Authorization': `Bearer ${accessToken}`,
