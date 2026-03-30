@@ -268,7 +268,11 @@ const CalendarAgenda = ({ session }) => {
                 body: JSON.stringify(eventData)
             })
 
-            if (!response.ok) throw new Error('Failed to create event')
+            if (!response.ok) {
+                const errorData = await response.json().catch(() => ({}))
+                console.error('API Error:', response.status, errorData)
+                throw new Error(`Failed to create event: ${errorData.error?.message || response.statusText}`)
+            }
 
             setIsModalOpen(false)
             fetchEvents() // Refresh list

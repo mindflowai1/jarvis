@@ -14,16 +14,14 @@
     -webkit-font-smoothing: antialiased;
 }
 
-/* ===== STICKY HEADER ===== */
-.mcal-header {
-    position: sticky;
-    top: 0;
-    z-index: 50;
-    background: rgba(15, 23, 42, 0.96);
-    backdrop-filter: blur(20px);
-    -webkit-backdrop-filter: blur(20px);
-    border-bottom: 1px solid rgba(255, 255, 255, 0.06);
-    padding: 16px 0 0;
+/* ===== STICKY HEADER - REMOVIDO (usando MobileHeader padronizado) ===== */
+/* Estilos mantidos para compatibilidade com mcal-logo-mobile */
+.mcal-logo-mobile {
+    width: 44px;
+    height: auto;
+    opacity: 0.95;
+    flex-shrink: 0;
+    filter: drop-shadow(0 10px 22px rgba(0, 0, 0, 0.35));
 }
 
 /* Header Row: [←  Month Year  →]  [Hoje] [+] */
@@ -31,8 +29,8 @@
     display: flex;
     align-items: center;
     justify-content: space-between;
-    padding: 0 16px 14px;
-    gap: 12px;
+    padding: 0 16px 12px;
+    gap: 10px;
 }
 
 .mcal-header-left {
@@ -44,23 +42,27 @@
 }
 
 .mcal-month-title {
-    font-size: 18px;
+    font-size: 17px;
     font-weight: 700;
     color: #f1f5f9;
     text-transform: capitalize;
     margin: 0;
     white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
     letter-spacing: -0.01em;
     background: linear-gradient(135deg, #fff 0%, #94a3b8 100%);
     -webkit-background-clip: text;
     background-clip: text;
     -webkit-text-fill-color: transparent;
+    flex: 1 1 auto;
+    min-width: 0;
 }
 
 .mcal-nav-arrow {
-    width: 34px;
-    height: 34px;
-    border-radius: 10px;
+    width: 36px;
+    height: 36px;
+    border-radius: 12px;
     background: rgba(255, 255, 255, 0.04);
     color: #94a3b8;
     border: 1px solid rgba(255, 255, 255, 0.06);
@@ -111,8 +113,8 @@
 }
 
 .mcal-add-btn {
-    width: 38px;
-    height: 38px;
+    width: 36px;
+    height: 36px;
     border-radius: 12px;
     background: rgba(59, 130, 246, 0.15);
     color: #60a5fa;

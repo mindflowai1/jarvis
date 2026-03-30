@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
+import MobileHeader from '../MobileHeader'
 import TransactionModal from '../TransactionModal'
 import RecurringReminders from '../RecurringReminders'
 import ExpenseLimits from '../ExpenseLimits'
@@ -61,23 +62,20 @@ const MobileFinancialDashboard = ({
 
     return (
         <div className="financial-dashboard mobile-view">
-            {/* Header Sticky */}
-            <header className="mobile-header">
-                <div className="header-top">
-                    <div className="logo-section">
-                        <h1>Financeiro</h1>
+            {/* Header Padronizado com ações à direita */}
+            <MobileHeader 
+                title="Financeiro" 
+                rightContent={
+                    <>
                         <button className="eye-btn" onClick={() => setShowBalance(!showBalance)}>
                             {showBalance ? '👁️' : '🔒'}
                         </button>
-                    </div>
-                    <div className="header-actions">
                         <div className="dropdown-container">
                             <button className="icon-btn" onClick={() => setIsMenuOpen(!isMenuOpen)} title="Menu">
                                 <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" width="24" height="24">
                                     <path strokeLinecap="round" strokeLinejoin="round" d="M12 6.75a.75.75 0 110-1.5.75.75 0 010 1.5zM12 12.75a.75.75 0 110-1.5.75.75 0 010 1.5zM12 18.75a.75.75 0 110-1.5.75.75 0 010 1.5z" />
                                 </svg>
                             </button>
-
                             <AnimatePresence>
                                 {isMenuOpen && (
                                     <>
@@ -125,8 +123,9 @@ const MobileFinancialDashboard = ({
                                 )}
                             </AnimatePresence>
                         </div>
-                    </div>
-                </div>
+                    </>
+                }
+            />
 
                 {/* Balance Card - Horizontal Scroll or Carousel feeling */}
                 <div className="summary-carousel">
@@ -151,7 +150,6 @@ const MobileFinancialDashboard = ({
                         </div>
                     </div>
                 </div>
-            </header>
 
             {/* Tab Switcher */}
             <div className="fin-tabs">

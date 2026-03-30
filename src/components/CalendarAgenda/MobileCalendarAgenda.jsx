@@ -1,5 +1,6 @@
 import { useEffect, useRef } from 'react'
 import { motion } from 'framer-motion'
+import MobileHeader from '../MobileHeader'
 import './MobileCalendarAgenda.css'
 
 const MobileCalendarAgenda = ({
@@ -45,8 +46,11 @@ const MobileCalendarAgenda = ({
 
     return (
         <div className="mcal-root">
-            {/* ===== STICKY HEADER ===== */}
-            <header className="mcal-header">
+            {/* ===== STICKY HEADER PADRONIZADO ===== */}
+            <MobileHeader title="Agenda" />
+
+            {/* ===== CONTROLS + DAY STRIP (below header) ===== */}
+            <div className="mcal-toolbar">
                 <div className="mcal-header-row">
                     <div className="mcal-header-left">
                         <button
@@ -110,7 +114,7 @@ const MobileCalendarAgenda = ({
                         )
                     })}
                 </div>
-            </header>
+            </div>
 
             {/* ===== EVENT LIST ===== */}
             <div className="mcal-content">

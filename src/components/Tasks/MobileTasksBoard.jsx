@@ -1,5 +1,6 @@
 import { useState, useRef } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
+import MobileHeader from '../MobileHeader'
 import './MobileTasksBoard.css'
 
 export default function MobileTasksBoard({
@@ -20,37 +21,40 @@ export default function MobileTasksBoard({
 
     return (
         <div className="mtk-container">
-            {/* ===== STICKY HEADER ===== */}
-            <div className="mtk-header">
-                <div className="mtk-header-top">
-                    <h2 className="mtk-title">Afazeres</h2>
-                    <div className="mtk-header-actions">
-                        <div className="filter-container mobile-filter-container">
-                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="filter-icon">
-                                <path strokeLinecap="round" strokeLinejoin="round" d="M6.75 3v2.25M17.25 3v2.25M3 18.75V7.5a2.25 2.25 0 012.25-2.25h13.5A2.25 2.25 0 0121 7.5v11.25m-18 0A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75m-18 0v-7.5A2.25 2.25 0 015.25 9h13.5A2.25 2.25 0 0121 11.25v7.5" />
-                            </svg>
-                            <div className="filter-input-wrapper">
-                                {!filterDate && <span className="filter-placeholder">Todos</span>}
-                                <input
-                                    type="date"
-                                    className={`filter-date-input ${!filterDate ? 'transparent-input' : ''}`}
-                                    value={filterDate}
-                                    onChange={(e) => setFilterDate(e.target.value)}
-                                    title="Filtrar por data"
-                                />
-                            </div>
-                            {filterDate && (
-                                <button
-                                    className="clear-filter-btn"
-                                    onClick={() => setFilterDate('')}
-                                    title="Mostrar Todos"
-                                >
-                                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor">
-                                        <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
-                                    </svg>
-                                </button>
-                            )}
+            {/* ===== STICKY HEADER PADRONIZADO ===== */}
+            <MobileHeader title="Afazeres" />
+
+            {/* ===== CONTROLS (below header) ===== */}
+            <div className="mtk-toolbar">
+                <div className="mtk-toolbar-row">
+                    <div className="filter-container mobile-filter-container">
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="filter-icon">
+                            <path strokeLinecap="round" strokeLinejoin="round" d="M6.75 3v2.25M17.25 3v2.25M3 18.75V7.5a2.25 2.25 0 012.25-2.25h13.5A2.25 2.25 0 0121 7.5v11.25m-18 0A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75m-18 0v-7.5A2.25 2.25 0 015.25 9h13.5A2.25 2.25 0 0121 11.25v7.5" />
+                        </svg>
+                        <div className="filter-input-wrapper">
+                            {!filterDate && <span className="filter-placeholder">Todos</span>}
+                            <input
+                                type="date"
+                                className={`filter-date-input ${!filterDate ? 'transparent-input' : ''}`}
+                                value={filterDate}
+                                onChange={(e) => setFilterDate(e.target.value)}
+                                title="Filtrar por data"
+                            />
                         </div>
+                        {filterDate && (
+                            <button
+                                className="clear-filter-btn"
+                                onClick={() => setFilterDate('')}
+                                title="Mostrar Todos"
+                            >
+                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor">
+                                    <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
+                                </svg>
+                            </button>
+                        )}
+                    </div>
+
+                    <div className="mtk-toolbar-actions">
                         {activeTab === 'done' && doneNotes.length > 0 && (
                             <button
                                 className="mtk-icon-btn mtk-clear-btn"
@@ -75,26 +79,26 @@ export default function MobileTasksBoard({
                         </button>
                     </div>
                 </div>
+            </div>
 
-                {/* ===== TABS ===== */}
-                <div className="mtk-tabs">
-                    <button
-                        className={`mtk-tab ${activeTab === 'todo' ? 'mtk-tab-active' : ''}`}
-                        onClick={() => setActiveTab('todo')}
-                    >
-                        <span className="mtk-tab-dot mtk-dot-todo" />
-                        A Fazer
-                        <span className="mtk-tab-badge">{todoNotes.length}</span>
-                    </button>
-                    <button
-                        className={`mtk-tab ${activeTab === 'done' ? 'mtk-tab-active' : ''}`}
-                        onClick={() => setActiveTab('done')}
-                    >
-                        <span className="mtk-tab-dot mtk-dot-done" />
-                        Concluídos
-                        <span className="mtk-tab-badge">{doneNotes.length}</span>
-                    </button>
-                </div>
+            {/* ===== TABS ===== */}
+            <div className="mtk-tabs">
+                <button
+                    className={`mtk-tab ${activeTab === 'todo' ? 'mtk-tab-active' : ''}`}
+                    onClick={() => setActiveTab('todo')}
+                >
+                    <span className="mtk-tab-dot mtk-dot-todo" />
+                    A Fazer
+                    <span className="mtk-tab-badge">{todoNotes.length}</span>
+                </button>
+                <button
+                    className={`mtk-tab ${activeTab === 'done' ? 'mtk-tab-active' : ''}`}
+                    onClick={() => setActiveTab('done')}
+                >
+                    <span className="mtk-tab-dot mtk-dot-done" />
+                    Concluídos
+                    <span className="mtk-tab-badge">{doneNotes.length}</span>
+                </button>
             </div>
 
             {/* ===== TASK LIST ===== */}

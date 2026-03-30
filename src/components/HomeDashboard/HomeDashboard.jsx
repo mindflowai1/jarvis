@@ -93,6 +93,11 @@ const HomeDashboard = ({ session, userName, onNavigate }) => {
 
             {/* TOP BAR */}
             <motion.div className="hd-topbar" variants={fadeUp}>
+                <img
+                    src="/logo-controle-c.png"
+                    alt="Controle-C"
+                    className="hd-logo-mobile"
+                />
                 <div className="hd-greeting">
                     <h1>{greeting}, <span>{displayName}</span></h1>
                 </div>

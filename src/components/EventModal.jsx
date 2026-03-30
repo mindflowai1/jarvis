@@ -3,6 +3,19 @@ import { createPortal } from 'react-dom'
 import { motion, AnimatePresence } from 'framer-motion'
 import './CalendarAgenda.css'
 
+const RECURRENCE_OPTIONS = [
+    { value: 'DAILY', label: 'Todos os dias', icon: '📅' },
+    { value: 'WEEKLY', label: 'Toda semana', icon: '📆' },
+    { value: 'WEEKDAYS', label: 'Dias úteis (Seg-Sex)', icon: '💼' },
+    { value: 'BIWEEKLY', label: 'A cada 2 semanas', icon: '🗓️' },
+    { value: 'MONTHLY', label: 'Todo mês', icon: '📊' }
+]
+
+const RECURRENCE_END_OPTIONS = [
+    { value: 'count', label: 'Número de ocorrências', icon: '🔢' },
+    { value: 'indefinite', label: 'Indefinidamente', icon: '♾️' }
+]
+
 export default function EventModal({ isOpen, onClose, onSave, onDelete, initialEvent }) {
     const [title, setTitle] = useState('')
     const [description, setDescription] = useState('')
@@ -18,14 +31,53 @@ export default function EventModal({ isOpen, onClose, onSave, onDelete, initialE
     const [generateMeetLink, setGenerateMeetLink] = useState(false)
     const [existingMeetLink, setExistingMeetLink] = useState('')
 
+    // Recurrence states
+    const [isRecurring, setIsRecurring] = useState(false)
+    const [recurrenceType, setRecurrenceType] = useState('DAILY')
+    const [recurrenceCount, setRecurrenceCount] = useState(10)
+    const [recurrenceEndType, setRecurrenceEndType] = useState('count')
+    const [showRecurrenceOptions, setShowRecurrenceOptions] = useState(false)
+
     useEffect(() => {
         if (isOpen) {
             setGenerateMeetLink(false)
+            setIsRecurring(false)
+            setRecurrenceType('DAILY')
+            setRecurrenceCount(10)
+            setRecurrenceEndType('count')
+            setShowRecurrenceOptions(false)
             if (initialEvent) {
                 setTitle(initialEvent.summary || '')
                 setDescription(initialEvent.description || '')
                 setLocation(initialEvent.location || '')
                 setExistingMeetLink(initialEvent.hangoutLink || '')
+
+                // Check if event has recurrence
+                if (initialEvent.recurrence && initialEvent.recurrence.length > 0) {
+                    setIsRecurring(true)
+                    // Parse recurrence rule
+                    const rrule = initialEvent.recurrence[0]
+                    if (rrule.includes('FREQ=DAILY')) {
+                        if (rrule.includes('BYDAY=MO,TU,WE,TH,FR')) {
+                            setRecurrenceType('WEEKDAYS')
+                        } else {
+                            setRecurrenceType('DAILY')
+                        }
+                    } else if (rrule.includes('FREQ=WEEKLY')) {
+                        if (rrule.includes('INTERVAL=2')) {
+                            setRecurrenceType('BIWEEKLY')
+                        } else {
+                            setRecurrenceType('WEEKLY')
+                        }
+                    } else if (rrule.includes('FREQ=MONTHLY')) {
+                        setRecurrenceType('MONTHLY')
+                    }
+                    // Parse count
+                    const countMatch = rrule.match(/COUNT=(\d+)/)
+                    if (countMatch) {
+                        setRecurrenceCount(parseInt(countMatch[1]))
+                    }
+                }
 
                 // Format dates for inputs
                 const startObj = new Date(initialEvent.start.dateTime || initialEvent.start.date)
@@ -71,18 +123,75 @@ export default function EventModal({ isOpen, onClose, onSave, onDelete, initialE
         }
     }
 
+    // Auto-fill end date/time when start changes
+    useEffect(() => {
+        if (!isOpen || !startDate || !startTime) return
+        
+        // Set end date same as start date
+        setEndDate(startDate)
+        
+        // Calculate end time: start time + 1 hour
+        const [hours, minutes] = startTime.split(':').map(Number)
+        const endDateTime = new Date()
+        endDateTime.setHours(hours + 1, minutes, 0, 0)
+        const endHours = endDateTime.getHours().toString().padStart(2, '0')
+        const endMinutes = endDateTime.getMinutes().toString().padStart(2, '0')
+        setEndTime(`${endHours}:${endMinutes}`)
+    }, [startDate, startTime, isOpen])
+
     const handleSubmit = (e) => {
         e.preventDefault()
 
         const startDateTime = new Date(`${startDate}T${startTime}:00`)
         const endDateTime = new Date(`${endDate}T${endTime}:00`)
+        
+        // Get user's timezone
+        const timeZone = Intl.DateTimeFormat().resolvedOptions().timeZone
 
         const eventData = {
             summary: title,
             description,
             location,
-            start: { dateTime: startDateTime.toISOString() },
-            end: { dateTime: endDateTime.toISOString() }
+            start: { 
+                dateTime: startDateTime.toISOString(),
+                timeZone: timeZone
+            },
+            end: { 
+                dateTime: endDateTime.toISOString(),
+                timeZone: timeZone
+            }
+        }
+
+        // Add recurrence if enabled
+        if (isRecurring && !initialEvent) {
+            let rrule = 'RRULE:FREQ='
+            
+            switch (recurrenceType) {
+                case 'DAILY':
+                    rrule += 'DAILY'
+                    break
+                case 'WEEKDAYS':
+                    rrule += 'DAILY;BYDAY=MO,TU,WE,TH,FR'
+                    break
+                case 'WEEKLY':
+                    rrule += 'WEEKLY'
+                    break
+                case 'BIWEEKLY':
+                    rrule += 'WEEKLY;INTERVAL=2'
+                    break
+                case 'MONTHLY':
+                    rrule += 'MONTHLY'
+                    break
+                default:
+                    rrule += 'DAILY'
+            }
+            
+            // Only add COUNT if not indefinite
+            if (recurrenceEndType === 'count') {
+                rrule += `;COUNT=${recurrenceCount}`
+            }
+            
+            eventData.recurrence = [rrule]
         }
 
         if (generateMeetLink && !existingMeetLink) {
@@ -230,6 +339,129 @@ export default function EventModal({ isOpen, onClose, onSave, onDelete, initialE
                                             Adicionar Google Meet
                                         </span>
                                     </label>
+                                </div>
+                            )}
+
+                            {/* Recurrence Section - Only for new events */}
+                            {!initialEvent && (
+                                <div className="form-group recurrence-group">
+                                    <label>Recorrência</label>
+                                    
+                                    {/* Toggle Recurrence */}
+                                    <div 
+                                        className={`recurrence-toggle ${isRecurring ? 'active' : ''}`}
+                                        onClick={() => {
+                                            setIsRecurring(!isRecurring)
+                                            if (!isRecurring) {
+                                                setShowRecurrenceOptions(true)
+                                            }
+                                        }}
+                                    >
+                                        <div className="recurrence-toggle-switch">
+                                            <motion.div 
+                                                className="recurrence-toggle-thumb"
+                                                animate={{ x: isRecurring ? 20 : 0 }}
+                                                transition={{ type: "spring", stiffness: 500, damping: 30 }}
+                                            />
+                                        </div>
+                                        <span className="recurrence-toggle-label">
+                                            {isRecurring ? 'Evento recorrente' : 'Evento único'}
+                                        </span>
+                                        {isRecurring && (
+                                            <motion.span 
+                                                initial={{ scale: 0 }}
+                                                animate={{ scale: 1 }}
+                                                className="recurrence-badge"
+                                            >
+                                                {RECURRENCE_OPTIONS.find(o => o.value === recurrenceType)?.icon}
+                                            </motion.span>
+                                        )}
+                                    </div>
+
+                                    {/* Recurrence Options */}
+                                    <AnimatePresence>
+                                        {isRecurring && showRecurrenceOptions && (
+                                            <motion.div
+                                                initial={{ opacity: 0, height: 0 }}
+                                                animate={{ opacity: 1, height: 'auto' }}
+                                                exit={{ opacity: 0, height: 0 }}
+                                                transition={{ duration: 0.2 }}
+                                                className="recurrence-options"
+                                            >
+                                                {/* Frequency Selection */}
+                                                <div className="recurrence-frequency">
+                                                    <label className="recurrence-sub-label">Repetir</label>
+                                                    <div className="recurrence-chips">
+                                                        {RECURRENCE_OPTIONS.map((option) => (
+                                                            <button
+                                                                key={option.value}
+                                                                type="button"
+                                                                className={`recurrence-chip ${recurrenceType === option.value ? 'active' : ''}`}
+                                                                onClick={() => setRecurrenceType(option.value)}
+                                                            >
+                                                                <span className="recurrence-chip-icon">{option.icon}</span>
+                                                                <span className="recurrence-chip-text">{option.label}</span>
+                                                            </button>
+                                                        ))}
+                                                    </div>
+                                                </div>
+
+                                                {/* End Type Selection - Count vs Indefinite */}
+                                                <div className="recurrence-end-type">
+                                                    <label className="recurrence-sub-label">Término</label>
+                                                    <div className="recurrence-end-chips">
+                                                        {RECURRENCE_END_OPTIONS.map((option) => (
+                                                            <button
+                                                                key={option.value}
+                                                                type="button"
+                                                                className={`recurrence-chip ${recurrenceEndType === option.value ? 'active' : ''}`}
+                                                                onClick={() => setRecurrenceEndType(option.value)}
+                                                            >
+                                                                <span className="recurrence-chip-icon">{option.icon}</span>
+                                                                <span className="recurrence-chip-text">{option.label}</span>
+                                                            </button>
+                                                        ))}
+                                                    </div>
+                                                </div>
+
+                                                {/* Count Selection - Only show if not indefinite */}
+                                                {recurrenceEndType === 'count' && (
+                                                    <motion.div 
+                                                        initial={{ opacity: 0, height: 0 }}
+                                                        animate={{ opacity: 1, height: 'auto' }}
+                                                        exit={{ opacity: 0, height: 0 }}
+                                                        className="recurrence-count"
+                                                    >
+                                                        <label className="recurrence-sub-label">
+                                                            Ocorrências: <strong>{recurrenceCount}</strong>
+                                                        </label>
+                                                        <input
+                                                            type="range"
+                                                            min="2"
+                                                            max="52"
+                                                            value={recurrenceCount}
+                                                            onChange={(e) => setRecurrenceCount(parseInt(e.target.value))}
+                                                            className="recurrence-slider"
+                                                        />
+                                                        <div className="recurrence-count-hint">
+                                                            Evento se repetirá {recurrenceCount} vezes no total
+                                                        </div>
+                                                    </motion.div>
+                                                )}
+
+                                                {recurrenceEndType === 'indefinite' && (
+                                                    <motion.div
+                                                        initial={{ opacity: 0 }}
+                                                        animate={{ opacity: 1 }}
+                                                        className="recurrence-indefinite-hint"
+                                                    >
+                                                        <span className="recurrence-indefinite-icon">♾️</span>
+                                                        <span>Evento se repetirá indefinidamente até ser cancelado manualmente</span>
+                                                    </motion.div>
+                                                )}
+                                            </motion.div>
+                                        )}
+                                    </AnimatePresence>
                                 </div>
                             )}
 

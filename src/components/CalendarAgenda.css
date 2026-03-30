@@ -144,6 +144,18 @@
     align-items: center;
     padding: 20px;
     /* Prevent touching edges on mobile */
+    overflow-y: auto;
+    /* Allow scrolling if modal is too tall */
+}
+
+/* Mobile: adjust backdrop for small screens */
+@media (max-height: 700px), (max-width: 480px) {
+    .modal-backdrop {
+        padding: 8px;
+        align-items: flex-start;
+        /* Align to top on small screens */
+        padding-top: 20px;
+    }
 }
 
 .modal-container {
@@ -159,6 +171,46 @@
     box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
     /* Enhanced shadow */
     animation: modalSlideIn 0.3s ease-out;
+    max-height: calc(100vh - 40px);
+    /* Ensure it fits in viewport */
+    overflow-y: auto;
+    /* Allow internal scroll if content is too long */
+}
+
+/* Mobile: adjust modal container for small screens */
+@media (max-height: 700px), (max-width: 480px) {
+    .modal-container {
+        width: 100%;
+        max-width: none;
+        padding: 16px;
+        max-height: calc(100vh - 40px);
+        border-radius: 12px;
+    }
+    
+    .event-modal {
+        max-width: none;
+    }
+    
+    .modal-header {
+        margin-bottom: 16px;
+    }
+    
+    .modal-header h3 {
+        font-size: 18px;
+    }
+    
+    .form-group {
+        margin-bottom: 12px;
+    }
+    
+    .form-row {
+        gap: 8px;
+    }
+    
+    .modal-actions {
+        margin-top: 16px;
+        padding-top: 12px;
+    }
 }
 
 @keyframes modalSlideIn {
@@ -175,6 +227,25 @@
 
 .event-modal {
     max-width: 550px;
+    width: 95%;
+}
+
+/* Mobile: event modal specific adjustments */
+@media (max-height: 700px), (max-width: 480px) {
+    .event-modal {
+        width: 100%;
+    }
+    
+    .event-modal .form-group input,
+    .event-modal .form-group textarea {
+        padding: 8px 10px;
+        font-size: 16px;
+        /* Prevent zoom on iOS */
+    }
+    
+    .event-modal textarea {
+        min-height: 60px;
+    }
 }
 
 .modal-header {
@@ -705,35 +776,274 @@
 }
 
 .google-icon-calendar {
-    width: 24px;
-    height: 24px;
+width: 24px;
+height: 24px;
 }
 
 .connection-features {
-    display: flex;
-    flex-direction: column;
-    gap: 12px;
-    padding-top: 24px;
-    border-top: 1px solid rgba(255, 255, 255, 0.05);
+display: flex;
+flex-direction: column;
+gap: 12px;
+padding-top: 24px;
+border-top: 1px solid rgba(255, 255, 255, 0.05);
 }
 
 .feature-item {
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    color: var(--text-muted);
-    font-size: 14px;
+display: flex;
+align-items: center;
+gap: 12px;
+color: var(--text-muted);
+font-size: 14px;
 }
 
 .feature-icon {
-    width: 20px;
-    height: 20px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    background: rgba(74, 222, 128, 0.1);
-    border-radius: 50%;
-    color: #4ade80;
-    font-size: 12px;
-    font-weight: 700;
+width: 20px;
+height: 20px;
+display: flex;
+align-items: center;
+justify-content: center;
+background: rgba(74, 222, 128, 0.1);
+border-radius: 50%;
+color: #4ade80;
+font-size: 12px;
+font-weight: 700;
+}
+
+/* ===== RECURRENCE STYLES ===== */
+.recurrence-group {
+margin-bottom: 16px;
+}
+
+.recurrence-toggle {
+display: flex;
+align-items: center;
+gap: 12px;
+padding: 12px 16px;
+background: rgba(15, 23, 42, 0.5);
+border: 1px solid rgba(255, 255, 255, 0.1);
+border-radius: 10px;
+cursor: pointer;
+transition: all 0.2s ease;
+}
+
+.recurrence-toggle:hover {
+background: rgba(15, 23, 42, 0.7);
+border-color: rgba(255, 255, 255, 0.15);
+}
+
+.recurrence-toggle.active {
+background: rgba(59, 130, 246, 0.1);
+border-color: rgba(59, 130, 246, 0.3);
+}
+
+.recurrence-toggle-switch {
+width: 44px;
+height: 24px;
+background: rgba(255, 255, 255, 0.1);
+border-radius: 12px;
+position: relative;
+transition: background 0.2s ease;
+}
+
+.recurrence-toggle.active .recurrence-toggle-switch {
+background: #3b82f6;
+}
+
+.recurrence-toggle-thumb {
+width: 20px;
+height: 20px;
+background: white;
+border-radius: 50%;
+position: absolute;
+top: 2px;
+left: 2px;
+box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+.recurrence-toggle-label {
+flex: 1;
+font-size: 14px;
+color: #e2e8f0;
+font-weight: 500;
+}
+
+.recurrence-badge {
+font-size: 18px;
+line-height: 1;
+}
+
+/* Recurrence Options */
+.recurrence-options {
+margin-top: 12px;
+padding: 16px;
+background: rgba(15, 23, 42, 0.4);
+border: 1px solid rgba(255, 255, 255, 0.06);
+border-radius: 12px;
+overflow: hidden;
+}
+
+.recurrence-sub-label {
+display: block;
+font-size: 12px;
+color: #94a3b8;
+margin-bottom: 10px;
+font-weight: 500;
+text-transform: uppercase;
+letter-spacing: 0.5px;
+}
+
+.recurrence-frequency {
+margin-bottom: 16px;
+}
+
+.recurrence-chips {
+display: flex;
+flex-wrap: wrap;
+gap: 8px;
+}
+
+.recurrence-chip {
+display: flex;
+align-items: center;
+gap: 6px;
+padding: 8px 12px;
+background: rgba(255, 255, 255, 0.05);
+border: 1px solid rgba(255, 255, 255, 0.08);
+border-radius: 20px;
+cursor: pointer;
+transition: all 0.2s ease;
+font-size: 13px;
+color: #94a3b8;
+}
+
+.recurrence-chip:hover {
+background: rgba(255, 255, 255, 0.1);
+border-color: rgba(255, 255, 255, 0.15);
+}
+
+.recurrence-chip.active {
+background: rgba(59, 130, 246, 0.2);
+border-color: rgba(59, 130, 246, 0.5);
+color: #60a5fa;
+font-weight: 500;
+}
+
+.recurrence-chip-icon {
+font-size: 14px;
+line-height: 1;
+}
+
+.recurrence-chip-text {
+white-space: nowrap;
+}
+
+/* Count Slider */
+.recurrence-count {
+padding-top: 16px;
+border-top: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.recurrence-slider {
+width: 100%;
+height: 6px;
+background: rgba(255, 255, 255, 0.1);
+border-radius: 3px;
+outline: none;
+-webkit-appearance: none;
+appearance: none;
+cursor: pointer;
+margin: 8px 0;
+}
+
+.recurrence-slider::-webkit-slider-thumb {
+-webkit-appearance: none;
+appearance: none;
+width: 18px;
+height: 18px;
+background: #3b82f6;
+border-radius: 50%;
+cursor: pointer;
+box-shadow: 0 2px 6px rgba(59, 130, 246, 0.4);
+transition: transform 0.1s ease;
+}
+
+.recurrence-slider::-webkit-slider-thumb:hover {
+transform: scale(1.1);
+}
+
+.recurrence-slider::-moz-range-thumb {
+width: 18px;
+height: 18px;
+background: #3b82f6;
+border-radius: 50%;
+cursor: pointer;
+border: none;
+box-shadow: 0 2px 6px rgba(59, 130, 246, 0.4);
+}
+
+.recurrence-count-hint {
+font-size: 12px;
+color: #64748b;
+margin-top: 6px;
+}
+
+/* End Type Selection */
+.recurrence-end-type {
+padding-top: 16px;
+border-top: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.recurrence-end-chips {
+display: flex;
+flex-wrap: wrap;
+gap: 8px;
+}
+
+/* Indefinite hint */
+.recurrence-indefinite-hint {
+display: flex;
+align-items: center;
+gap: 10px;
+padding: 12px 16px;
+background: rgba(59, 130, 246, 0.1);
+border: 1px solid rgba(59, 130, 246, 0.2);
+border-radius: 10px;
+margin-top: 12px;
+font-size: 13px;
+color: #94a3b8;
+}
+
+.recurrence-indefinite-icon {
+font-size: 20px;
+line-height: 1;
+}
+
+/* Mobile adjustments for recurrence */
+@media (max-height: 700px), (max-width: 480px) {
+    .recurrence-toggle {
+        padding: 10px 12px;
+    }
+    
+    .recurrence-options {
+        padding: 12px;
+    }
+    
+    .recurrence-chip {
+        padding: 8px 12px;
+        font-size: 12px;
+    }
+    
+    .recurrence-chip-icon {
+        font-size: 16px;
+    }
+    
+    /* Make chips full width on mobile for better readability */
+    .recurrence-chips {
+        flex-direction: column;
+    }
+    
+    .recurrence-chip {
+        width: 100%;
+        justify-content: flex-start;
+    }
 }

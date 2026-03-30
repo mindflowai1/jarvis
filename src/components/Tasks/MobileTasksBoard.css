@@ -9,41 +9,44 @@
     background: transparent;
 }
 
-/* ===== HEADER ===== */
-.mtk-header {
-    position: sticky;
-    top: 0;
-    z-index: 50;
-    background: rgba(15, 23, 42, 0.92);
-    backdrop-filter: blur(16px);
-    -webkit-backdrop-filter: blur(16px);
-    border-bottom: 1px solid rgba(255, 255, 255, 0.06);
-    padding-top: 16px;
+/* ===== HEADER - REMOVIDO (usando MobileHeader padronizado) ===== */
+/* Mantido apenas mtk-logo-mobile para compatibilidade */
+
+.mtk-logo-mobile {
+    width: 44px;
+    height: auto;
+    opacity: 0.95;
+    flex-shrink: 0;
+    filter: drop-shadow(0 10px 22px rgba(0, 0, 0, 0.35));
 }
 
-.mtk-header-top {
+/* ===== TOOLBAR (controles abaixo do header) ===== */
+.mtk-toolbar {
     display: flex;
-    justify-content: space-between;
     align-items: center;
-    padding: 0 20px 14px;
+    justify-content: space-between;
+    padding: 0 16px 12px;
+    gap: 12px;
 }
 
-.mtk-title {
-    font-size: 26px;
-    font-weight: 800;
-    color: #f1f5f9;
-    margin: 0;
-    letter-spacing: -0.5px;
-}
-
-.mtk-header-actions {
+.mtk-toolbar-row {
     display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    width: 100%;
+}
+
+.mtk-toolbar-actions {
+    display: flex;
+    align-items: center;
     gap: 8px;
+    flex-shrink: 0;
 }
 
 .mtk-icon-btn {
-    width: 38px;
-    height: 38px;
+    width: 36px;
+    height: 36px;
     border-radius: 12px;
     border: 1px solid rgba(255, 255, 255, 0.1);
     display: flex;
@@ -64,6 +67,7 @@
     border: none;
     color: white;
     box-shadow: 0 4px 12px rgba(59, 130, 246, 0.35);
+    border-radius: 999px;
 }
 
 .mtk-add-btn:active {
@@ -370,10 +374,16 @@
 
 /* ===== MOBILE FILTER OVERRIDES ===== */
 .mobile-filter-container {
-    height: 38px;
+    height: 36px;
     border-radius: 12px;
-    min-width: 130px;
+    min-width: 0;
+    width: auto;
+    flex: 1 1 auto;
+    max-width: 150px;
     background: rgba(255, 255, 255, 0.04);
+    padding: 0 10px;
+    box-sizing: border-box;
+    flex-shrink: 1;
 }
 
 .mobile-filter-container .filter-icon {
@@ -382,9 +392,13 @@
 }
 
 .mobile-filter-container .filter-date-input {
-    font-size: 13px;
+    font-size: 12.5px;
 }
 
 .mobile-filter-container .filter-placeholder {
-    font-size: 13px;
+    font-size: 12.5px;
+    top: 50%;
+    left: 8px;
+    transform: translateY(-50%);
+    z-index: 2;
 }

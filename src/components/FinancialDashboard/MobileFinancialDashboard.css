@@ -12,43 +12,7 @@
     color: #f8fafc;
 }
 
-/* Header */
-.mobile-header {
-    position: sticky;
-    top: 0;
-    z-index: 50;
-    background: rgba(15, 23, 42, 0.95);
-    backdrop-filter: blur(20px);
-    -webkit-backdrop-filter: blur(20px);
-    border-bottom: 1px solid rgba(255, 255, 255, 0.05);
-    padding: 16px 20px;
-    display: flex;
-    flex-direction: column;
-    gap: 16px;
-}
-
-.mobile-header .header-top {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-}
-
-.mobile-header .logo-section {
-    display: flex;
-    align-items: center;
-    gap: 12px;
-}
-
-.mobile-header h1 {
-    font-size: 24px;
-    font-weight: 700;
-    margin: 0;
-    background: linear-gradient(135deg, #fff 0%, #94a3b8 100%);
-    -webkit-background-clip: text;
-    background-clip: text;
-    -webkit-text-fill-color: transparent;
-}
-
+/* Controls (agora dentro do header via rightContent) */
 .eye-btn {
     background: none;
     border: none;
@@ -60,12 +24,12 @@
 
 .header-actions {
     display: flex;
-    gap: 12px;
+    gap: 8px;
 }
 
 .icon-btn {
-    width: 40px;
-    height: 40px;
+    width: 36px;
+    height: 36px;
     border-radius: 12px;
     background: rgba(255, 255, 255, 0.05);
     border: 1px solid rgba(255, 255, 255, 0.05);
@@ -259,7 +223,7 @@
     display: flex;
     gap: 6px;
     padding: 4px;
-    margin: 16px 20px 0;
+    margin: 16px 16px 0;
     background: rgba(15, 23, 42, 0.8);
     border-radius: 14px;
     border: 1px solid rgba(255, 255, 255, 0.08);
@@ -347,7 +311,7 @@
 
 /* List Content */
 .mobile-content {
-    padding: 20px;
+    padding: 16px 16px 100px;
 }
 
 .list-header {

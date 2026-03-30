@@ -1,0 +1,57 @@
+/* ===== MOBILE HEADER PADRONIZADO ===== */
+/* Usado em todas as abas mobile do dashboard */
+
+.mobile-header-standard {
+    position: sticky;
+    top: 0;
+    z-index: 50;
+    background: rgba(15, 23, 42, 0.96);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+    padding: 12px 0 0;
+}
+
+.mobile-header-inner {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 16px 12px;
+    gap: 10px;
+}
+
+.mobile-header-brand {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex: 1;
+    min-width: 0;
+}
+
+.mobile-header-logo {
+    width: 44px;
+    height: auto;
+    opacity: 0.95;
+    flex-shrink: 0;
+    filter: drop-shadow(0 10px 22px rgba(0, 0, 0, 0.35));
+}
+
+.mobile-header-title {
+    font-size: 22px;
+    font-weight: 800;
+    margin: 0;
+    color: #f1f5f9;
+    letter-spacing: -0.35px;
+    white-space: nowrap;
+    background: linear-gradient(135deg, #fff 0%, #94a3b8 100%);
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+}
+
+.mobile-header-actions {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex-shrink: 0;
+}
