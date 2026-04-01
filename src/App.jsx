@@ -9,6 +9,10 @@ import AdminDashboard from './pages/AdminDashboard'
 import SubscriptionGuard from './components/SubscriptionGuard'
 import AccessDenied from './pages/AccessDenied'
 import Tests from './pages/Tests'
+import ResetPassword from './pages/ResetPassword'
+
+import PrivacyPolicy from './pages/PrivacyPolicy'
+import TermsOfService from './pages/TermsOfService'
 
 // Componente independente para gerenciar redirecionamentos de autenticação
 function AuthRedirectHandler() {
@@ -17,16 +21,21 @@ function AuthRedirectHandler() {
 
     useEffect(() => {
         // Verifica se aterrissamos na raiz com um hash de convite ou recuperacao
-        if (window.location.hash && (window.location.hash.includes('type=invite') || window.location.hash.includes('type=recovery'))) {
+        if (window.location.hash && window.location.hash.includes('type=invite')) {
             navigate('/dashboard', { replace: true });
+        }
+        if (window.location.hash && window.location.hash.includes('type=recovery')) {
+            navigate('/reset-password', { replace: true });
         }
 
         // Escuta os eventos de Auth do Supabase (quando o token e processado)
         const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
-            if (event === 'SIGNED_IN' || event === 'PASSWORD_RECOVERY') {
+            if (event === 'SIGNED_IN') {
                 if (location.pathname === '/' || location.pathname === '/login') {
                     navigate('/dashboard', { replace: true });
                 }
+            } else if (event === 'PASSWORD_RECOVERY') {
+                 navigate('/reset-password', { replace: true });
             }
         });
 
@@ -113,6 +122,21 @@ function App() {
                     path="/tests"
                     element={<Tests />}
                 />
+                
+                <Route
+                    path="/reset-password"
+                    element={<ResetPassword />}
+                />
+                
+                <Route
+                    path="/privacy"
+                    element={<PrivacyPolicy />}
+                />
+                <Route
+                    path="/terms"
+                    element={<TermsOfService />}
+                />
+                
                 <Route
                     path="/dashboard"
                     element={

@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react'
+import { Link } from 'react-router-dom'
 import { supabase } from '../supabaseClient'
 import '../index.css'
 
@@ -10,6 +11,8 @@ const Login = () => {
     // Form fields
     const [email, setEmail] = useState('')
     const [password, setPassword] = useState('')
+    const [mode, setMode] = useState('login') // 'login' or 'forgot-password'
+    const [successMessage, setSuccessMessage] = useState('')
 
     useEffect(() => {
         setLoaded(true)
@@ -62,6 +65,34 @@ const Login = () => {
         }
     }
 
+    const handleForgotPassword = async (e) => {
+        e.preventDefault()
+        setError('')
+        setSuccessMessage('')
+
+        if (!email.trim() || !validateEmail(email)) {
+            setError('Por favor, informe um email válido')
+            return
+        }
+
+        setLoading(true)
+        try {
+            const { error } = await supabase.auth.resetPasswordForEmail(email, {
+                redirectTo: `${window.location.origin}/reset-password`,
+            })
+
+            if (error) throw error
+
+            setSuccessMessage('Se o email existir, um link de recuperação foi enviado.')
+        } catch (err) {
+            console.error('Forgot password error:', err)
+            // Para segurança evite confirmar se o email existe, mas para erros de taxa de limite etc avise
+            setError(err.message || 'Erro ao solicitar redefinição de senha')
+        } finally {
+            setLoading(false)
+        }
+    }
+
     return (
         <div className="app-container">
             <div className="bg-glow top-left"></div>
@@ -78,7 +109,7 @@ const Login = () => {
                 </div>
 
                 {/* Form */}
-                <form className="auth-form" onSubmit={handleSignIn}>
+                <form className="auth-form" onSubmit={mode === 'login' ? handleSignIn : handleForgotPassword}>
                     <div className="form-input-wrapper">
                         <input
                             type="email"
@@ -91,20 +122,38 @@ const Login = () => {
                         />
                     </div>
 
-                    <div className="form-input-wrapper">
-                        <input
-                            type="password"
-                            placeholder="Senha"
-                            value={password}
-                            onChange={(e) => setPassword(e.target.value)}
-                            className="form-input"
-                            disabled={loading}
-                            autoComplete="current-password"
-                        />
-                    </div>
+                    {mode === 'login' && (
+                        <>
+                            <div className="form-input-wrapper">
+                                <input
+                                    type="password"
+                                    placeholder="Senha"
+                                    value={password}
+                                    onChange={(e) => setPassword(e.target.value)}
+                                    className="form-input"
+                                    disabled={loading}
+                                    autoComplete="current-password"
+                                />
+                            </div>
+                            <div className="flex justify-end mt-1 mb-2">
+                                <button
+                                    type="button"
+                                    onClick={() => { setMode('forgot-password'); setError(''); setSuccessMessage(''); }}
+                                    className="text-xs text-gray-400 hover:text-[#00f5ff] transition-colors bg-transparent border-none cursor-pointer"
+                                >
+                                    Esqueci minha senha
+                                </button>
+                            </div>
+                        </>
+                    )}
 
                     {error && (
                         <div className="error-message">{error}</div>
+                    )}
+                    {successMessage && (
+                        <div className="success-message text-[#00f5ff] text-sm text-center mb-4 p-2 bg-[#00f5ff]/10 rounded border border-[#00f5ff]/20">
+                            {successMessage}
+                        </div>
                     )}
 
                     <button
@@ -112,12 +161,26 @@ const Login = () => {
                         className="submit-btn"
                         disabled={loading}
                     >
-                        {loading ? 'Processando...' : 'Entrar'}
+                        {loading ? 'Processando...' : (mode === 'login' ? 'Entrar' : 'Enviar Link de Recuperação')}
                     </button>
+                    
+                    {mode === 'forgot-password' && (
+                        <button
+                            type="button"
+                            onClick={() => { setMode('login'); setError(''); setSuccessMessage(''); }}
+                            className="w-full text-center mt-4 text-sm text-gray-400 hover:text-white transition-colors bg-transparent border-none cursor-pointer"
+                        >
+                            Voltar para o Login
+                        </button>
+                    )}
                 </form>
 
-                <div className="footer-credits">
-                    <p>Controle-C © 2026</p>
+                <div className="footer-credits mt-6 text-center text-xs text-slate-500">
+                    <p className="mb-2">Controle-C © 2026</p>
+                    <div className="flex justify-center gap-4">
+                        <Link to="/privacy" className="hover:text-[#0cf2cd] transition-colors">Privacidade</Link>
+                        <Link to="/terms" className="hover:text-[#0cf2cd] transition-colors">Termos de Serviço</Link>
+                    </div>
                 </div>
             </div>
         </div>

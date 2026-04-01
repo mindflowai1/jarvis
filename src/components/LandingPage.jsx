@@ -1,5 +1,6 @@
 import React, { Suspense, useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
+import { Link } from 'react-router-dom';
 import ParticleWave3D from './ParticleWave3D';
 
 // ── Componentes Utilitários ──────────────────────────────────────────
@@ -1171,9 +1172,10 @@ const LandingPage = () => {
                         <div>
                             <h4 className="text-white font-semibold text-sm mb-4">Legal</h4>
                             <ul className="space-y-2.5">
-                                {['Privacidade', 'Termos de Uso', 'LGPD', 'Cookies'].map((item, i) => (
-                                    <li key={i}><a href="#" className="text-slate-500 hover:text-slate-300 text-sm transition-colors">{item}</a></li>
-                                ))}
+                                <li><Link to="/privacy" className="text-slate-500 hover:text-slate-300 text-sm transition-colors">Privacidade</Link></li>
+                                <li><Link to="/terms" className="text-slate-500 hover:text-slate-300 text-sm transition-colors">Termos de Uso</Link></li>
+                                <li><a href="#" className="text-slate-500 hover:text-slate-300 text-sm transition-colors">LGPD</a></li>
+                                <li><a href="#" className="text-slate-500 hover:text-slate-300 text-sm transition-colors">Cookies</a></li>
                             </ul>
                         </div>
                     </div>
