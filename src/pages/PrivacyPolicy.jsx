@@ -13,7 +13,7 @@ const PrivacyPolicy = () => {
       <header className="relative z-10 p-6 border-b border-white/5 bg-gray-950/50 backdrop-blur-md">
         <div className="max-w-4xl mx-auto flex items-center justify-between">
           <Link to="/" className="text-2xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-[#0cf2cd] to-[#25D366] tracking-tight">
-            JARVIS
+            CONTROLE-C
           </Link>
           <Link to="/" className="text-slate-400 hover:text-white transition-colors text-sm font-medium">
             Voltar para o início
@@ -40,7 +40,7 @@ const PrivacyPolicy = () => {
                 1. Informações que Coletamos
               </h2>
               <p>
-                Coletamos informações que você nos fornece diretamente ao usar nossos serviços, como nome, e-mail e dados de uso necessários para o funcionamento do Jarvis. Informações de calendário e integrações de terceiros são acessadas estritamente com o seu consentimento.
+                Coletamos informações que você nos fornece diretamente ao usar nossos serviços, como nome, e-mail e dados de uso necessários para o funcionamento do Controle-C. Informações de calendário e integrações de terceiros são acessadas estritamente com o seu consentimento.
               </p>
             </section>
 
@@ -53,9 +53,9 @@ const PrivacyPolicy = () => {
                 Utilizamos as informações coletadas para:
               </p>
               <ul className="list-disc pl-6 mt-2 space-y-1 text-slate-400">
-                <li>Fornecer, operar e manter os serviços do Jarvis.</li>
+                <li>Fornecer, operar e manter os serviços do Controle-C.</li>
                 <li>Melhorar, personalizar e expandir nossos serviços.</li>
-                <li>Entender e analisar como você usa o Jarvis.</li>
+                <li>Entender e analisar como você usa o Controle-C.</li>
                 <li>Desenvolver novos produtos, serviços e funcionalidades.</li>
                 <li>Comunicar-nos com você, seja diretamente ou por meio de parceiros, para atendimento ao cliente, atualizações e marketing (se consentido).</li>
               </ul>
@@ -96,7 +96,7 @@ const PrivacyPolicy = () => {
 
       {/* Footer minimalista */}
       <footer className="py-6 text-center text-slate-500 text-xs border-t border-white/5 bg-gray-950/50 mt-auto relative z-10">
-        <p>&copy; {new Date().getFullYear()} Jarvis. Todos os direitos reservados.</p>
+        <p>&copy; {new Date().getFullYear()} Controle-C. Todos os direitos reservados.</p>
       </footer>
     </div>
   );

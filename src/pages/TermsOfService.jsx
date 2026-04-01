@@ -13,7 +13,7 @@ const TermsOfService = () => {
       <header className="relative z-10 p-6 border-b border-white/5 bg-gray-950/50 backdrop-blur-md">
         <div className="max-w-4xl mx-auto flex items-center justify-between">
           <Link to="/" className="text-2xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-[#0cf2cd] to-[#25D366] tracking-tight">
-            JARVIS
+            CONTROLE-C
           </Link>
           <Link to="/" className="text-slate-400 hover:text-white transition-colors text-sm font-medium">
             Voltar para o início
@@ -40,7 +40,7 @@ const TermsOfService = () => {
                 1. Aceitação dos Termos
               </h2>
               <p>
-                Ao acessar e utilizar os serviços do Jarvis, você atesta que leu, compreendeu e concordou em se vincular a estes Termos de Serviço. Se você não concorda com qualquer parte destes termos, você não deve usar nossos serviços.
+                Ao acessar e utilizar os serviços do Controle-C, você atesta que leu, compreendeu e concordou em se vincular a estes Termos de Serviço. Se você não concorda com qualquer parte destes termos, você não deve usar nossos serviços.
               </p>
             </section>
 
@@ -50,7 +50,7 @@ const TermsOfService = () => {
                 2. Descrição dos Serviços
               </h2>
               <p>
-                O Jarvis é um assistente pessoal inteligente integrado a inteligência artificial, projetado para auxiliar na produtividade, gerenciamento de dados e interações. O serviço está sujeito a alterações, atualizações e melhorias contínuas sem aviso prévio.
+                O Controle-C é um assistente pessoal inteligente integrado a inteligência artificial, projetado para auxiliar na produtividade, gerenciamento de dados e interações. O serviço está sujeito a alterações, atualizações e melhorias contínuas sem aviso prévio.
               </p>
             </section>
 
@@ -60,7 +60,7 @@ const TermsOfService = () => {
                 3. Uso Aceitável
               </h2>
               <p>
-                Você se compromete a utilizar os serviços do Jarvis para finalidades legais e íntegras. É expressamente proibido:
+                Você se compromete a utilizar os serviços do Controle-C para finalidades legais e íntegras. É expressamente proibido:
               </p>
               <ul className="list-disc pl-6 mt-2 space-y-1 text-slate-400">
                 <li>Violar qualquer lei ou regulamento local, estadual, nacional ou internacional.</li>
@@ -76,7 +76,7 @@ const TermsOfService = () => {
                 4. Propriedade Intelectual
               </h2>
               <p>
-                Todos os direitos, títulos e interesses do Jarvis e de todos os componentes associados são de propriedade exclusiva dos seus criadores. Você não tem permissão para copiar, modificar, distribuir, vender ou alugar qualquer parte dos nossos serviços.
+                Todos os direitos, títulos e interesses do Controle-C e de todos os componentes associados são de propriedade exclusiva dos seus criadores. Você não tem permissão para copiar, modificar, distribuir, vender ou alugar qualquer parte dos nossos serviços.
               </p>
             </section>
 
@@ -86,7 +86,7 @@ const TermsOfService = () => {
                 5. Limitação de Responsabilidade
               </h2>
               <p>
-                O Jarvis é fornecido "no estado em que se encontra" e "conforme disponível". Não garantimos que o serviço será contínuo, seguro ou livre de erros. Em nenhuma circunstância o Jarvis ou seus desenvolvedores serão responsáveis por quaisquer danos diretos, indiretos, incidentais ou consequenciais decorrentes do uso ou da incapacidade de usar o serviço.
+                O Controle-C é fornecido "no estado em que se encontra" e "conforme disponível". Não garantimos que o serviço será contínuo, seguro ou livre de erros. Em nenhuma circunstância o Controle-C ou seus desenvolvedores serão responsáveis por quaisquer danos diretos, indiretos, incidentais ou consequenciais decorrentes do uso ou da incapacidade de usar o serviço.
               </p>
             </section>
 
@@ -105,7 +105,7 @@ const TermsOfService = () => {
 
       {/* Footer minimalista */}
       <footer className="py-6 text-center text-slate-500 text-xs border-t border-white/5 bg-gray-950/50 mt-auto relative z-10">
-        <p>&copy; {new Date().getFullYear()} Jarvis. Todos os direitos reservados.</p>
+        <p>&copy; {new Date().getFullYear()} Controle-C. Todos os direitos reservados.</p>
       </footer>
     </div>
   );
