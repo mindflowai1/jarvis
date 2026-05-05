@@ -1,0 +1,304 @@
+/* PlanningDashboard.css */
+.planning-dashboard {
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+    padding-bottom: 40px;
+}
+
+/* Month Navigation */
+.month-navigator {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 20px;
+    background: rgba(30, 41, 59, 0.4);
+    padding: 12px 24px;
+    border-radius: 16px;
+    border: 1px solid rgba(148, 163, 184, 0.1);
+    backdrop-filter: blur(10px);
+    width: fit-content;
+    margin: 0 auto;
+}
+
+.nav-month-btn {
+    background: rgba(15, 23, 42, 0.6);
+    border: 1px solid rgba(148, 163, 184, 0.2);
+    color: #fff;
+    width: 36px;
+    height: 36px;
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.nav-month-btn:hover {
+    background: #3b82f6;
+    border-color: #3b82f6;
+}
+
+.current-month-display {
+    text-align: center;
+    min-width: 160px;
+}
+
+.current-month-display h2 {
+    margin: 0;
+    font-size: 18px;
+    font-weight: 700;
+    text-transform: capitalize;
+    color: #fff;
+}
+
+.current-month-display p {
+    margin: 0;
+    font-size: 12px;
+    color: #94a3b8;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+.planning-list-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0 8px;
+    margin-bottom: 8px;
+}
+
+.planning-list-header h3 {
+    color: #94a3b8;
+    font-weight: 600;
+    margin: 0;
+}
+
+/* Planning Cards */
+.planning-item-card {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    background: rgba(30, 41, 59, 0.4);
+    border: 1px solid rgba(148, 163, 184, 0.1);
+    padding: 16px 20px;
+    border-radius: 16px;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    position: relative;
+    overflow: hidden;
+}
+
+.planning-item-card.is-paid {
+    background: rgba(34, 197, 94, 0.05);
+    border-color: rgba(34, 197, 94, 0.2);
+    opacity: 0.8;
+}
+
+.planning-item-card::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 0;
+    bottom: 0;
+    width: 4px;
+    background: #3b82f6;
+}
+
+.planning-item-card.installment::before { background: #f59e0b; }
+.planning-item-card.subscription::before { background: #8b5cf6; }
+.planning-item-card.future_expense::before { background: #10b981; }
+
+.planning-item-card.is-paid::before {
+    background: #22c55e;
+}
+
+.type-badge {
+    font-size: 10px;
+    padding: 2px 6px;
+    border-radius: 4px;
+    background: rgba(148, 163, 184, 0.1);
+    color: #94a3b8;
+    font-weight: 700;
+    text-transform: uppercase;
+    margin-bottom: 4px;
+    display: inline-block;
+}
+
+.installment-info {
+    font-size: 11px;
+    color: #f59e0b;
+    font-weight: 600;
+    margin-left: 8px;
+}
+
+.t-category {
+    color: rgba(255, 255, 255, 0.4);
+    font-size: 0.8rem;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.t-due-day {
+    color: #00e5ff;
+    font-size: 0.8rem;
+    font-weight: 500;
+    opacity: 0.8;
+}
+
+/* Paid Toggle */
+.paid-toggle {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+    cursor: pointer;
+}
+
+.check-circle {
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    border: 2px solid rgba(148, 163, 184, 0.3);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s;
+    color: transparent;
+}
+
+.check-circle.checked {
+    background: #22c55e;
+    border-color: #22c55e;
+    color: white;
+}
+
+.paid-label {
+    font-size: 10px;
+    font-weight: 600;
+    color: #64748b;
+}
+
+.paid-toggle:hover .check-circle:not(.checked) {
+    border-color: #22c55e;
+    color: rgba(34, 197, 94, 0.5);
+}
+
+/* Summary Mini Cards */
+.planning-summary {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 16px;
+}
+
+.mini-stat-card {
+    background: rgba(30, 41, 59, 0.3);
+    padding: 12px 16px;
+    border-radius: 12px;
+    border: 1px solid rgba(148, 163, 184, 0.05);
+}
+
+.mini-stat-card label {
+    font-size: 12px;
+    color: #94a3b8;
+    display: block;
+    margin-bottom: 4px;
+}
+
+.mini-stat-card .value {
+    font-size: 18px;
+    font-weight: 700;
+}
+
+.mini-stat-card .value.pending { color: #f87171; }
+.mini-stat-card .value.done { color: #4ade80; }
+
+@media (max-width: 768px) {
+    .planning-summary {
+        grid-template-columns: 1fr;
+    }
+}
+
+.t-right-side {
+    display: flex;
+    align-items: center;
+    gap: 24px;
+}
+
+.t-amount {
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: #fff;
+    white-space: nowrap;
+}
+
+.planning-item-card .t-actions {
+    opacity: 1 !important;
+    transform: none !important;
+    display: flex !important;
+    gap: 12px;
+}
+
+.planning-item-card .action-btn {
+    background: rgba(30, 41, 59, 0.8);
+    border: 1px solid rgba(148, 163, 184, 0.3);
+    color: #fff;
+    width: 36px;
+    height: 36px;
+    border-radius: 10px;
+    display: flex !important;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+    position: relative;
+    z-index: 10;
+}
+
+.planning-item-card .action-btn svg {
+    width: 16px !important;
+    height: 16px !important;
+    display: block !important;
+    stroke: currentColor;
+    stroke-width: 2;
+}
+
+.planning-item-card .action-btn:hover {
+    background: rgba(255, 255, 255, 0.2);
+    transform: scale(1.1);
+}
+
+.planning-item-card .action-btn.edit {
+    color: #00e5ff !important;
+    border-color: rgba(0, 229, 255, 0.3) !important;
+}
+
+.planning-item-card .action-btn.edit:hover {
+    background: rgba(0, 229, 255, 0.15);
+    border-color: #00e5ff;
+    box-shadow: 0 0 15px rgba(0, 229, 255, 0.3);
+}
+
+.planning-item-card .action-btn.reminder.active {
+    background: rgba(255, 215, 0, 0.2) !important;
+    color: #ffd700 !important;
+    border-color: rgba(255, 215, 0, 0.3) !important;
+}
+
+.planning-item-card .action-btn.reminder.active:hover {
+    background: rgba(255, 215, 0, 0.3) !important;
+    transform: translateY(-2px);
+    box-shadow: 0 0 15px rgba(255, 215, 0, 0.4);
+}
+
+.planning-item-card .action-btn.delete {
+    color: #ff4444 !important;
+    border-color: rgba(255, 68, 68, 0.3) !important;
+}
+
+.planning-item-card .action-btn.delete:hover {
+    background: rgba(255, 68, 68, 0.15);
+    border-color: #ff4444;
+    box-shadow: 0 0 15px rgba(255, 68, 68, 0.3);
+}
+

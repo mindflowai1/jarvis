@@ -9,6 +9,7 @@ export const useHomeDashboard = (session) => {
     const [taskProgress, setTaskProgress] = useState({ done: 0, total: 0 })
     const [upcomingEvents, setUpcomingEvents] = useState([])
     const [nearReminders, setNearReminders] = useState([])
+    const [habitProgress, setHabitProgress] = useState({ done: 0, total: 0, percent: 0 })
     const [isCalendarConnected, setIsCalendarConnected] = useState(false)
     const accessTokenCache = useRef(null)
 
@@ -75,7 +76,7 @@ export const useHomeDashboard = (session) => {
         try {
             setLoading(true)
 
-            const [summaryRes, txRes, pendingRes, allTasksRes, remindersRes, calendarEvents] = await Promise.all([
+            const [summaryRes, txRes, pendingRes, allTasksRes, remindersRes, habitsRes, habitLogsRes, calendarEvents] = await Promise.all([
                 supabase.rpc('get_financial_summary', {
                     start_date: null, end_date: null, search_term: null,
                     filter_type: null, filter_category: null
@@ -84,6 +85,8 @@ export const useHomeDashboard = (session) => {
                 supabase.from('notes').select('*').eq('is_completed', false).order('prazo', { ascending: true }).limit(6),
                 supabase.from('notes').select('id, is_completed'),
                 supabase.from('recurring_reminders').select('*').eq('is_active', true).order('due_day', { ascending: true }),
+                supabase.from('habits').select('id').eq('is_active', true),
+                supabase.from('habit_logs').select('habit_id').eq('completed_at', new Date().toISOString().split('T')[0]),
                 fetchCalendarEvents()
             ])
 
@@ -118,6 +121,15 @@ export const useHomeDashboard = (session) => {
             // Calendar
             setUpcomingEvents(calendarEvents)
 
+            // Habit Progress
+            const totalHabits = habitsRes.data?.length || 0
+            const doneHabits = habitLogsRes.data?.length || 0
+            setHabitProgress({
+                done: doneHabits,
+                total: totalHabits,
+                percent: totalHabits > 0 ? Math.round((doneHabits / totalHabits) * 100) : 0
+            })
+
         } catch (error) {
             console.error('Error loading dashboard data:', error)
         } finally {
@@ -131,6 +143,6 @@ export const useHomeDashboard = (session) => {
 
     return {
         loading, stats, recentTransactions, pendingTasks, taskProgress,
-        upcomingEvents, nearReminders, isCalendarConnected, refresh: loadDashboardData
+        upcomingEvents, nearReminders, habitProgress, isCalendarConnected, refresh: loadDashboardData
     }
 }

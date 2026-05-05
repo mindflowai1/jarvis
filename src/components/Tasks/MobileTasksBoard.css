@@ -86,70 +86,171 @@
     background: rgba(239, 68, 68, 0.2);
 }
 
-/* ===== TABS ===== */
-.mtk-tabs {
+/* ===== PROJECTS LIST ===== */
+.mtk-projects-list {
+    flex: 1;
+    padding: 0 16px 100px;
+    overflow-y: auto;
     display: flex;
-    padding: 0 16px;
-    gap: 4px;
+    flex-direction: column;
+    gap: 24px;
 }
 
-.mtk-tab {
-    flex: 1;
-    background: transparent;
+.mtk-project-section {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.mtk-project-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 4px 0;
+    position: sticky;
+    top: 0;
+    background: var(--bg-main); /* Match your background variable */
+    z-index: 5;
+}
+
+.mtk-project-info {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.mtk-project-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    box-shadow: 0 0 8px currentColor;
+}
+
+.mtk-project-name {
+    font-size: 17px;
+    font-weight: 700;
+    color: var(--text-main);
+    margin: 0;
+}
+
+.mtk-project-count {
+    background: rgba(255, 255, 255, 0.08);
+    color: var(--text-muted);
+    font-size: 11px;
+    font-weight: 700;
+    padding: 2px 8px;
+    border-radius: 10px;
+}
+
+.mtk-project-header-actions {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.mtk-project-filter {
+    position: relative;
+    width: 32px;
+    height: 32px;
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--text-muted);
+    transition: all 0.2s;
+}
+
+.mtk-project-filter.active {
+    background: rgba(59, 130, 246, 0.1);
+    color: #3b82f6;
+    border-color: rgba(59, 130, 246, 0.3);
+}
+
+.mtk-project-filter input[type="date"] {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    opacity: 0;
+    z-index: 1;
+}
+
+.mtk-clear-project-filter {
+    position: absolute;
+    top: -4px;
+    right: -4px;
+    width: 16px;
+    height: 16px;
+    background: #ef4444;
+    color: white;
     border: none;
-    color: #64748b;
-    padding: 12px 8px;
-    font-size: 14px;
-    font-weight: 600;
-    border-bottom: 2.5px solid transparent;
-    transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+    border-radius: 50%;
+    font-size: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 2;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+}
+
+.mtk-add-task-inline {
+    width: 32px;
+    height: 32px;
+    border-radius: 10px;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    background: rgba(59, 130, 246, 0.1);
+    color: #3b82f6;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+}
+
+.mtk-tasks-container {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.mtk-no-tasks {
+    font-size: 13px;
+    color: var(--text-muted);
+    text-align: center;
+    padding: 12px;
+    background: rgba(255, 255, 255, 0.02);
+    border-radius: 12px;
+    margin: 0;
+}
+
+/* ===== DONE SECTION ===== */
+.mtk-done-section {
+    margin-top: 4px;
+}
+
+.mtk-toggle-done {
+    width: 100%;
     display: flex;
     align-items: center;
     justify-content: center;
     gap: 8px;
+    padding: 10px;
+    background: rgba(255, 255, 255, 0.03);
+    border: none;
+    border-radius: 12px;
+    color: var(--text-muted);
+    font-size: 12px;
+    font-weight: 600;
     cursor: pointer;
-    -webkit-tap-highlight-color: transparent;
 }
 
-.mtk-tab-active {
-    color: #f1f5f9;
-    border-bottom-color: #3b82f6;
-}
-
-.mtk-tab-dot {
-    width: 7px;
-    height: 7px;
-    border-radius: 50%;
-    flex-shrink: 0;
-}
-
-.mtk-dot-todo {
-    background: #3b82f6;
-    box-shadow: 0 0 6px rgba(59, 130, 246, 0.5);
-}
-
-.mtk-dot-done {
-    background: #22c55e;
-    box-shadow: 0 0 6px rgba(34, 197, 94, 0.5);
-}
-
-.mtk-tab:not(.mtk-tab-active) .mtk-tab-dot {
-    opacity: 0.4;
-    box-shadow: none;
-}
-
-.mtk-tab-badge {
-    background: rgba(255, 255, 255, 0.06);
-    padding: 2px 8px;
-    border-radius: 10px;
-    font-size: 11px;
-    font-weight: 700;
-    color: #94a3b8;
-}
-
-.mtk-tab-active .mtk-tab-badge {
-    background: rgba(59, 130, 246, 0.15);
-    color: #60a5fa;
+.mtk-done-list {
+    margin-top: 10px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
 }
 
 /* ===== TASK LIST ===== */
@@ -226,27 +327,24 @@
     width: 26px;
     height: 26px;
     min-width: 26px;
-    border: none;
+    border: 2px solid rgba(255, 255, 255, 0.15);
+    border-radius: 8px;
     background: transparent;
     padding: 0;
     cursor: pointer;
     color: #64748b;
-    transition: color 0.2s, transform 0.2s;
+    transition: all 0.2s;
     -webkit-tap-highlight-color: transparent;
     margin-top: 1px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
 
-.mtk-checkbox:active {
-    transform: scale(0.85);
-}
-
-.mtk-checkbox svg {
-    width: 24px;
-    height: 24px;
-}
-
-.mtk-card-done .mtk-checkbox {
-    color: #22c55e;
+.mtk-checkbox.checked {
+    background: #22c55e;
+    border-color: #22c55e;
+    color: white;
 }
 
 /* ===== CARD BODY ===== */

@@ -4,7 +4,9 @@ import CalendarAgenda from '../components/CalendarAgenda'
 import PhoneNumberModal from '../components/PhoneNumberModal'
 import HomeDashboard from '../components/HomeDashboard/HomeDashboard'
 import FinancialDashboard from '../components/FinancialDashboard'
+import PlanningDashboard from '../components/PlanningDashboard'
 import Tasks from '../components/Tasks'
+import HabitTracker from '../components/HabitTracker'
 import Settings from '../components/Settings'
 import '../index.css'
 
@@ -19,7 +21,7 @@ const Dashboard = ({ session }) => {
     useEffect(() => {
         const searchParams = new URLSearchParams(window.location.search);
         const tab = searchParams.get('tab');
-        if (tab && ['home', 'calendar', 'finance', 'tasks', 'settings'].includes(tab)) {
+        if (tab && ['home', 'calendar', 'finance', 'tasks', 'habits', 'settings'].includes(tab)) {
             setActiveTab(tab);
             // Optionally clean up the URL
             window.history.replaceState({}, '', window.location.pathname);
@@ -35,39 +37,37 @@ const Dashboard = ({ session }) => {
     }, [session])
 
     const checkUserProfile = async (userId) => {
-        console.log('🔍 Checking user profile for:', userId)
-        
-        // Timer to ensure a minimum display time for the smooth animation (visual polish)
-        const minLoadingTime = new Promise(resolve => setTimeout(resolve, 800))
+        if (!userId) return;
         
         try {
             const profileReq = supabase
                 .from('user_profiles')
                 .select('*')
                 .eq('user_id', userId)
-                .single()
+                .single();
             
-            const [{ data, error }] = await Promise.all([profileReq, minLoadingTime])
+            // Note: minLoadingTime is for UX polish (avoiding flicker)
+            const minLoadingTime = new Promise(resolve => setTimeout(resolve, 800));
+            const [response] = await Promise.all([profileReq, minLoadingTime]);
+            const { data, error } = response;
 
             if (error && error.code !== 'PGRST116') {
-                console.error('Error checking profile:', error)
-                return
+                throw error;
             }
 
             if (!data || !data.phone_number) {
-                console.log('⚠️ No profile or phone found, showing modal')
-                setShowPhoneModal(true)
+                setShowPhoneModal(true);
             } else {
-                console.log('✅ Profile found:', data)
-                setUserProfile(data)
-                setShowPhoneModal(false)
+                setUserProfile(data);
+                setShowPhoneModal(false);
             }
         } catch (err) {
-            console.error('Unexpected error checking profile:', err)
+            console.error('Unexpected error checking profile:', err);
         } finally {
-            setIsDashboardLoading(false)
+            setIsDashboardLoading(false);
         }
-    }
+    };
+
 
     // Formata número para exibição: 5511999999999 -> +55 (11) 99999-9999
     const formatPhoneDisplay = (phone) => {
@@ -195,7 +195,18 @@ const Dashboard = ({ session }) => {
                         <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor">
                             <path strokeLinecap="round" strokeLinejoin="round" d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
                         </svg>
-                        Afazeres
+                        Tarefas
+                    </a>
+                    <a
+                        href="#"
+                        className={`nav-item ${activeTab === 'habits' ? 'active' : ''}`}
+                        onClick={(e) => { e.preventDefault(); setActiveTab('habits'); }}
+                    >
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor">
+                            <path strokeLinecap="round" strokeLinejoin="round" d="M15.362 5.214A8.252 8.252 0 0112 21 8.25 8.25 0 016.038 7.048 8.287 8.287 0 009 9.6a8.983 8.983 0 013.361-6.867 8.21 8.21 0 003 2.48z" />
+                            <path strokeLinecap="round" strokeLinejoin="round" d="M12 18a3.75 3.75 0 00.495-7.467 5.99 5.99 0 00-1.925 3.546 5.974 5.974 0 01-1.568-4.58A5.978 5.978 0 008.134 11 5.977 5.977 0 0012 18z" />
+                        </svg>
+                        Hábitos
                     </a>
                     <a
                         href="#"
@@ -258,7 +269,18 @@ const Dashboard = ({ session }) => {
                     <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor">
                         <path strokeLinecap="round" strokeLinejoin="round" d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
                     </svg>
-                    <span>Afazeres</span>
+                    <span>Tarefas</span>
+                </a>
+                <a
+                    href="#"
+                    className={`mobile-nav-item ${activeTab === 'habits' ? 'active' : ''}`}
+                    onClick={(e) => { e.preventDefault(); setActiveTab('habits'); }}
+                >
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor">
+                        <path strokeLinecap="round" strokeLinejoin="round" d="M15.362 5.214A8.252 8.252 0 0112 21 8.25 8.25 0 016.038 7.048 8.287 8.287 0 009 9.6a8.983 8.983 0 013.361-6.867 8.21 8.21 0 003 2.48z" />
+                        <path strokeLinecap="round" strokeLinejoin="round" d="M12 18a3.75 3.75 0 00.495-7.467 5.99 5.99 0 00-1.925 3.546 5.974 5.974 0 01-1.568-4.58A5.978 5.978 0 008.134 11 5.977 5.977 0 0012 18z" />
+                    </svg>
+                    <span>Hábitos</span>
                 </a>
                 <a
                     href="#"
@@ -278,6 +300,7 @@ const Dashboard = ({ session }) => {
                 {activeTab === 'calendar' && <CalendarAgenda session={session} />}
                 {activeTab === 'finance' && <FinancialDashboard userName={userProfile?.name || session?.user?.user_metadata?.full_name || session?.user?.email} />}
                 {activeTab === 'tasks' && <Tasks session={session} />}
+                {activeTab === 'habits' && <HabitTracker session={session} />}
                 {activeTab === 'settings' && <Settings session={session} />}
             </main>
         </div>

@@ -64,7 +64,7 @@ const MobileFinancialDashboard = ({
         <div className="financial-dashboard mobile-view">
             {/* Header Padronizado com ações à direita */}
             <MobileHeader 
-                title="Financeiro" 
+                title="" 
                 rightContent={
                     <>
                         <button className="eye-btn" onClick={() => setShowBalance(!showBalance)}>
@@ -210,14 +210,35 @@ const MobileFinancialDashboard = ({
                                             {getIconForCategory(tx.categoria, tx.tipo)}
                                         </div>
                                         <div className="card-details">
-                                            <span className="card-title">{tx.summary || tx.categoria}</span>
-                                            <span className="card-date">
+                                            <span className="card-title">
                                                 {(() => {
-                                                    const [datePart] = tx.created_at.split(/[T ]/);
-                                                    const [y, m, d] = datePart.split("-");
-                                                    return `${d}/${m}`;
+                                                    const rawSummary = tx.summary || tx.categoria || ''
+                                                    const parcMatch = rawSummary.match(/\[Parc:\s*(.*?)\]/)
+                                                    const cleanTitle = rawSummary.replace(/\[.*?\]/g, '').trim()
+                                                    return (
+                                                        <>
+                                                            {cleanTitle}
+                                                            {parcMatch && (
+                                                                <span className="installment-badge" style={{ marginLeft: '4px', fontSize: '0.85em', color: '#64748b', fontWeight: '500' }}>
+                                                                    ({parcMatch[1]})
+                                                                </span>
+                                                            )}
+                                                        </>
+                                                    )
                                                 })()}
                                             </span>
+                                            <div className="card-meta">
+                                                <span className="card-date">
+                                                    {(() => {
+                                                        const [datePart] = tx.created_at.split(/[T ]/);
+                                                        const [y, m, d] = datePart.split("-");
+                                                        return `${d}/${m}`;
+                                                    })()}
+                                                </span>
+                                                {tx.payment_method && (
+                                                    <span className="payment-badge-mini">{tx.payment_method}</span>
+                                                )}
+                                            </div>
                                         </div>
                                         <div className={`card-amount ${tx.tipo}`}>
                                             {tx.tipo === 'saida' ? '-' : '+'}
@@ -308,6 +329,21 @@ const MobileFinancialDashboard = ({
                                     {categories.map(cat => (
                                         <option key={cat} value={cat}>{cat}</option>
                                     ))}
+                                </select>
+                            </div>
+
+                            <div className="filter-group">
+                                <label>Forma de Pagamento</label>
+                                <select
+                                    className="mobile-select"
+                                    value={filters.paymentMethod}
+                                    onChange={(e) => handleFilterChange('paymentMethod', e.target.value)}
+                                >
+                                    <option value="all">Todas</option>
+                                    <option value="Pix">Pix</option>
+                                    <option value="Débito">Débito</option>
+                                    <option value="Dinheiro">Dinheiro</option>
+                                    <option value="Crédito">Crédito</option>
                                 </select>
                             </div>
 

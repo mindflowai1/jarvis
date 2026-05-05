@@ -2,40 +2,55 @@ import { useState, useEffect, useRef } from 'react'
 import { supabase } from '../supabaseClient'
 import { motion, AnimatePresence } from 'framer-motion'
 import TaskModal from './TaskModal'
+import ProjectModal from './ProjectModal'
 import MobileTasksBoard from './Tasks/MobileTasksBoard'
 import '../Tasks.css'
 
 export default function Tasks({ session }) {
     const [notes, setNotes] = useState([])
+    const [projects, setProjects] = useState([])
     const [loading, setLoading] = useState(true)
     const [error, setError] = useState(null)
-    const [draggingId, setDraggingId] = useState(null)
     const [isModalOpen, setIsModalOpen] = useState(false)
+    const [isProjectModalOpen, setIsProjectModalOpen] = useState(false)
     const [editingTask, setEditingTask] = useState(null)
+    const [editingProject, setEditingProject] = useState(null)
     const [filterDate, setFilterDate] = useState('')
+    const [projectFilters, setProjectFilters] = useState({}) // Novo estado para filtros individuais
+    const [expandedProjects, setExpandedProjects] = useState({}) // For "Show Completed" toggle
 
     useEffect(() => {
-        fetchNotes()
+        fetchData()
     }, [session])
 
-    const fetchNotes = async () => {
+    const fetchData = async () => {
         try {
             setLoading(true)
+            
+            // 1. Fetch Projects
+            const { data: projectsData, error: projectsError } = await supabase
+                .from('task_projects')
+                .select('*')
+                .order('created_at', { ascending: true })
+
+            if (projectsError) throw projectsError
+
+            // 2. Fetch Tasks
             let query = supabase
                 .from('notes')
                 .select('*')
-                // Always order by deadline (prazo) closest first, then Created most recent
                 .order('prazo', { ascending: true, nullsFirst: false })
                 .order('created_at', { ascending: false })
 
-            const { data, error } = await query
+            const { data: tasksData, error: tasksError } = await query
 
-            if (error) throw error
+            if (tasksError) throw tasksError
 
-            setNotes(data || [])
+            setProjects(projectsData || [])
+            setNotes(tasksData || [])
         } catch (error) {
-            console.error('Error fetching notes:', error)
-            setError('Erro ao carregar notas. Tente novamente mais tarde.')
+            console.error('Error fetching tasks data:', error)
+            setError('Erro ao carregar dados. Tente novamente mais tarde.')
         } finally {
             setLoading(false)
         }
@@ -45,13 +60,14 @@ export default function Tasks({ session }) {
         try {
             const user = session?.user
 
-            if (editingTask) {
+            if (editingTask && editingTask.id) {
                 // Update
                 const { error } = await supabase
                     .from('notes')
                     .update({
                         content: taskData.text,
-                        prazo: taskData.prazo
+                        prazo: taskData.prazo,
+                        project_id: taskData.project_id
                     })
                     .eq('id', editingTask.id)
 
@@ -64,18 +80,70 @@ export default function Tasks({ session }) {
                         user_id: user?.id,
                         content: taskData.text,
                         is_completed: false,
-                        prazo: taskData.prazo
+                        prazo: taskData.prazo,
+                        project_id: taskData.project_id
                     })
 
                 if (error) throw error
             }
-            fetchNotes()
+            fetchData()
             setIsModalOpen(false)
             setEditingTask(null)
         } catch (error) {
             console.error('Error saving task:', error)
             alert('Erro ao salvar tarefa')
             throw error
+        }
+    }
+
+    const handleSaveProject = async (projectData) => {
+        try {
+            if (editingProject) {
+                // Update
+                const { error } = await supabase
+                    .from('task_projects')
+                    .update({
+                        name: projectData.name,
+                        color: projectData.color
+                    })
+                    .eq('id', editingProject.id)
+
+                if (error) throw error
+            } else {
+                // Insert
+                const { error } = await supabase
+                    .from('task_projects')
+                    .insert({
+                        user_id: session?.user?.id,
+                        name: projectData.name,
+                        color: projectData.color
+                    })
+
+                if (error) throw error
+            }
+            fetchData()
+            setIsProjectModalOpen(false)
+            setEditingProject(null)
+        } catch (error) {
+            console.error('Error saving project:', error)
+            alert('Erro ao salvar projeto')
+        }
+    }
+
+    const handleDeleteProject = async (projectId, projectName) => {
+        if (!confirm(`Tem certeza que deseja excluir o projeto "${projectName}"? Todas as tarefas vinculadas a ele serão afetadas.`)) return
+
+        try {
+            const { error } = await supabase
+                .from('task_projects')
+                .delete()
+                .eq('id', projectId)
+
+            if (error) throw error
+            fetchData()
+        } catch (error) {
+            console.error('Error deleting project:', error)
+            alert('Erro ao excluir projeto')
         }
     }
 
@@ -93,11 +161,10 @@ export default function Tasks({ session }) {
             if (error) throw error
         } catch (error) {
             console.error('Error updating task:', error)
-            fetchNotes() // Revert by fetching
+            fetchData() // Revert by fetching
             alert('Erro ao atualizar tarefa')
         }
     }
-
 
     const handleDeleteTask = async (id) => {
         if (!confirm('Tem certeza que deseja excluir esta tarefa?')) return
@@ -113,36 +180,16 @@ export default function Tasks({ session }) {
             if (error) throw error
         } catch (error) {
             console.error('Error deleting task:', error)
-            fetchNotes() // Revert
+            fetchData() // Revert
             alert('Erro ao excluir tarefa')
         }
     }
 
-    const handleClearCompleted = async () => {
-        if (doneNotes.length === 0) return
-
-        const confirmed = confirm(
-            `Tem certeza que deseja excluir permanentemente ${doneNotes.length} tarefa(s) concluída(s)? Esta ação não pode ser desfeita.`
-        )
-
-        if (!confirmed) return
-
-        // Optimistic update
-        const idsToDelete = doneNotes.map(n => n.id)
-        setNotes(prev => prev.filter(n => !n.is_completed))
-
-        try {
-            const { error } = await supabase
-                .from('notes')
-                .delete()
-                .in('id', idsToDelete)
-
-            if (error) throw error
-        } catch (error) {
-            console.error('Error clearing completed tasks:', error)
-            fetchNotes() // Revert on error
-            alert('Erro ao limpar tarefas concluídas')
-        }
+    const toggleProjectExpanded = (projectId) => {
+        setExpandedProjects(prev => ({
+            ...prev,
+            [projectId]: !prev[projectId]
+        }))
     }
 
     const formatDate = (dateString) => {
@@ -152,20 +199,25 @@ export default function Tasks({ session }) {
     }
 
     // Filter notes locally
-    const filteredNotes = filterDate
-        ? notes.filter(n => n.prazo === filterDate)
-        : notes
+    const getFilteredNotes = () => {
+        let result = notes;
+        
+        // Aplica filtro global se existir
+        if (filterDate) {
+            result = result.filter(n => n.prazo === filterDate);
+        }
+        
+        return result;
+    }
 
-    // Separate notes into columns
-    const todoNotes = filteredNotes.filter(n => !n.is_completed)
-    const doneNotes = filteredNotes.filter(n => n.is_completed)
+    const filteredNotes = getFilteredNotes();
 
     if (loading) {
         return (
             <div className="tasks-container">
                 <div className="loading-state">
                     <div className="spinner"></div>
-                    <p>Carregando suas anotações...</p>
+                    <p>Carregando suas tarefas...</p>
                 </div>
             </div>
         )
@@ -176,7 +228,7 @@ export default function Tasks({ session }) {
             {/* ===== DESKTOP VIEW ===== */}
             <div className="tasks-desktop-wrapper">
                 <div className="tasks-header">
-                    <h2>Meus Afazeres</h2>
+                    <h2>Minhas Tarefas</h2>
                     <div className="tasks-actions">
                         <div className="filter-container">
                             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="filter-icon">
@@ -205,6 +257,16 @@ export default function Tasks({ session }) {
                             )}
                         </div>
 
+                        <button className="add-project-btn" onClick={() => {
+                            setEditingProject(null)
+                            setIsProjectModalOpen(true)
+                        }}>
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor">
+                                <path strokeLinecap="round" strokeLinejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
+                            </svg>
+                            Novo Projeto
+                        </button>
+                        
                         <button className="add-btn" onClick={() => {
                             setEditingTask(null)
                             setIsModalOpen(true)
@@ -214,119 +276,189 @@ export default function Tasks({ session }) {
                             </svg>
                             Nova Tarefa
                         </button>
-                        <button className="refresh-btn" onClick={fetchNotes} title="Atualizar">
-                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor">
-                                <path strokeLinecap="round" strokeLinejoin="round" d="M16.023 9.348h4.992v-.001M2.985 19.644v-4.992m0 0h4.992m-4.993 0l3.181 3.183a8.25 8.25 0 0013.803-3.7M4.031 9.865a8.25 8.25 0 0113.803-3.7l3.181 3.182m0-4.991v4.99" />
-                            </svg>
-                        </button>
                     </div>
                 </div>
 
                 {error && <div className="error-message">{error}</div>}
 
-                <div className="kanban-board">
-                    {/* Column: To Do */}
-                    <div
-                        className="kanban-column todo-column"
-                        style={{ zIndex: todoNotes.some(n => n.id === draggingId) ? 20 : 1 }}
-                    >
-                        <div className="column-header">
-                            <h3>A Fazer</h3>
-                            <span className="count-badge">{todoNotes.length}</span>
+                <div className="projects-grid">
+                    {projects.length === 0 ? (
+                        <div className="empty-projects-state">
+                            <p>Você ainda não tem projetos. Crie um para começar a organizar suas tarefas!</p>
+                            <button className="btn-create-first" onClick={() => {
+                                setEditingProject(null)
+                                setIsProjectModalOpen(true)
+                            }}>Criar Primeiro Projeto</button>
                         </div>
-                        <motion.div className="column-content">
-                            <AnimatePresence>
-                                {todoNotes.map((note) => (
-                                    <KanbanCard
-                                        key={note.id}
-                                        note={note}
-                                        formatDate={formatDate}
-                                        setDraggingId={setDraggingId}
-                                        onEdit={() => {
-                                            setEditingTask(note)
-                                            setIsModalOpen(true)
-                                        }}
-                                        onDelete={() => handleDeleteTask(note.id)}
-                                        onDragEnd={(e, info) => {
-                                            if (info.offset.x > 100) updateTaskStatus(note.id, true)
-                                        }}
-                                    />
-                                ))}
-                            </AnimatePresence>
-                            {todoNotes.length === 0 && (
-                                <div className="empty-column-state">
-                                    <p>{filterDate ? 'Nenhuma tarefa para esta data' : 'Tudo feito! 🎉'}</p>
-                                </div>
-                            )}
-                        </motion.div>
-                    </div>
+                    ) : (
+                            projects.map(project => {
+                            const projectSpecificDate = projectFilters[project.id] || ''
+                            
+                            // Filtra tarefas deste projeto e aplica o filtro de data específico do projeto
+                            const projectTasks = filteredNotes.filter(n => {
+                                const isProjectTask = n.project_id === project.id
+                                if (!isProjectTask) return false
+                                
+                                if (projectSpecificDate) {
+                                    return n.prazo === projectSpecificDate
+                                }
+                                return true
+                            })
 
-                    {/* Column: Done */}
-                    <div
-                        className="kanban-column done-column"
-                        style={{ zIndex: doneNotes.some(n => n.id === draggingId) ? 20 : 1 }}
-                    >
-                        <div className="column-header">
-                            <div className="column-header-left">
-                                <h3>Concluído</h3>
-                                <span className="count-badge">{doneNotes.length}</span>
-                            </div>
-                            {doneNotes.length > 0 && (
-                                <button
-                                    className="clear-completed-btn"
-                                    onClick={handleClearCompleted}
-                                    title="Esvaziar tarefas concluídas"
-                                >
-                                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor">
-                                        <path strokeLinecap="round" strokeLinejoin="round" d="M14.74 9l-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 01-2.244 2.077H8.084a2.25 2.25 0 01-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 00-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 013.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 00-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 00-7.5 0" />
-                                    </svg>
-                                    Esvaziar
-                                </button>
-                            )}
-                        </div>
-                        <motion.div className="column-content">
-                            <AnimatePresence>
-                                {doneNotes.map((note) => (
-                                    <KanbanCard
-                                        key={note.id}
-                                        note={note}
-                                        formatDate={formatDate}
-                                        isDone={true}
-                                        setDraggingId={setDraggingId}
-                                        onEdit={() => {
-                                            setEditingTask(note)
-                                            setIsModalOpen(true)
-                                        }}
-                                        onDelete={() => handleDeleteTask(note.id)}
-                                        onDragEnd={(e, info) => {
-                                            if (info.offset.x < -100) updateTaskStatus(note.id, false)
-                                        }}
-                                    />
-                                ))}
-                            </AnimatePresence>
-                            {doneNotes.length === 0 && (
-                                <div className="empty-column-state">
-                                    <p>{filterDate ? 'Nenhuma tarefa concluída nesta data' : 'Nenhuma tarefa concluída'}</p>
+                            const todoTasks = projectTasks.filter(n => !n.is_completed)
+                            const doneTasks = projectTasks.filter(n => n.is_completed)
+                            const isExpanded = expandedProjects[project.id]
+
+                            return (
+                                <div key={project.id} className="project-column">
+                                    <div className="project-header">
+                                        <div className="project-title-group">
+                                            <span className="project-dot" style={{ backgroundColor: project.color }}></span>
+                                            <h3>{project.name}</h3>
+                                            <span className="count-badge">{todoTasks.length}</span>
+                                        </div>
+                                        <div className="project-actions">
+                                            <div className={`project-filter-mini ${projectSpecificDate ? 'active' : ''}`}>
+                                                <input 
+                                                    type="date" 
+                                                    value={projectSpecificDate}
+                                                    onChange={(e) => setProjectFilters(prev => ({
+                                                        ...prev,
+                                                        [project.id]: e.target.value
+                                                    }))}
+                                                    title="Filtrar este projeto"
+                                                />
+                                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor">
+                                                    <path strokeLinecap="round" strokeLinejoin="round" d="M6.75 3v2.25M17.25 3v2.25M3 18.75V7.5a2.25 2.25 0 012.25-2.25h13.5A2.25 2.25 0 0121 7.5v11.25m-18 0A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75m-18 0v-7.5A2.25 2.25 0 015.25 9h13.5A2.25 2.25 0 0121 11.25v7.5" />
+                                                </svg>
+                                                {projectSpecificDate && (
+                                                    <button 
+                                                        className="clear-project-filter"
+                                                        onClick={() => setProjectFilters(prev => ({
+                                                            ...prev,
+                                                            [project.id]: ''
+                                                        }))}
+                                                    >
+                                                        ×
+                                                    </button>
+                                                )}
+                                            </div>
+                                            <button className="project-action-btn" onClick={() => {
+                                                setEditingProject(project)
+                                                setIsProjectModalOpen(true)
+                                            }} title="Editar Projeto">
+                                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" width="16" height="16">
+                                                    <path strokeLinecap="round" strokeLinejoin="round" d="m16.862 4.487 1.687-1.688a1.875 1.875 0 1 1 2.652 2.652L10.582 16.07a4.5 4.5 0 0 1-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 0 1 1.13-1.897l8.932-8.931Zm0 0L19.5 7.125M18 14v4.75A2.25 2.25 0 0 1 15.75 21H5.25A2.25 2.25 0 0 1 3 18.75V8.25A2.25 2.25 0 0 1 5.25 6H10" />
+                                                </svg>
+                                            </button>
+                                            <button className="project-action-btn delete" onClick={() => handleDeleteProject(project.id, project.name)} title="Excluir Projeto">
+                                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" width="16" height="16">
+                                                    <path strokeLinecap="round" strokeLinejoin="round" d="M14.74 9l-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 01-2.244 2.077H8.084a2.25 2.25 0 01-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 00-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 013.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 00-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 00-7.5 0" />
+                                                </svg>
+                                            </button>
+                                        </div>
+                                    </div>
+
+                                    <div className="project-tasks-list">
+                                        <AnimatePresence>
+                                            {todoTasks.map(task => (
+                                                <KanbanCard
+                                                    key={task.id}
+                                                    note={task}
+                                                    formatDate={formatDate}
+                                                    onEdit={() => {
+                                                        setEditingTask(task)
+                                                        setIsModalOpen(true)
+                                                    }}
+                                                    onDelete={() => handleDeleteTask(task.id)}
+                                                    onToggleStatus={() => updateTaskStatus(task.id, true)}
+                                                />
+                                            ))}
+                                        </AnimatePresence>
+
+                                        {todoTasks.length === 0 && !isExpanded && (
+                                            <div className="empty-project-tasks">
+                                                <p>Nenhuma tarefa pendente</p>
+                                            </div>
+                                        )}
+
+                                        {doneTasks.length > 0 && (
+                                            <div className="done-tasks-section">
+                                                <button className="toggle-done-btn" onClick={() => toggleProjectExpanded(project.id)}>
+                                                    {isExpanded ? 'Ocultar concluídas' : `Ver concluídas (${doneTasks.length})`}
+                                                    <svg 
+                                                        xmlns="http://www.w3.org/2000/svg" 
+                                                        fill="none" 
+                                                        viewBox="0 0 24 24" 
+                                                        strokeWidth={2} 
+                                                        stroke="currentColor" 
+                                                        width="12" 
+                                                        height="12"
+                                                        style={{ transform: isExpanded ? 'rotate(180deg)' : 'none', transition: 'transform 0.2s' }}
+                                                    >
+                                                        <path strokeLinecap="round" strokeLinejoin="round" d="M19.5 8.25l-7.5 7.5-7.5-7.5" />
+                                                    </svg>
+                                                </button>
+                                                
+                                                <AnimatePresence>
+                                                    {isExpanded && (
+                                                        <motion.div 
+                                                            initial={{ opacity: 0, height: 0 }}
+                                                            animate={{ opacity: 1, height: 'auto' }}
+                                                            exit={{ opacity: 0, height: 0 }}
+                                                            className="done-tasks-list"
+                                                        >
+                                                            {doneTasks.map(task => (
+                                                                <KanbanCard
+                                                                    key={task.id}
+                                                                    note={task}
+                                                                    isDone={true}
+                                                                    formatDate={formatDate}
+                                                                    onEdit={() => {
+                                                                        setEditingTask(task)
+                                                                        setIsModalOpen(true)
+                                                                    }}
+                                                                    onDelete={() => handleDeleteTask(task.id)}
+                                                                    onToggleStatus={() => updateTaskStatus(task.id, false)}
+                                                                />
+                                                            ))}
+                                                        </motion.div>
+                                                    )}
+                                                </AnimatePresence>
+                                            </div>
+                                        )}
+                                    </div>
+                                    
+                                    <button className="add-task-inline" onClick={() => {
+                                        setEditingTask({ project_id: project.id })
+                                        setIsModalOpen(true)
+                                    }}>
+                                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" width="14" height="14">
+                                            <path strokeLinecap="round" strokeLinejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
+                                        </svg>
+                                        Adicionar tarefa
+                                    </button>
                                 </div>
-                            )}
-                        </motion.div>
-                    </div>
+                            )
+                        })
+                    )}
                 </div>
             </div>
 
             {/* ===== MOBILE VIEW ===== */}
             <div className="tasks-mobile-wrapper">
                 <MobileTasksBoard
-                    todoNotes={todoNotes}
-                    doneNotes={doneNotes}
+                    projects={projects}
+                    filteredNotes={filteredNotes}
                     updateTaskStatus={updateTaskStatus}
                     handleDeleteTask={handleDeleteTask}
-                    handleClearCompleted={handleClearCompleted}
                     formatDate={formatDate}
                     setIsModalOpen={setIsModalOpen}
                     setEditingTask={setEditingTask}
                     filterDate={filterDate}
                     setFilterDate={setFilterDate}
+                    projectFilters={projectFilters}
+                    setProjectFilters={setProjectFilters}
                 />
             </div>
 
@@ -335,68 +467,68 @@ export default function Tasks({ session }) {
                 onClose={() => setIsModalOpen(false)}
                 onSave={handleSaveTask}
                 task={editingTask}
+                projects={projects}
+            />
+
+            <ProjectModal
+                isOpen={isProjectModalOpen}
+                onClose={() => setIsProjectModalOpen(false)}
+                onSave={handleSaveProject}
+                project={editingProject}
             />
         </div>
     )
 }
 
-function KanbanCard({ note, formatDate, isDone, onDragEnd, setDraggingId, onEdit, onDelete }) {
-    const isDragging = useRef(false)
-
+function KanbanCard({ note, formatDate, isDone, onEdit, onDelete, onToggleStatus }) {
     return (
         <motion.div
-            initial={{ opacity: 0, y: 20 }}
+            initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, transition: { duration: 0.15 } }}
-            drag
-            dragSnapToOrigin={true}
-            dragMomentum={false}
-            dragElastic={0.1}
-            onDragStart={() => {
-                isDragging.current = true
-                setDraggingId(note.id)
-            }}
-            onDragEnd={(e, info) => {
-                setDraggingId(null)
-                onDragEnd(e, info)
-                // Small delay to ensure onClick sees the drag state before resetting
-                setTimeout(() => {
-                    isDragging.current = false
-                }, 100)
-            }}
-            whileDrag={{ scale: 1.05, zIndex: 100, cursor: 'grabbing', boxShadow: "0 20px 40px rgba(0,0,0,0.3)" }}
-            whileHover={{ scale: 1.02, zIndex: 5 }}
-            className={`note-card ${isDone ? 'completed' : ''}`}
+            exit={{ opacity: 0, scale: 0.95 }}
+            whileHover={{ scale: 1.01 }}
+            className={`note-card project-task-card ${isDone ? 'completed' : ''}`}
             onClick={(e) => {
-                // Prevent editing if dragging occurred
-                if (isDragging.current) return;
-                // Prevent editing when clicking buttons
-                if (e.target.closest('.card-actions')) return;
+                if (e.target.closest('.card-actions') || e.target.closest('.task-check')) return;
                 onEdit();
             }}
         >
-            <div className="note-content">
-                <p>{note.text || note.content || 'Sem conteúdo'}</p>
-            </div>
-            <div className="note-footer">
-                <span className="note-date" title="Prazo">
-                    {note.prazo && (
-                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" style={{ width: '14px', height: '14px', marginRight: '4px', display: 'inline-block', verticalAlign: 'text-bottom' }}>
-                            <path fillRule="evenodd" d="M6.75 2.25A.75.75 0 017.5 3v1.5h9V3A.75.75 0 0118 3v1.5h.75a3 3 0 013 3v11.25a3 3 0 01-3 3H5.25a3 3 0 01-3-3V7.5a3 3 0 013-3H6V3a.75.75 0 01.75-.75zm13.5 9a1.5 1.5 0 00-1.5-1.5H5.25a1.5 1.5 0 00-1.5 1.5v7.5a1.5 1.5 0 001.5 1.5h13.5a1.5 1.5 0 001.5-1.5v-7.5z" clipRule="evenodd" />
+            <div className="task-body">
+                <button 
+                    className={`task-check ${isDone ? 'checked' : ''}`} 
+                    onClick={(e) => {
+                        e.stopPropagation();
+                        onToggleStatus();
+                    }}
+                >
+                    {isDone && (
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" width="12" height="12">
+                            <path fillRule="evenodd" d="M19.916 4.626a.75.75 0 01.208 1.04l-9 13.5a.75.75 0 01-1.154.114l-6-6a.75.75 0 011.06-1.06l5.353 5.353 8.493-12.739a.75.75 0 011.04-.208z" clipRule="evenodd" />
                         </svg>
                     )}
-                    {note.prazo ? formatDate(note.prazo) : 'Sem prazo'}
-                </span>
-                <div className="card-actions">
-                    <button className="icon-btn delete-btn" onClick={(e) => {
-                        e.stopPropagation();
-                        onDelete();
-                    }} title="Excluir">
-                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor">
-                            <path strokeLinecap="round" strokeLinejoin="round" d="M14.74 9l-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 01-2.244 2.077H8.084a2.25 2.25 0 01-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 00-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 013.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 00-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 00-7.5 0" />
-                        </svg>
-                    </button>
+                </button>
+                <div className="note-content">
+                    <p>{note.text || note.content || 'Sem conteúdo'}</p>
+                    {note.prazo && (
+                        <span className="note-date">
+                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" width="12" height="12">
+                                <path fillRule="evenodd" d="M6.75 2.25A.75.75 0 017.5 3v1.5h9V3A.75.75 0 0118 3v1.5h.75a3 3 0 013 3v11.25a3 3 0 01-3 3H5.25a3 3 0 01-3-3V7.5a3 3 0 013-3H6V3a.75.75 0 01.75-.75zm13.5 9a1.5 1.5 0 00-1.5-1.5H5.25a1.5 1.5 0 00-1.5 1.5v7.5a1.5 1.5 0 001.5 1.5h13.5a1.5 1.5 0 001.5-1.5v-7.5z" clipRule="evenodd" />
+                            </svg>
+                            {formatDate(note.prazo)}
+                        </span>
+                    )}
                 </div>
+            </div>
+            
+            <div className="card-actions">
+                <button className="icon-btn delete-btn" onClick={(e) => {
+                    e.stopPropagation();
+                    onDelete();
+                }} title="Excluir">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor">
+                        <path strokeLinecap="round" strokeLinejoin="round" d="M14.74 9l-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 01-2.244 2.077H8.084a2.25 2.25 0 01-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 00-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 013.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 00-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 00-7.5 0" />
+                    </svg>
+                </button>
             </div>
         </motion.div>
     )

@@ -634,6 +634,77 @@
     color: #f87171;
 }
 
+/* ===== HABITS WIDGET ===== */
+.hd-habit-stats {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    height: 100%;
+    padding: 10px 0;
+}
+
+.hd-habit-circle {
+    width: 80px;
+    height: 80px;
+}
+
+.hd-habit-circle svg {
+    display: block;
+    margin: 0 auto;
+}
+
+.circle-bg {
+    fill: none;
+    stroke: rgba(148, 163, 184, 0.1);
+    stroke-width: 3;
+}
+
+.circle-fill {
+    fill: none;
+    stroke: #3b82f6;
+    stroke-width: 3;
+    stroke-linecap: round;
+    transition: stroke-dasharray 1s ease-out;
+}
+
+.circle-text {
+    fill: #f1f5f9;
+    font-size: 8px;
+    font-weight: 700;
+    text-anchor: middle;
+    font-family: 'Rajdhani', sans-serif;
+}
+
+.hd-habit-info {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+}
+
+.hd-habit-label {
+    font-size: 12px;
+    color: #64748b;
+    text-transform: uppercase;
+    font-weight: 600;
+}
+
+.hd-habit-count {
+    font-size: 18px;
+    font-weight: 700;
+    color: #f1f5f9;
+}
+
+.hd-habit-status-badge {
+    font-size: 11px;
+    font-weight: 600;
+    padding: 2px 8px;
+    border-radius: 6px;
+    background: rgba(16, 185, 129, 0.1);
+    color: #34d399;
+    width: fit-content;
+    margin-top: 4px;
+}
+
 /* ===== MOBILE ===== */
 @media (max-width: 768px) {
     .hd-root {

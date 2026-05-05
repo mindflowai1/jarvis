@@ -103,27 +103,40 @@ const TransactionModal = ({ isOpen, onClose, onSave, transaction, onDelete }) =>
         tipo: 'saida',
         categoria: '',
         summary: '',
+        payment_method: 'Dinheiro',
         created_at: getLocalYMD()
     })
     const [loading, setLoading] = useState(false)
 
+    const [hiddenTags, setHiddenTags] = useState('')
+
     // Pre-fill form when transaction prop changes
     useEffect(() => {
         if (transaction && isOpen) {
+            const rawSummary = transaction.summary || ''
+            // Extrai todos os marcadores no final da string para preservar na edição
+            const tagsMatch = rawSummary.match(/(\s*\[.*?\])+$/)
+            const tags = tagsMatch ? tagsMatch[0] : ''
+            const cleanSummary = rawSummary.replace(/\[.*?\]/g, '').trim()
+
+            setHiddenTags(tags)
             setFormData({
                 valor: transaction.valor,
                 tipo: transaction.tipo,
                 categoria: transaction.categoria,
-                summary: transaction.summary || '',
+                summary: cleanSummary,
+                payment_method: transaction.payment_method || 'Dinheiro',
                 created_at: getLocalYMD(transaction.created_at)
             })
         } else if (isOpen) {
             // Reset for new transaction
+            setHiddenTags('')
             setFormData({
                 valor: '',
                 tipo: 'saida',
                 categoria: '',
                 summary: '',
+                payment_method: 'Dinheiro',
                 created_at: getLocalYMD()
             })
         }
@@ -143,6 +156,7 @@ const TransactionModal = ({ isOpen, onClose, onSave, transaction, onDelete }) =>
         try {
             await onSave({
                 ...formData,
+                summary: formData.summary.trim() + hiddenTags,
                 valor: parseFloat(formData.valor)
             })
             onClose()
@@ -151,6 +165,26 @@ const TransactionModal = ({ isOpen, onClose, onSave, transaction, onDelete }) =>
         } finally {
             setLoading(false)
         }
+    }
+
+    const handlePaymentMethodSelect = (method) => {
+        if (method === 'Crédito') {
+            // Redirect logic
+            if (window.onRedirectToPlanning) {
+                window.onRedirectToPlanning({
+                    description: formData.summary,
+                    valor: formData.valor,
+                    categoria: formData.categoria || 'Compras',
+                    start_date: formData.created_at,
+                    payment_method: 'Crédito'
+                });
+                onClose();
+            } else {
+                alert('Recurso de planejamento não disponível no momento.');
+            }
+            return;
+        }
+        setFormData(prev => ({ ...prev, payment_method: method }));
     }
 
     const handleChangeTipo = (newTipo) => {
@@ -165,6 +199,13 @@ const TransactionModal = ({ isOpen, onClose, onSave, transaction, onDelete }) =>
         const { name, value } = e.target
         setFormData(prev => ({ ...prev, [name]: value }))
     }
+
+    const paymentMethods = [
+        { id: 'Pix', label: 'Pix', icon: '📱' },
+        { id: 'Débito', label: 'Débito', icon: '💳' },
+        { id: 'Dinheiro', label: 'Dinheiro', icon: '💵' },
+        { id: 'Crédito', label: 'Crédito', icon: '➕💳' }
+    ];
 
     const typeOptions = [
         { value: 'saida', label: 'Saída (Despesa)' },
@@ -206,6 +247,23 @@ const TransactionModal = ({ isOpen, onClose, onSave, transaction, onDelete }) =>
                                     onChange={handleChangeTipo}
                                     placeholder="Selecione o tipo"
                                 />
+                            </div>
+
+                            <div className="form-group">
+                                <label>Forma de Pagamento</label>
+                                <div className="payment-method-grid">
+                                    {paymentMethods.map(method => (
+                                        <button
+                                            key={method.id}
+                                            type="button"
+                                            className={`payment-method-btn ${formData.payment_method === method.id ? 'active' : ''} ${method.id === 'Crédito' ? 'credit-btn' : ''}`}
+                                            onClick={() => handlePaymentMethodSelect(method.id)}
+                                        >
+                                            <span className="method-icon">{method.icon}</span>
+                                            <span className="method-label">{method.label}</span>
+                                        </button>
+                                    ))}
+                                </div>
                             </div>
 
                             <div className="form-group">

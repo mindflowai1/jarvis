@@ -4,27 +4,33 @@ import MobileHeader from '../MobileHeader'
 import './MobileTasksBoard.css'
 
 export default function MobileTasksBoard({
-    todoNotes,
-    doneNotes,
+    projects,
+    filteredNotes,
     updateTaskStatus,
     handleDeleteTask,
-    handleClearCompleted,
     formatDate,
     setIsModalOpen,
     setEditingTask,
     filterDate,
     setFilterDate,
+    projectFilters,
+    setProjectFilters,
 }) {
-    const [activeTab, setActiveTab] = useState('todo')
+    const [expandedProjects, setExpandedProjects] = useState({})
 
-    const currentNotes = activeTab === 'todo' ? todoNotes : doneNotes
+    const toggleProjectExpanded = (projectId) => {
+        setExpandedProjects(prev => ({
+            ...prev,
+            [projectId]: !prev[projectId]
+        }))
+    }
 
     return (
         <div className="mtk-container">
             {/* ===== STICKY HEADER PADRONIZADO ===== */}
-            <MobileHeader title="Afazeres" />
+            <MobileHeader title="Tarefas" />
 
-            {/* ===== CONTROLS (below header) ===== */}
+            {/* ===== CONTROLS ===== */}
             <div className="mtk-toolbar">
                 <div className="mtk-toolbar-row">
                     <div className="filter-container mobile-filter-container">
@@ -55,17 +61,6 @@ export default function MobileTasksBoard({
                     </div>
 
                     <div className="mtk-toolbar-actions">
-                        {activeTab === 'done' && doneNotes.length > 0 && (
-                            <button
-                                className="mtk-icon-btn mtk-clear-btn"
-                                onClick={handleClearCompleted}
-                                title="Esvaziar Lixeira"
-                            >
-                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor">
-                                    <path strokeLinecap="round" strokeLinejoin="round" d="M14.74 9l-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 01-2.244 2.077H8.084a2.25 2.25 0 01-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 00-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 013.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 00-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 00-7.5 0" />
-                                </svg>
-                            </button>
-                        )}
                         <button
                             className="mtk-icon-btn mtk-add-btn"
                             onClick={() => {
@@ -81,85 +76,150 @@ export default function MobileTasksBoard({
                 </div>
             </div>
 
-            {/* ===== TABS ===== */}
-            <div className="mtk-tabs">
-                <button
-                    className={`mtk-tab ${activeTab === 'todo' ? 'mtk-tab-active' : ''}`}
-                    onClick={() => setActiveTab('todo')}
-                >
-                    <span className="mtk-tab-dot mtk-dot-todo" />
-                    A Fazer
-                    <span className="mtk-tab-badge">{todoNotes.length}</span>
-                </button>
-                <button
-                    className={`mtk-tab ${activeTab === 'done' ? 'mtk-tab-active' : ''}`}
-                    onClick={() => setActiveTab('done')}
-                >
-                    <span className="mtk-tab-dot mtk-dot-done" />
-                    Concluídos
-                    <span className="mtk-tab-badge">{doneNotes.length}</span>
-                </button>
-            </div>
+            {/* ===== PROJECTS LIST ===== */}
+            <div className="mtk-projects-list">
+                {projects.length === 0 ? (
+                    <div className="mtk-empty">
+                        <span className="mtk-empty-icon">📋</span>
+                        <p className="mtk-empty-text">Nenhum projeto encontrado.</p>
+                    </div>
+                ) : (
+                    projects.map(project => {
+                        const projectSpecificDate = projectFilters[project.id] || ''
+                        
+                        // Filtra tarefas deste projeto e aplica o filtro de data específico do projeto
+                        const projectTasks = filteredNotes.filter(n => {
+                            const isProjectTask = n.project_id === project.id
+                            if (!isProjectTask) return false
+                            
+                            if (projectSpecificDate) {
+                                return n.prazo === projectSpecificDate
+                            }
+                            return true
+                        })
 
-            {/* ===== TASK LIST ===== */}
-            <div className="mtk-list">
-                <AnimatePresence mode="wait">
-                    {currentNotes.length === 0 ? (
-                        <motion.div
-                            key="empty"
-                            initial={{ opacity: 0, y: 20 }}
-                            animate={{ opacity: 1, y: 0 }}
-                            exit={{ opacity: 0 }}
-                            className="mtk-empty"
-                        >
-                            <span className="mtk-empty-icon">
-                                {activeTab === 'todo' ? '🎉' : '📋'}
-                            </span>
-                            <p className="mtk-empty-text">
-                                {activeTab === 'todo'
-                                    ? 'Tudo feito! Nenhuma tarefa pendente.'
-                                    : 'Nenhuma tarefa concluída ainda.'}
-                            </p>
-                            {activeTab === 'todo' && (
-                                <button
-                                    className="mtk-empty-cta"
-                                    onClick={() => {
-                                        setEditingTask(null)
-                                        setIsModalOpen(true)
-                                    }}
-                                >
-                                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" width="18" height="18">
-                                        <path fillRule="evenodd" d="M12 3.75a.75.75 0 01.75.75v6.75h6.75a.75.75 0 010 1.5h-6.75v6.75a.75.75 0 01-1.5 0v-6.75H4.5a.75.75 0 010-1.5h6.75V4.5a.75.75 0 01.75-.75z" clipRule="evenodd" />
-                                    </svg>
-                                    Nova Tarefa
-                                </button>
-                            )}
-                        </motion.div>
-                    ) : (
-                        <motion.div
-                            key={activeTab}
-                            initial={{ opacity: 0, x: activeTab === 'todo' ? -20 : 20 }}
-                            animate={{ opacity: 1, x: 0 }}
-                            exit={{ opacity: 0 }}
-                            transition={{ duration: 0.2 }}
-                            className="mtk-cards"
-                        >
-                            {currentNotes.map((note, index) => (
-                                <MobileTaskCard
-                                    key={note.id}
-                                    note={note}
-                                    index={index}
-                                    isDone={activeTab === 'done'}
-                                    formatDate={formatDate}
-                                    updateTaskStatus={updateTaskStatus}
-                                    handleDeleteTask={handleDeleteTask}
-                                    setEditingTask={setEditingTask}
-                                    setIsModalOpen={setIsModalOpen}
-                                />
-                            ))}
-                        </motion.div>
-                    )}
-                </AnimatePresence>
+                        const todoTasks = projectTasks.filter(n => !n.is_completed)
+                        const doneTasks = projectTasks.filter(n => n.is_completed)
+                        const isExpanded = expandedProjects[project.id]
+
+                        return (
+                            <div key={project.id} className="mtk-project-section">
+                                <div className="mtk-project-header">
+                                    <div className="mtk-project-info">
+                                        <span className="mtk-project-dot" style={{ backgroundColor: project.color }}></span>
+                                        <h3 className="mtk-project-name">{project.name}</h3>
+                                        <span className="mtk-project-count">{todoTasks.length}</span>
+                                    </div>
+                                    <div className="mtk-project-header-actions">
+                                        <div className={`mtk-project-filter ${projectSpecificDate ? 'active' : ''}`}>
+                                            <input 
+                                                type="date" 
+                                                value={projectSpecificDate}
+                                                onChange={(e) => setProjectFilters(prev => ({
+                                                    ...prev,
+                                                    [project.id]: e.target.value
+                                                }))}
+                                            />
+                                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" width="18" height="18">
+                                                <path strokeLinecap="round" strokeLinejoin="round" d="M6.75 3v2.25M17.25 3v2.25M3 18.75V7.5a2.25 2.25 0 012.25-2.25h13.5A2.25 2.25 0 0121 7.5v11.25m-18 0A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75m-18 0v-7.5A2.25 2.25 0 015.25 9h13.5A2.25 2.25 0 0121 11.25v7.5" />
+                                            </svg>
+                                            {projectSpecificDate && (
+                                                <button 
+                                                    className="mtk-clear-project-filter"
+                                                    onClick={() => setProjectFilters(prev => ({
+                                                        ...prev,
+                                                        [project.id]: ''
+                                                    }))}
+                                                >
+                                                    ×
+                                                </button>
+                                            )}
+                                        </div>
+                                        <button 
+                                            className="mtk-add-task-inline"
+                                            onClick={() => {
+                                                setEditingTask({ project_id: project.id })
+                                                setIsModalOpen(true)
+                                            }}
+                                        >
+                                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" width="20" height="20">
+                                                <path fillRule="evenodd" d="M12 3.75a.75.75 0 01.75.75v6.75h6.75a.75.75 0 010 1.5h-6.75v6.75a.75.75 0 01-1.5 0v-6.75H4.5a.75.75 0 010-1.5h6.75V4.5a.75.75 0 01.75-.75z" clipRule="evenodd" />
+                                            </svg>
+                                        </button>
+                                    </div>
+                                </div>
+
+                                <div className="mtk-tasks-container">
+                                    {todoTasks.map((task, idx) => (
+                                        <MobileTaskCard
+                                            key={task.id}
+                                            note={task}
+                                            index={idx}
+                                            isDone={false}
+                                            formatDate={formatDate}
+                                            updateTaskStatus={updateTaskStatus}
+                                            handleDeleteTask={handleDeleteTask}
+                                            setEditingTask={setEditingTask}
+                                            setIsModalOpen={setIsModalOpen}
+                                        />
+                                    ))}
+
+                                    {todoTasks.length === 0 && !isExpanded && (
+                                        <p className="mtk-no-tasks">Nenhuma tarefa pendente</p>
+                                    )}
+
+                                    {doneTasks.length > 0 && (
+                                        <div className="mtk-done-section">
+                                            <button 
+                                                className="mtk-toggle-done"
+                                                onClick={() => toggleProjectExpanded(project.id)}
+                                            >
+                                                {isExpanded ? 'Ocultar concluídas' : `Ver concluídas (${doneTasks.length})`}
+                                                <svg 
+                                                    xmlns="http://www.w3.org/2000/svg" 
+                                                    fill="none" 
+                                                    viewBox="0 0 24 24" 
+                                                    strokeWidth={2} 
+                                                    stroke="currentColor" 
+                                                    width="12" 
+                                                    height="12"
+                                                    style={{ transform: isExpanded ? 'rotate(180deg)' : 'none', transition: 'transform 0.2s' }}
+                                                >
+                                                    <path strokeLinecap="round" strokeLinejoin="round" d="M19.5 8.25l-7.5 7.5-7.5-7.5" />
+                                                </svg>
+                                            </button>
+
+                                            <AnimatePresence>
+                                                {isExpanded && (
+                                                    <motion.div
+                                                        initial={{ opacity: 0, height: 0 }}
+                                                        animate={{ opacity: 1, height: 'auto' }}
+                                                        exit={{ opacity: 0, height: 0 }}
+                                                        className="mtk-done-list"
+                                                    >
+                                                        {doneTasks.map((task, idx) => (
+                                                            <MobileTaskCard
+                                                                key={task.id}
+                                                                note={task}
+                                                                index={idx}
+                                                                isDone={true}
+                                                                formatDate={formatDate}
+                                                                updateTaskStatus={updateTaskStatus}
+                                                                handleDeleteTask={handleDeleteTask}
+                                                                setEditingTask={setEditingTask}
+                                                                setIsModalOpen={setIsModalOpen}
+                                                            />
+                                                        ))}
+                                                    </motion.div>
+                                                )}
+                                            </AnimatePresence>
+                                        </div>
+                                    )}
+                                </div>
+                            </div>
+                        )
+                    })
+                )}
             </div>
         </div>
     )
@@ -188,7 +248,6 @@ function MobileTaskCard({
         handleDeleteTask(note.id)
     }
 
-    // Determine deadline urgency
     const getDeadlineClass = () => {
         if (!note.prazo || isDone) return ''
         const today = new Date()
@@ -203,43 +262,27 @@ function MobileTaskCard({
 
     return (
         <motion.div
-            initial={{ opacity: 0, y: 20 }}
+            initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, scale: 0.95 }}
-            transition={{ delay: index * 0.04 }}
-            drag="x"
-            dragSnapToOrigin
-            dragMomentum={false}
-            dragElastic={0.15}
-            dragConstraints={{ left: -120, right: 120 }}
-            onDragStart={() => { isDragging.current = true }}
-            onDragEnd={(e, info) => {
-                const threshold = 80
-                if (!isDone && info.offset.x > threshold) {
-                    updateTaskStatus(note.id, true)
-                } else if (isDone && info.offset.x < -threshold) {
-                    updateTaskStatus(note.id, false)
-                }
-                setTimeout(() => { isDragging.current = false }, 100)
-            }}
-            whileDrag={{ scale: 1.03, zIndex: 50, boxShadow: '0 12px 32px rgba(0,0,0,0.3)' }}
+            transition={{ delay: index * 0.02 }}
             className={`mtk-card ${isDone ? 'mtk-card-done' : ''} ${getDeadlineClass()}`}
             onClick={handleEdit}
         >
-            {/* Checkbox (visual only) */}
-            <div className="mtk-checkbox">
-                {isDone ? (
-                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
-                        <path fillRule="evenodd" d="M2.25 12c0-5.385 4.365-9.75 9.75-9.75s9.75 4.365 9.75 9.75-4.365 9.75-9.75 9.75S2.25 17.385 2.25 12zm13.36-1.814a.75.75 0 10-1.22-.872l-3.236 4.53L9.53 12.22a.75.75 0 00-1.06 1.06l2.25 2.25a.75.75 0 001.14-.094l3.75-5.25z" clipRule="evenodd" />
-                    </svg>
-                ) : (
-                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor">
-                        <circle cx="12" cy="12" r="9.75" />
+            <div 
+                className={`mtk-checkbox ${isDone ? 'checked' : ''}`}
+                onClick={(e) => {
+                    e.stopPropagation()
+                    updateTaskStatus(note.id, !isDone)
+                }}
+            >
+                {isDone && (
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" width="12" height="12">
+                        <path fillRule="evenodd" d="M19.916 4.626a.75.75 0 01.208 1.04l-9 13.5a.75.75 0 01-1.154.114l-6-6a.75.75 0 011.06-1.06l5.353 5.353 8.493-12.739a.75.75 0 011.04-.208z" clipRule="evenodd" />
                     </svg>
                 )}
             </div>
 
-            {/* Content */}
             <div className="mtk-card-body">
                 <p className="mtk-card-text">
                     {note.text || note.content || 'Sem conteúdo'}
@@ -254,7 +297,6 @@ function MobileTaskCard({
                 )}
             </div>
 
-            {/* Delete */}
             <button className="mtk-delete-btn" onClick={handleDelete}>
                 <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor">
                     <path strokeLinecap="round" strokeLinejoin="round" d="M14.74 9l-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 01-2.244 2.077H8.084a2.25 2.25 0 01-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 00-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 013.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 00-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 00-7.5 0" />

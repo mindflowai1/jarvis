@@ -8,7 +8,8 @@ export const useFinancialData = () => {
         endDate: '',
         search: '',
         type: 'all',
-        category: 'all'
+        category: 'all',
+        paymentMethod: 'all'
     })
     const [stats, setStats] = useState({
         income: 0,
@@ -38,7 +39,8 @@ export const useFinancialData = () => {
                     end_date: filters.endDate || null,
                     search_term: debouncedSearch || null,
                     filter_type: filters.type === 'all' ? null : filters.type,
-                    filter_category: filters.category === 'all' ? null : filters.category
+                    filter_category: filters.category === 'all' ? null : filters.category,
+                    filter_payment_method: filters.paymentMethod === 'all' ? null : filters.paymentMethod
                 })
 
             if (summaryError) throw summaryError
@@ -62,6 +64,7 @@ export const useFinancialData = () => {
             if (filters.endDate) query = query.lte('created_at', filters.endDate + 'T23:59:59')
             if (filters.type !== 'all') query = query.eq('tipo', filters.type)
             if (filters.category !== 'all') query = query.eq('categoria', filters.category)
+            if (filters.paymentMethod !== 'all') query = query.eq('payment_method', filters.paymentMethod)
             if (debouncedSearch) {
                 query = query.or(`summary.ilike.%${debouncedSearch}%,categoria.ilike.%${debouncedSearch}%`)
             }
@@ -89,7 +92,7 @@ export const useFinancialData = () => {
         } finally {
             setLoading(false)
         }
-    }, [filters.startDate, filters.endDate, filters.type, filters.category, debouncedSearch])
+    }, [filters.startDate, filters.endDate, filters.type, filters.category, filters.paymentMethod, debouncedSearch])
 
     // Initial load
     useEffect(() => {
@@ -141,6 +144,7 @@ export const useFinancialData = () => {
                         tipo: data.tipo,
                         categoria: data.categoria,
                         summary: data.summary,
+                        payment_method: data.payment_method || 'Dinheiro',
                         created_at: parsedDate
                     })
                     .eq('id', editingId)
@@ -156,6 +160,7 @@ export const useFinancialData = () => {
                         tipo: data.tipo,
                         categoria: data.categoria,
                         summary: data.summary,
+                        payment_method: data.payment_method || 'Dinheiro',
                         created_at: parsedDate
                     })
 

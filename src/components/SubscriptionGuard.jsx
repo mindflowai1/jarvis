@@ -6,39 +6,55 @@ const SubscriptionGuard = ({ children, session }) => {
     const [status, setStatus] = useState('loading') // loading, active, blocked
 
     useEffect(() => {
-        checkSubscription()
+        let isMounted = true;
+        const controller = new AbortController();
+
+        const checkSubscription = async () => {
+            if (!session?.user?.id) return;
+
+            try {
+                const { data: profile, error } = await supabase
+                    .from('user_profiles')
+                    .select('*')
+                    .eq('user_id', session.user.id)
+                    .single();
+
+                if (error) {
+                    // Erro de registro não encontrado (PGRST116) não é um erro de rede
+                    if (error.code === 'PGRST116') {
+                        if (isMounted) setStatus('active');
+                        return;
+                    }
+                    throw error;
+                }
+
+                if (isMounted) {
+                    const isBlocked = profile?.subscription_status === 'blocked';
+                    const isExpired = profile?.subscription_expires_at && new Date(profile.subscription_expires_at) < new Date();
+
+                    if (isBlocked || isExpired) {
+                        setStatus('blocked');
+                    } else {
+                        // Passamos o perfil completo para os filhos se necessário (via cloneElement ou prop explícita se usarmos contexto futuramente)
+                        setStatus('active');
+                    }
+                }
+            } catch (err) {
+                if (isMounted) {
+                    console.error('Erro ao verificar assinatura:', err);
+                    setStatus('active'); // Fail-safe
+                }
+            }
+        };
+
+        checkSubscription();
+
+        return () => {
+            isMounted = false;
+            controller.abort();
+        };
     }, [session])
 
-    const checkSubscription = async () => {
-        if (!session?.user?.id) return
-
-        try {
-            const { data: profile } = await supabase
-                .from('user_profiles')
-                .select('subscription_status, subscription_expires_at')
-                .eq('user_id', session.user.id)
-                .single()
-
-            if (!profile) {
-                // Se não tem perfil, assume ativo (ou trate conforme regra de negócio)
-                setStatus('active')
-                return
-            }
-
-            const isBlocked = profile.subscription_status === 'blocked'
-            const isExpired = profile.subscription_expires_at && new Date(profile.subscription_expires_at) < new Date()
-
-            if (isBlocked || isExpired) {
-                setStatus('blocked')
-            } else {
-                setStatus('active')
-            }
-
-        } catch (error) {
-            console.error('Erro ao verificar assinatura:', error)
-            setStatus('active') // Fail safe: permitir acesso se der erro de rede? Ou bloquear? Decisão de negócio.
-        }
-    }
 
     if (status === 'loading') {
         return (

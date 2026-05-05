@@ -141,6 +141,59 @@
     font-weight: 500;
 }
 
+/* Payment Method Grid */
+.payment-method-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 8px;
+}
+
+.payment-method-btn {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    padding: 10px 4px;
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid rgba(255, 255, 255, 0.05);
+    border-radius: 12px;
+    color: #94a3b8;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    font-family: inherit;
+}
+
+.payment-method-btn .method-icon {
+    font-size: 18px;
+}
+
+.payment-method-btn .method-label {
+    font-size: 11px;
+    font-weight: 500;
+}
+
+.payment-method-btn:hover {
+    background: rgba(255, 255, 255, 0.05);
+    border-color: rgba(255, 255, 255, 0.1);
+}
+
+.payment-method-btn.active {
+    background: rgba(59, 130, 246, 0.15);
+    border-color: #3b82f6;
+    color: #3b82f6;
+}
+
+.payment-method-btn.credit-btn {
+    border-style: dashed;
+}
+
+.payment-method-btn.credit-btn:hover {
+    background: rgba(139, 92, 246, 0.1);
+    border-color: #8b5cf6;
+    color: #a78bfa;
+}
+
 /* Custom Select Dropdown (Minimal) */
 .custom-select-container {
     position: relative;

@@ -1,0 +1,219 @@
+.modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.85);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1100;
+    padding: 20px;
+}
+
+.planning-modal-content {
+    background: #121212;
+    border: 1px solid #222;
+    border-radius: 12px;
+    width: 100%;
+    max-width: 480px;
+    max-height: 90vh;
+    display: flex;
+    flex-direction: column;
+    font-family: 'Rajdhani', sans-serif;
+    box-shadow: 0 20px 40px rgba(0,0,0,0.4);
+}
+
+.planning-modal-header {
+    padding: 20px 24px;
+    border-bottom: 1px solid #222;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.planning-modal-header h2 {
+    color: #fff;
+    margin: 0;
+    font-size: 1.25rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+.close-btn {
+    background: transparent;
+    border: none;
+    color: #666;
+    cursor: pointer;
+    padding: 5px;
+    transition: color 0.2s;
+}
+
+.close-btn:hover {
+    color: #fff;
+}
+
+.planning-form {
+    padding: 24px;
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
+/* Scrollbar Style */
+.planning-form::-webkit-scrollbar {
+    width: 6px;
+}
+.planning-form::-webkit-scrollbar-thumb {
+    background: #333;
+    border-radius: 10px;
+}
+
+.form-group {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.form-group label {
+    color: #888;
+    font-size: 0.75rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+/* Type Selector - Back to Original */
+.type-selector {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 8px;
+    background: #1a1a1a;
+    padding: 4px;
+    border-radius: 8px;
+}
+
+.type-option {
+    background: transparent;
+    border: none;
+    color: #666;
+    padding: 8px;
+    border-radius: 6px;
+    cursor: pointer;
+    font-family: 'Rajdhani', sans-serif;
+    font-weight: 600;
+    font-size: 0.85rem;
+    transition: all 0.2s;
+}
+
+.type-option.active {
+    background: #00e5ff;
+    color: #000;
+}
+
+/* Inputs */
+.planning-input {
+    background: #1a1a1a;
+    border: 1px solid #222;
+    border-radius: 8px;
+    padding: 10px 14px;
+    color: #fff;
+    font-family: 'Rajdhani', sans-serif;
+    font-size: 0.95rem;
+}
+
+.planning-input:focus {
+    outline: none;
+    border-color: #00e5ff;
+}
+
+.planning-grid {
+    display: grid;
+    grid-template-columns: 1.5fr 1fr;
+    gap: 12px;
+}
+
+.currency-field {
+    position: relative;
+    display: flex;
+    align-items: center;
+}
+
+.currency-field .prefix {
+    position: absolute;
+    left: 14px;
+    color: #00e5ff;
+    font-weight: 700;
+}
+
+.currency-field .planning-input {
+    padding-left: 40px;
+    width: 100%;
+}
+
+/* Actions */
+.planning-actions {
+    padding: 20px 24px;
+    border-top: 1px solid #222;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 12px;
+}
+
+.action-buttons-right {
+    display: flex;
+    gap: 12px;
+}
+
+.btn-plan-cancel {
+    background: transparent;
+    border: 1px solid #333;
+    color: #fff;
+    padding: 12px 20px;
+    border-radius: 8px;
+    font-family: 'Rajdhani', sans-serif;
+    font-weight: 600;
+    cursor: pointer;
+}
+
+.btn-plan-delete {
+    background: rgba(255, 68, 68, 0.1);
+    border: 1px solid rgba(255, 68, 68, 0.3);
+    color: #ff4444;
+    padding: 12px 20px;
+    border-radius: 8px;
+    font-family: 'Rajdhani', sans-serif;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.btn-plan-delete:hover {
+    background: #ff4444;
+    color: #fff;
+}
+
+.btn-plan-save {
+    background: #00e5ff;
+    border: none;
+    color: #000;
+    padding: 12px 24px;
+    border-radius: 8px;
+    font-family: 'Rajdhani', sans-serif;
+    font-weight: 700;
+    cursor: pointer;
+    transition: filter 0.2s;
+}
+
+.btn-plan-save:hover {
+    filter: brightness(1.2);
+}
+
+.btn-plan-save:disabled, .btn-plan-delete:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}

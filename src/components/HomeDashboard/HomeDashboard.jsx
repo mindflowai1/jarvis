@@ -37,7 +37,7 @@ const AnimatedValue = ({ value, prefix = '', suffix = '' }) => {
 const HomeDashboard = ({ session, userName, onNavigate }) => {
     const {
         loading, stats, recentTransactions, pendingTasks, taskProgress,
-        upcomingEvents, nearReminders, isCalendarConnected
+        upcomingEvents, nearReminders, habitProgress, isCalendarConnected
     } = useHomeDashboard(session)
 
     const [greeting, setGreeting] = useState('')
@@ -169,7 +169,7 @@ const HomeDashboard = ({ session, userName, onNavigate }) => {
                             </div>
                         ) : (
                             <div className="hd-timeline">
-                                {upcomingEvents.map((ev, i) => (
+                                {Array.isArray(upcomingEvents) && upcomingEvents.map((ev, i) => (
                                     <div className="hd-timeline__item" key={ev.id || i}>
                                         <span className="hd-timeline__time">
                                             {ev.start?.dateTime ? formatTime(ev.start.dateTime) : 'Dia todo'}
@@ -229,6 +229,42 @@ const HomeDashboard = ({ session, userName, onNavigate }) => {
                                 })}
                             </ul>
                         )}
+                    </div>
+                </motion.div>
+
+                {/* HABITS */}
+                <motion.div className="hd-widget hd-widget--habits" variants={fadeUp}>
+                    <div className="hd-widget__head">
+                        <div className="hd-widget__title">
+                            <span className="hd-widget__emoji">🔥</span>
+                            <h3>Hábitos</h3>
+                        </div>
+                        <button className="hd-widget__link" onClick={() => onNavigate('habits')}>Meta diária</button>
+                    </div>
+                    <div className="hd-widget__body">
+                        <div className="hd-habit-stats">
+                            <div className="hd-habit-circle">
+                                <svg viewBox="0 0 36 36">
+                                    <path
+                                        className="circle-bg"
+                                        d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"
+                                    />
+                                    <path
+                                        className="circle-fill"
+                                        strokeDasharray={`${habitProgress.percent}, 100`}
+                                        d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"
+                                    />
+                                    <text x="18" y="20.35" className="circle-text">{habitProgress.percent}%</text>
+                                </svg>
+                            </div>
+                            <div className="hd-habit-info">
+                                <p className="hd-habit-label">Hoje</p>
+                                <p className="hd-habit-count">{habitProgress.done} de {habitProgress.total}</p>
+                                <div className="hd-habit-status-badge">
+                                    {habitProgress.percent === 100 ? '✅ Concluído' : '🚀 Em foco'}
+                                </div>
+                            </div>
+                        </div>
                     </div>
                 </motion.div>
 

@@ -75,7 +75,6 @@ const DesktopFinancialDashboard = ({
         <div className="financial-dashboard desktop-view">
 
             <header className="dashboard-header">
-                <h1>Financeiro</h1>
                 <div className="header-actions">
                     <button
                         onClick={() => setIsRemindersOpen(true)}
@@ -180,6 +179,18 @@ const DesktopFinancialDashboard = ({
                             <option key={cat} value={cat}>{cat}</option>
                         ))}
                     </select>
+
+                    <select
+                        className="filter-select"
+                        value={filters.paymentMethod}
+                        onChange={(e) => handleFilterChange('paymentMethod', e.target.value)}
+                    >
+                        <option value="all">Todas as Formas</option>
+                        <option value="Pix">Pix</option>
+                        <option value="Débito">Débito</option>
+                        <option value="Dinheiro">Dinheiro</option>
+                        <option value="Crédito">Crédito</option>
+                    </select>
                 </div>
             </section>
 
@@ -235,10 +246,29 @@ const DesktopFinancialDashboard = ({
                                     {getIconForCategory(tx.categoria, tx.tipo)}
                                 </div>
                                 <div className="t-details">
-                                    <h3>{tx.summary || tx.categoria}</h3>
+                                    <h3>
+                                        {(() => {
+                                            const rawSummary = tx.summary || tx.categoria || ''
+                                            const parcMatch = rawSummary.match(/\[Parc:\s*(.*?)\]/)
+                                            const cleanTitle = rawSummary.replace(/\[.*?\]/g, '').trim()
+                                            return (
+                                                <>
+                                                    {cleanTitle}
+                                                    {parcMatch && (
+                                                        <span className="installment-badge" style={{ marginLeft: '6px', fontSize: '0.85em', color: '#64748b', fontWeight: '500' }}>
+                                                            ({parcMatch[1]})
+                                                        </span>
+                                                    )}
+                                                </>
+                                            )
+                                        })()}
+                                    </h3>
                                     <p>
                                         {formatDate(tx.created_at)}
                                         <span className="t-category">{tx.categoria}</span>
+                                        {tx.payment_method && (
+                                            <span className="payment-method-badge">{tx.payment_method}</span>
+                                        )}
                                     </p>
                                 </div>
                             </div>
