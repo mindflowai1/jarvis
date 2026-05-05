@@ -1,24 +1,23 @@
 import { useEffect, useState, useRef } from 'react'
-import { motion } from 'framer-motion'
+import { motion, AnimatePresence } from 'framer-motion'
 import { useHomeDashboard } from '../../hooks/useHomeDashboard'
 import './HomeDashboard.css'
 
-// Animated counter component
-const AnimatedValue = ({ value, prefix = '', suffix = '' }) => {
+// Premium Animated Counter
+const AnimatedValue = ({ value, prefix = '', suffix = '', isCurrency = true }) => {
     const [display, setDisplay] = useState(0)
     const ref = useRef(null)
 
     useEffect(() => {
         const target = typeof value === 'number' ? value : 0
-        const duration = 1400
+        const duration = 1500
         const startTime = performance.now()
-        const startVal = 0
+        const startVal = display
 
         const animate = (now) => {
             const elapsed = now - startTime
             const progress = Math.min(elapsed / duration, 1)
-            // ease-out cubic
-            const eased = 1 - Math.pow(1 - progress, 3)
+            const eased = 1 - Math.pow(1 - progress, 5)
             setDisplay(startVal + (target - startVal) * eased)
             if (progress < 1) ref.current = requestAnimationFrame(animate)
         }
@@ -27,11 +26,11 @@ const AnimatedValue = ({ value, prefix = '', suffix = '' }) => {
         return () => cancelAnimationFrame(ref.current)
     }, [value])
 
-    const formatted = new Intl.NumberFormat('pt-BR', {
-        style: 'currency', currency: 'BRL', minimumFractionDigits: 2
-    }).format(display)
+    const formatted = isCurrency 
+        ? new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(display)
+        : `${prefix}${Math.round(display)}${suffix}`
 
-    return <span>{formatted}</span>
+    return <span className="animated-num">{formatted}</span>
 }
 
 const HomeDashboard = ({ session, userName, onNavigate }) => {
@@ -41,17 +40,13 @@ const HomeDashboard = ({ session, userName, onNavigate }) => {
     } = useHomeDashboard(session)
 
     const [greeting, setGreeting] = useState('')
-    const [dateStr, setDateStr] = useState('')
+    const [time, setTime] = useState(new Date())
 
     useEffect(() => {
-        const now = new Date()
-        const h = now.getHours()
+        const timer = setInterval(() => setTime(new Date()), 1000)
+        const h = new Date().getHours()
         setGreeting(h < 12 ? 'Bom dia' : h < 18 ? 'Boa tarde' : 'Boa noite')
-
-        const day = now.getDate().toString().padStart(2, '0')
-        const months = ['jan', 'fev', 'mar', 'abr', 'mai', 'jun', 'jul', 'ago', 'set', 'out', 'nov', 'dez']
-        const month = months[now.getMonth()]
-        setDateStr(`${day} ${month} ${now.getFullYear()}`)
+        return () => clearInterval(timer)
     }, [])
 
     const formatTime = (iso) => {
@@ -61,272 +56,217 @@ const HomeDashboard = ({ session, userName, onNavigate }) => {
 
     const formatDate = (d) => {
         if (!d) return ''
-        const [y, m, day] = d.split('T')[0].split('-')
-        return `${day}/${m}`
+        const date = new Date(d)
+        return date.toLocaleDateString('pt-BR', { day: '2-digit', month: 'short' })
     }
 
-    const formatCurrency = (v) => new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(v || 0)
+    const cleanSummary = (summary) => {
+        if (!summary) return ''
+        // Remove [Ref: ...], [Mês: ...]
+        let cleaned = summary.replace(/\[Ref:.*?\]/g, '').replace(/\[Mês:.*?\]/g, '')
+        // Format [Parc: 1/2] to (1/2)
+        cleaned = cleaned.replace(/\[Parc: (.*?)\]/g, '($1)')
+        return cleaned.trim()
+    }
 
-    const categoryIcon = (cat, type) => {
-        if (type === 'entrada') return '💰'
-        const map = { 'alimentacao': '🍽️', 'alimentação': '🍽️', 'transporte': '🚗', 'lazer': '🎉', 'saude': '💊', 'saúde': '💊', 'moradia': '🏠', 'compras': '🛍️', 'farmacia': '💊' }
+    const categoryIcon = (cat) => {
+        const map = { 
+            'alimentacao': '🍴', 'transporte': '🚗', 'lazer': '🎮', 
+            'saude': '🏥', 'moradia': '🏠', 'compras': '🛍️', 
+            'farmacia': '💊', 'educação': '📚', 'investimento': '📈',
+            'salário': '💰', 'renda': '💵'
+        }
         return map[cat?.toLowerCase()] || '💸'
     }
 
-    const displayName = userName || session?.user?.user_metadata?.full_name || session?.user?.email?.split('@')[0] || 'Usuário'
-    const progressPercent = taskProgress.total > 0 ? Math.round((taskProgress.done / taskProgress.total) * 100) : 0
-
-    const stagger = { hidden: { opacity: 0 }, show: { opacity: 1, transition: { staggerChildren: 0.08 } } }
-    const fadeUp = { hidden: { opacity: 0, y: 16 }, show: { opacity: 1, y: 0, transition: { type: 'spring', stiffness: 400, damping: 28 } } }
+    const displayName = userName || session?.user?.user_metadata?.full_name || session?.user?.email?.split('@')[0] || 'Comandante'
 
     if (loading) {
         return (
-            <div className="hd-loading">
-                <div className="hd-spinner" />
-                <p>Carregando painel...</p>
+            <div className="hd-loader">
+                <div className="hd-loader-circle" />
+                <p>Sincronizando cockpit...</p>
             </div>
         )
     }
 
     return (
-        <motion.div className="hd-root" variants={stagger} initial="hidden" animate="show">
-
-            {/* TOP BAR */}
-            <motion.div className="hd-topbar" variants={fadeUp}>
-                <img
-                    src="/logo-controle-c.png"
-                    alt="Controle-C"
-                    className="hd-logo-mobile"
-                />
-                <div className="hd-greeting">
-                    <h1>{greeting}, <span>{displayName}</span></h1>
-                </div>
-                <div className="hd-date">{dateStr}</div>
-            </motion.div>
-
-            {/* STATS ROW */}
-            <div className="hd-stats">
-                <motion.div className="hd-stat hd-stat--balance" variants={fadeUp}>
-                    <div className="hd-stat__icon">
-                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                            <path strokeLinecap="round" strokeLinejoin="round" d="M21 12a2.25 2.25 0 00-2.25-2.25H15a3 3 0 11-6 0H5.25A2.25 2.25 0 003 12m18 0v6a2.25 2.25 0 01-2.25 2.25H5.25A2.25 2.25 0 013 18v-6m18 0V9M3 12V9m18 0a2.25 2.25 0 00-2.25-2.25H5.25A2.25 2.25 0 003 9m18 0V6a2.25 2.25 0 00-2.25-2.25H5.25A2.25 2.25 0 003 6v3" />
-                        </svg>
+        <div className="hd-viewport hd-no-scroll">
+            <div className="hd-ambient-glow" />
+            
+            <div className="hd-cockpit-fixed">
+                {/* --- HEADER: COMPACT & BALANCED --- */}
+                <header className="hd-header-compact">
+                    <div className="hd-id-group">
+                        <motion.div initial={{ opacity: 0, x: -20 }} animate={{ opacity: 1, x: 0 }}>
+                            <span className="hd-tag">{greeting}, {displayName}</span>
+                            <div className="hd-balance-header">
+                                <small>Saldo Disponível</small>
+                                <h2><AnimatedValue value={stats.balance} /></h2>
+                            </div>
+                        </motion.div>
                     </div>
-                    <div className="hd-stat__data">
-                        <span className="hd-stat__label">Saldo</span>
-                        <span className="hd-stat__value"><AnimatedValue value={stats.balance} /></span>
-                    </div>
-                </motion.div>
 
-                <motion.div className="hd-stat hd-stat--income" variants={fadeUp}>
-                    <div className="hd-stat__icon">
-                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                            <path strokeLinecap="round" strokeLinejoin="round" d="M2.25 18L9 11.25l4.306 4.307a11.95 11.95 0 015.814-5.519l2.74-1.22m0 0l-5.94-2.28m5.94 2.28l-2.28 5.941" />
-                        </svg>
-                    </div>
-                    <div className="hd-stat__data">
-                        <span className="hd-stat__label">Entradas</span>
-                        <span className="hd-stat__value hd-stat__value--green"><AnimatedValue value={stats.income} /></span>
-                    </div>
-                </motion.div>
-
-                <motion.div className="hd-stat hd-stat--expense" variants={fadeUp}>
-                    <div className="hd-stat__icon">
-                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                            <path strokeLinecap="round" strokeLinejoin="round" d="M2.25 6L9 12.75l4.286-4.286a11.948 11.948 0 014.306 6.43l.776 2.898m0 0l3.182-5.511m-3.182 5.51l-5.511-3.181" />
-                        </svg>
-                    </div>
-                    <div className="hd-stat__data">
-                        <span className="hd-stat__label">Saídas</span>
-                        <span className="hd-stat__value hd-stat__value--red"><AnimatedValue value={stats.expense} /></span>
-                    </div>
-                </motion.div>
-            </div>
-
-            {/* MAIN GRID 2x2 */}
-            <div className="hd-grid">
-
-                {/* AGENDA */}
-                <motion.div className="hd-widget" variants={fadeUp}>
-                    <div className="hd-widget__head">
-                        <div className="hd-widget__title">
-                            <span className="hd-widget__emoji">📅</span>
-                            <h3>Agenda de Hoje</h3>
-                            {upcomingEvents.length > 0 && <span className="hd-badge">{upcomingEvents.length}</span>}
+                    <div className="hd-stats-mini">
+                        <div className="hd-mini-stat in">
+                            <label>Entradas</label>
+                            <AnimatedValue value={stats.income} />
                         </div>
-                        <button className="hd-widget__link" onClick={() => onNavigate('calendar')}>Ver tudo</button>
+                        <div className="hd-mini-stat out">
+                            <label>Saídas</label>
+                            <AnimatedValue value={stats.expense} />
+                        </div>
                     </div>
-                    <div className="hd-widget__body">
-                        {!isCalendarConnected ? (
-                            <div className="hd-empty">
-                                <p>Agenda não conectada</p>
-                                <button className="hd-connect-btn" onClick={() => onNavigate('settings')}>Conectar Google</button>
+
+                    <div className="hd-clock-group">
+                        <div className="hd-clock-big">
+                            {time.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' })}
+                        </div>
+                        <div className="hd-date-small">
+                            {time.toLocaleDateString('pt-BR', { weekday: 'short', day: 'numeric', month: 'short' })}
+                        </div>
+                    </div>
+                </header>
+
+                {/* --- MAIN GRID: 3 COLUMNS --- */}
+                <main className="hd-main-grid">
+                    
+                    {/* COL 1: FOCUS & DISCIPLINE */}
+                    <div className="hd-col">
+                        {/* AGENDA */}
+                        <section className="hd-widget-compact hd-widget-agenda">
+                            <div className="hd-w-head">
+                                <h3><span className="hd-w-icon">📅</span> Agenda</h3>
+                                <button onClick={() => onNavigate('calendar')}>Ver tudo</button>
                             </div>
-                        ) : upcomingEvents.length === 0 ? (
-                            <div className="hd-empty">
-                                <span className="hd-empty__icon">🎉</span>
-                                <p>Dia livre! Sem compromissos.</p>
-                            </div>
-                        ) : (
-                            <div className="hd-timeline">
-                                {Array.isArray(upcomingEvents) && upcomingEvents.map((ev, i) => (
-                                    <div className="hd-timeline__item" key={ev.id || i}>
-                                        <span className="hd-timeline__time">
-                                            {ev.start?.dateTime ? formatTime(ev.start.dateTime) : 'Dia todo'}
-                                        </span>
-                                        <div className="hd-timeline__dot" />
-                                        <span className="hd-timeline__text">{ev.summary}</span>
+                            <div className="hd-w-body">
+                                {upcomingEvents.length === 0 ? (
+                                    <div className="hd-w-empty">Sem missões para hoje.</div>
+                                ) : (
+                                    <div className="hd-t-list">
+                                        {upcomingEvents.slice(0, 3).map((event, i) => (
+                                            <div key={event.id || i} className="hd-t-item">
+                                                <span className="hd-t-time">{event.start?.dateTime ? formatTime(event.start.dateTime) : 'Hoje'}</span>
+                                                <span className="hd-t-desc">{event.summary}</span>
+                                            </div>
+                                        ))}
                                     </div>
-                                ))}
+                                )}
                             </div>
-                        )}
-                    </div>
-                </motion.div>
+                        </section>
 
-                {/* TASKS */}
-                <motion.div className="hd-widget" variants={fadeUp}>
-                    <div className="hd-widget__head">
-                        <div className="hd-widget__title">
-                            <span className="hd-widget__emoji">📋</span>
-                            <h3>Afazeres</h3>
-                            {pendingTasks.length > 0 && <span className="hd-badge hd-badge--amber">{pendingTasks.length}</span>}
-                        </div>
-                        <button className="hd-widget__link" onClick={() => onNavigate('tasks')}>Ver quadro</button>
-                    </div>
-                    {/* Progress bar */}
-                    {taskProgress.total > 0 && (
-                        <div className="hd-progress">
-                            <div className="hd-progress__bar">
-                                <div className="hd-progress__fill" style={{ width: `${progressPercent}%` }} />
+                        {/* HABITS */}
+                        <section className="hd-widget-compact hd-widget-habits">
+                            <div className="hd-w-head">
+                                <h3><span className="hd-w-icon">🔥</span> Hábitos</h3>
+                                <button onClick={() => onNavigate('habits')}>Tracker</button>
                             </div>
-                            <span className="hd-progress__text">{taskProgress.done}/{taskProgress.total} concluídas ({progressPercent}%)</span>
-                        </div>
-                    )}
-                    <div className="hd-widget__body">
-                        {pendingTasks.length === 0 ? (
-                            <div className="hd-empty">
-                                <span className="hd-empty__icon">✅</span>
-                                <p>Tudo em dia!</p>
-                            </div>
-                        ) : (
-                            <ul className="hd-tasks">
-                                {pendingTasks.map(task => {
-                                    const now = new Date(); now.setHours(0, 0, 0, 0)
-                                    let urg = 'future'
-                                    if (task.prazo) {
-                                        const [y, m, d] = task.prazo.split('T')[0].split('-')
-                                        const td = new Date(y, m - 1, d)
-                                        if (td < now) urg = 'expired'
-                                        else if (td.getTime() === now.getTime()) urg = 'today'
-                                    }
-                                    return (
-                                        <li key={task.id} className={`hd-task ${urg === 'expired' ? 'hd-task--expired' : ''}`}>
-                                            <span className={`hd-task__dot hd-task__dot--${urg}`} />
-                                            <span className="hd-task__text">{task.content}</span>
-                                            {task.prazo && <span className="hd-task__date">{formatDate(task.prazo)}</span>}
-                                        </li>
-                                    )
-                                })}
-                            </ul>
-                        )}
-                    </div>
-                </motion.div>
-
-                {/* HABITS */}
-                <motion.div className="hd-widget hd-widget--habits" variants={fadeUp}>
-                    <div className="hd-widget__head">
-                        <div className="hd-widget__title">
-                            <span className="hd-widget__emoji">🔥</span>
-                            <h3>Hábitos</h3>
-                        </div>
-                        <button className="hd-widget__link" onClick={() => onNavigate('habits')}>Meta diária</button>
-                    </div>
-                    <div className="hd-widget__body">
-                        <div className="hd-habit-stats">
-                            <div className="hd-habit-circle">
-                                <svg viewBox="0 0 36 36">
-                                    <path
-                                        className="circle-bg"
-                                        d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"
-                                    />
-                                    <path
-                                        className="circle-fill"
-                                        strokeDasharray={`${habitProgress.percent}, 100`}
-                                        d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"
-                                    />
-                                    <text x="18" y="20.35" className="circle-text">{habitProgress.percent}%</text>
-                                </svg>
-                            </div>
-                            <div className="hd-habit-info">
-                                <p className="hd-habit-label">Hoje</p>
-                                <p className="hd-habit-count">{habitProgress.done} de {habitProgress.total}</p>
-                                <div className="hd-habit-status-badge">
-                                    {habitProgress.percent === 100 ? '✅ Concluído' : '🚀 Em foco'}
+                            <div className="hd-habits-mini">
+                                <div className="hd-ring-small">
+                                    <svg viewBox="0 0 100 100">
+                                        <circle className="hd-ring-base" cx="50" cy="50" r="40" />
+                                        <motion.circle 
+                                            className="hd-ring-progress" 
+                                            cx="50" cy="50" r="40" 
+                                            initial={{ pathLength: 0 }}
+                                            animate={{ pathLength: habitProgress.percent / 100 }}
+                                            transition={{ duration: 1.5 }}
+                                        />
+                                    </svg>
+                                    <span className="hd-ring-text">{habitProgress.percent}%</span>
+                                </div>
+                                <div className="hd-h-stats">
+                                    <div className="hd-h-pill"><strong>{habitProgress.done}</strong> <span>feitos</span></div>
+                                    <div className="hd-h-pill"><strong>{habitProgress.total}</strong> <span>total</span></div>
                                 </div>
                             </div>
-                        </div>
+                        </section>
                     </div>
-                </motion.div>
 
-                {/* REMINDERS */}
-                <motion.div className="hd-widget" variants={fadeUp}>
-                    <div className="hd-widget__head">
-                        <div className="hd-widget__title">
-                            <span className="hd-widget__emoji">💳</span>
-                            <h3>Contas do Mês</h3>
-                        </div>
-                        <button className="hd-widget__link" onClick={() => onNavigate('finance')}>Gerenciar</button>
-                    </div>
-                    <div className="hd-widget__body">
-                        {nearReminders.length === 0 ? (
-                            <div className="hd-empty"><p>Nenhum lembrete cadastrado</p></div>
-                        ) : (
-                            <ul className="hd-reminders">
-                                {nearReminders.map(r => (
-                                    <li key={r.id} className="hd-reminder">
-                                        <span className={`hd-reminder__dot hd-reminder__dot--${r.status}`} />
-                                        <span className="hd-reminder__name">{r.summary}</span>
-                                        <span className="hd-reminder__day">dia {r.due_day}</span>
-                                    </li>
-                                ))}
-                            </ul>
-                        )}
-                    </div>
-                </motion.div>
-
-                {/* TRANSACTIONS */}
-                <motion.div className="hd-widget" variants={fadeUp}>
-                    <div className="hd-widget__head">
-                        <div className="hd-widget__title">
-                            <span className="hd-widget__emoji">💸</span>
-                            <h3>Movimentações</h3>
-                        </div>
-                        <button className="hd-widget__link" onClick={() => onNavigate('finance')}>Ver extrato</button>
-                    </div>
-                    <div className="hd-widget__body">
-                        {recentTransactions.length === 0 ? (
-                            <div className="hd-empty"><p>Nenhuma transação ainda</p></div>
-                        ) : (
-                            <ul className="hd-txlist">
-                                {recentTransactions.map(tx => (
-                                    <li key={tx.id} className="hd-tx">
-                                        <span className="hd-tx__icon">{categoryIcon(tx.categoria, tx.tipo)}</span>
-                                        <div className="hd-tx__info">
-                                            <span className="hd-tx__desc">{tx.summary}</span>
-                                            <span className="hd-tx__cat">{tx.categoria}</span>
+                    {/* COL 2: FINANCE RADAR (CENTRAL FOCUS) */}
+                    <div className="hd-col hd-col--wide">
+                        <section className="hd-widget-compact hd-widget-finance-full">
+                            <div className="hd-w-head">
+                                <h3><span className="hd-w-icon">💰</span> Transações Recentes</h3>
+                                <button onClick={() => onNavigate('finance')}>Financeiro</button>
+                            </div>
+                            <div className="hd-w-body">
+                                <div className="hd-tx-grid">
+                                    {recentTransactions.map(tx => (
+                                        <div key={tx.id} className="hd-tx-row">
+                                            <span className="hd-tx-cat">{categoryIcon(tx.categoria)}</span>
+                                            <div className="hd-tx-info">
+                                                <strong>{cleanSummary(tx.summary)}</strong>
+                                                <small>{formatDate(tx.created_at)}</small>
+                                            </div>
+                                            <span className={`hd-tx-val ${tx.tipo}`}>
+                                                {tx.tipo === 'entrada' ? '+' : '-'}{new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL', maximumFractionDigits: 0 }).format(tx.valor)}
+                                            </span>
                                         </div>
-                                        <span className={`hd-tx__val hd-tx__val--${tx.tipo}`}>
-                                            {tx.tipo === 'entrada' ? '+' : '-'}{formatCurrency(tx.valor)}
-                                        </span>
-                                    </li>
-                                ))}
-                            </ul>
-                        )}
+                                    ))}
+                                </div>
+                            </div>
+                        </section>
                     </div>
-                </motion.div>
 
+                    {/* COL 3: OPERATIONS */}
+                    <div className="hd-col">
+                        {/* TASKS */}
+                        <section className="hd-widget-compact hd-widget-tasks">
+                            <div className="hd-w-head">
+                                <h3><span className="hd-w-icon">✅</span> Tarefas</h3>
+                                <button onClick={() => onNavigate('tasks')}>Quadro</button>
+                            </div>
+                            <div className="hd-w-body">
+                                {pendingTasks.length === 0 ? (
+                                    <div className="hd-w-empty">Missões cumpridas! 🏆</div>
+                                ) : (
+                                    <div className="hd-op-list">
+                                        {pendingTasks.slice(0, 4).map(task => {
+                                            const isOverdue = task.prazo && new Date(task.prazo) < new Date()
+                                            return (
+                                                <div key={task.id} className={`hd-op-item ${isOverdue ? 'overdue' : ''}`}>
+                                                    <div className="hd-op-bullet" />
+                                                    <div className="hd-op-text">
+                                                        <p>{task.content}</p>
+                                                        {task.prazo && <span>{formatDate(task.prazo)}</span>}
+                                                    </div>
+                                                </div>
+                                            )
+                                        })}
+                                    </div>
+                                )}
+                            </div>
+                        </section>
+
+                        {/* REMINDERS */}
+                        <section className="hd-widget-compact hd-widget-reminders">
+                            <div className="hd-w-head">
+                                <h3><span className="hd-w-icon">🔔</span> Alertas</h3>
+                            </div>
+                            <div className="hd-w-body">
+                                {nearReminders.length === 0 ? (
+                                    <div className="hd-w-empty">Sem alertas críticos.</div>
+                                ) : (
+                                    <div className="hd-al-list">
+                                        {nearReminders.slice(0, 3).map(bill => (
+                                            <div key={bill.id} className={`hd-al-item ${bill.status}`}>
+                                                <div className="hd-al-day">{bill.due_day}</div>
+                                                <div className="hd-al-info">
+                                                    <strong>{cleanSummary(bill.summary)}</strong>
+                                                    <span>{bill.status === 'past' ? 'Atrasado' : 'Próximo'}</span>
+                                                </div>
+                                            </div>
+                                        ))}
+                                    </div>
+                                )}
+                            </div>
+                        </section>
+                    </div>
+
+                </main>
             </div>
-        </motion.div>
+        </div>
     )
 }
 
