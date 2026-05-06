@@ -1,6 +1,5 @@
 import { useState, useRef } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
-import MobileHeader from '../MobileHeader'
 import './MobileTasksBoard.css'
 
 export default function MobileTasksBoard({
@@ -27,9 +26,6 @@ export default function MobileTasksBoard({
 
     return (
         <div className="mtk-container">
-            {/* ===== STICKY HEADER PADRONIZADO ===== */}
-            <MobileHeader title="Tarefas" />
-
             {/* ===== CONTROLS ===== */}
             <div className="mtk-toolbar">
                 <div className="mtk-toolbar-row">

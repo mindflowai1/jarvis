@@ -1,30 +1,25 @@
 import './MobileHeader.css'
 
 /**
- * MobileHeader - Componente padronizado para headers mobile do dashboard
+ * MobileHeader - Header padrão premium para TODAS as abas em mobile.
+ * Renderizado pelo Dashboard.jsx, não pelos componentes filhos.
  * 
- * Uso:
- * <MobileHeader title="Agenda" />
- * <MobileHeader title="Financeiro" rightContent={<BotaoOlho />} />
+ * @param {string} title - Nome da aba (Início, Agenda, etc.)
  */
-export default function MobileHeader({ title, rightContent }) {
+export default function MobileHeader({ title }) {
     return (
-        <header className="mobile-header-standard">
-            <div className="mobile-header-inner">
-                <div className="mobile-header-brand">
+        <header className="mh-premium-container">
+            <div className="mh-premium-inner">
+                <div className="mh-brand">
                     <img
                         src="/logo-controle-c.png"
                         alt="Controle-C"
-                        className="mobile-header-logo"
+                        className="mh-logo-premium"
                     />
-                    <h1 className="mobile-header-title">{title}</h1>
+                    <h1 className="mh-title-premium">{title}</h1>
                 </div>
-                {rightContent && (
-                    <div className="mobile-header-actions">
-                        {rightContent}
-                    </div>
-                )}
             </div>
+            <div className="mh-glass-bottom-line"></div>
         </header>
     )
 }

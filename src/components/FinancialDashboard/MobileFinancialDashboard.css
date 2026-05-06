@@ -4,12 +4,107 @@
     display: flex;
     flex-direction: column;
     height: 100%;
-    /* Fill available space */
     position: relative;
     padding-bottom: 80px;
-    /* Space for FAB */
     font-family: 'Space Grotesk', sans-serif;
     color: #f8fafc;
+}
+
+/* ===== COMPACT FINANCIAL HEADER ===== */
+.fin-mobile-header {
+    padding: 16px;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.fin-header-top {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+}
+
+.fin-header-balance {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+}
+
+.fin-header-label {
+    font-size: 11px;
+    color: #64748b;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    font-weight: 600;
+}
+
+.fin-header-value {
+    margin: 0;
+    font-size: 26px;
+    font-weight: 800;
+    color: #fff;
+    line-height: 1.1;
+}
+
+.fin-header-controls {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.fin-ctrl-btn {
+    width: 34px;
+    height: 34px;
+    border-radius: 10px;
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    color: #94a3b8;
+    font-size: 16px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.fin-ctrl-btn:active {
+    transform: scale(0.92);
+    background: rgba(255, 255, 255, 0.1);
+}
+
+.fin-header-stats {
+    display: flex;
+    gap: 8px;
+}
+
+.fin-stat-pill {
+    flex: 1;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px 12px;
+    border-radius: 10px;
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.fin-stat-pill .pill-label {
+    font-size: 11px;
+    color: #64748b;
+    font-weight: 500;
+}
+
+.fin-stat-pill .pill-value {
+    font-size: 14px;
+    font-weight: 700;
+}
+
+.fin-stat-pill.income .pill-value {
+    color: #10b981;
+}
+
+.fin-stat-pill.expense .pill-value {
+    color: #ef4444;
 }
 
 /* Controls (agora dentro do header via rightContent) */
@@ -223,7 +318,7 @@
     display: flex;
     gap: 6px;
     padding: 4px;
-    margin: 16px 16px 0;
+    margin: 0 16px;
     background: rgba(15, 23, 42, 0.8);
     border-radius: 14px;
     border: 1px solid rgba(255, 255, 255, 0.08);

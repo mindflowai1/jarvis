@@ -619,6 +619,11 @@
         filter: drop-shadow(0 0 8px rgba(96, 165, 250, 0.5));
     }
 
+    /* Desktop: hide mobile header */
+    .mobile-global-header {
+        display: none;
+    }
+
     @media (max-width: 768px) {
         .dashboard-container {
             flex-direction: column;
@@ -634,7 +639,12 @@
 
         .main-content {
             padding: 0 16px 90px;
-            /* No top padding - let mobile headers stick to top */
+        }
+
+        .mobile-global-header {
+            display: block;
+            margin: 0 -16px 16px -16px;
+            /* Stretch edge-to-edge over the main-content padding and give bottom breathing room */
         }
     }
 

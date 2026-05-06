@@ -1,6 +1,5 @@
 import { useState } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
-import MobileHeader from '../MobileHeader'
 import TransactionModal from '../TransactionModal'
 import RecurringReminders from '../RecurringReminders'
 import ExpenseLimits from '../ExpenseLimits'
@@ -62,17 +61,22 @@ const MobileFinancialDashboard = ({
 
     return (
         <div className="financial-dashboard mobile-view">
-            {/* Header Padronizado com ações à direita */}
-            <MobileHeader 
-                title="" 
-                rightContent={
-                    <>
-                        <button className="eye-btn" onClick={() => setShowBalance(!showBalance)}>
+            {/* ===== COMPACT FINANCIAL HEADER ===== */}
+            <header className="fin-mobile-header">
+                <div className="fin-header-top">
+                    <div className="fin-header-balance">
+                        <span className="fin-header-label">Saldo Atual</span>
+                        <h2 className="fin-header-value">
+                            {showBalance ? formatCurrency(stats.balance) : 'R$ •••••'}
+                        </h2>
+                    </div>
+                    <div className="fin-header-controls">
+                        <button className="fin-ctrl-btn" onClick={() => setShowBalance(!showBalance)}>
                             {showBalance ? '👁️' : '🔒'}
                         </button>
                         <div className="dropdown-container">
-                            <button className="icon-btn" onClick={() => setIsMenuOpen(!isMenuOpen)} title="Menu">
-                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" width="24" height="24">
+                            <button className="fin-ctrl-btn" onClick={() => setIsMenuOpen(!isMenuOpen)} title="Menu">
+                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" width="20" height="20">
                                     <path strokeLinecap="round" strokeLinejoin="round" d="M12 6.75a.75.75 0 110-1.5.75.75 0 010 1.5zM12 12.75a.75.75 0 110-1.5.75.75 0 010 1.5zM12 18.75a.75.75 0 110-1.5.75.75 0 010 1.5z" />
                                 </svg>
                             </button>
@@ -123,33 +127,19 @@ const MobileFinancialDashboard = ({
                                 )}
                             </AnimatePresence>
                         </div>
-                    </>
-                }
-            />
-
-                {/* Balance Card - Horizontal Scroll or Carousel feeling */}
-                <div className="summary-carousel">
-                    <motion.div
-                        className="summary-card-mobile balance-card"
-                        whileTap={{ scale: 0.98 }}
-                    >
-                        <span className="label">Saldo Atual</span>
-                        <span className="value">
-                            {showBalance ? formatCurrency(stats.balance) : 'R$ •••••'}
-                        </span>
-                    </motion.div>
-
-                    <div className="mini-stats-row">
-                        <div className="mini-stat income">
-                            <span className="label">Entradas</span>
-                            <span className="value">{showBalance ? formatCurrency(stats.income) : '•••••'}</span>
-                        </div>
-                        <div className="mini-stat expense">
-                            <span className="label">Saídas</span>
-                            <span className="value">{showBalance ? formatCurrency(stats.expense) : '•••••'}</span>
-                        </div>
                     </div>
                 </div>
+                <div className="fin-header-stats">
+                    <div className="fin-stat-pill income">
+                        <span className="pill-label">Entradas</span>
+                        <span className="pill-value">{showBalance ? formatCurrency(stats.income) : '•••'}</span>
+                    </div>
+                    <div className="fin-stat-pill expense">
+                        <span className="pill-label">Saídas</span>
+                        <span className="pill-value">{showBalance ? formatCurrency(stats.expense) : '•••'}</span>
+                    </div>
+                </div>
+            </header>
 
             {/* Tab Switcher */}
             <div className="fin-tabs">

@@ -8,6 +8,7 @@ import PlanningDashboard from '../components/PlanningDashboard'
 import Tasks from '../components/Tasks'
 import HabitTracker from '../components/HabitTracker'
 import Settings from '../components/Settings'
+import MobileHeader from '../components/MobileHeader'
 import '../index.css'
 
 const Dashboard = ({ session }) => {
@@ -296,6 +297,9 @@ const Dashboard = ({ session }) => {
             </nav>
 
             <main className="main-content">
+                <div className="mobile-global-header">
+                    <MobileHeader title={{ home: 'Início', calendar: 'Agenda', finance: 'Financeiro', tasks: 'Tarefas', habits: 'Hábitos', settings: 'Ajustes' }[activeTab]} />
+                </div>
                 {activeTab === 'home' && <HomeDashboard session={session} userName={userProfile?.name} onNavigate={setActiveTab} />}
                 {activeTab === 'calendar' && <CalendarAgenda session={session} />}
                 {activeTab === 'finance' && <FinancialDashboard userName={userProfile?.name || session?.user?.user_metadata?.full_name || session?.user?.email} />}
