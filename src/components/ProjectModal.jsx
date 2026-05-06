@@ -71,7 +71,6 @@ const ProjectModal = ({ isOpen, onClose, onSave, project }) => {
                             className="pm-input"
                             placeholder="Ex: Trabalho, Estudo, Casa..."
                             required
-                            autoFocus
                         />
                     </div>
 

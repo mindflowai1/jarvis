@@ -75,7 +75,6 @@ const TaskModal = ({ isOpen, onClose, onSave, task, projects }) => {
                             className="tm-input"
                             placeholder="Ex: Pagar conta de luz"
                             required
-                            autoFocus
                         />
                     </div>
 
