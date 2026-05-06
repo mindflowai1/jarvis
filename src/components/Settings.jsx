@@ -273,7 +273,7 @@ const Settings = ({ session }) => {
 
     return (
         <div className="settings-container">
-            <h2 className="settings-title">Configurações</h2>
+            <h2 className="settings-title desktop-only">Configurações</h2>
 
             <div className="settings-grid">
                 <div className="settings-card">
