@@ -1,10 +1,10 @@
 .habits-root {
-    min-height: 100vh;
-    padding: 40px;
+    min-height: auto;
+    padding: 0;
     position: relative;
     color: #f1f5f9;
-    background: #0f172a;
-    overflow-x: hidden;
+    /* O background do Dashboard (.main-content) já deve cuidar do fundo, mas deixamos transparente ou apenas o color base */
+    background: transparent;
 }
 
 .habits-glass-bg {
@@ -126,6 +126,7 @@
     justify-content: center;
     font-size: 24px;
 }
+
 
 .stat-info {
     flex: 1;
@@ -878,10 +879,15 @@
 }
 
 .save-btn {
-    background: #3b82f6;
+    background: var(--habit-color, #10b981);
     color: white;
     border: none;
-    box-shadow: 0 10px 20px rgba(59, 130, 246, 0.3);
+    box-shadow: 0 10px 20px var(--habit-color-alpha, rgba(16, 185, 129, 0.3));
+    transition: all 0.2s ease;
+}
+
+.save-btn:hover {
+    filter: brightness(1.1);
 }
 
 /* LOADING */
@@ -914,34 +920,7 @@
     }
 }
 
-@media (max-width: 768px) {
-    .habits-root {
-        padding: 20px;
-    }
-    
-    .habits-hero {
-        flex-direction: column;
-        align-items: flex-start;
-        gap: 24px;
-    }
-    
-    .habits-primary-btn {
-        width: 100%;
-        justify-content: center;
-    }
-    
-    .habits-stats-grid {
-        grid-template-columns: 1fr;
-    }
-    
-    .habits-main-grid {
-        grid-template-columns: 1fr;
-    }
-    
-    .hero-left h1 {
-        font-size: 32px;
-    }
-}
+
 
 /* HABIT HISTORY MODAL */
 .habit-history-modal {
@@ -1341,10 +1320,149 @@
     font-weight: 600;
 }
 
+/* MODAL HISTORY HEADER */
+.history-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 32px;
+}
+
+.header-main {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+}
+
+.habit-icon-large {
+    width: 64px;
+    height: 64px;
+    border-radius: 20px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 32px;
+}
+
+.header-main h2 {
+    font-size: 28px;
+    font-weight: 800;
+    margin: 0 0 4px 0;
+    color: #f8fafc;
+    letter-spacing: -0.5px;
+}
+
+.header-main p {
+    color: #64748b;
+    font-size: 14px;
+    margin: 0;
+}
+
+.close-history {
+    background: none;
+    border: none;
+    color: #64748b;
+    font-size: 28px;
+    cursor: pointer;
+    padding: 4px;
+    line-height: 1;
+    margin-left: 8px;
+}
+
+.close-history:hover {
+    color: #f1f5f9;
+}
+
+.history-footer-actions {
+    display: flex;
+    gap: 12px;
+    margin-top: 32px;
+    padding-top: 24px;
+    border-top: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.h-footer-btn {
+    flex: 1;
+    padding: 14px;
+    border-radius: 14px;
+    border: none;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    transition: all 0.2s ease;
+}
+
+.h-footer-btn.edit {
+    background: rgba(255, 255, 255, 0.05);
+    color: #f8fafc;
+}
+
+.h-footer-btn.edit:hover {
+    background: rgba(255, 255, 255, 0.1);
+}
+
+.h-footer-btn.delete {
+    background: rgba(239, 68, 68, 0.1);
+    color: #ef4444;
+}
+
+.h-footer-btn.delete:hover {
+    background: rgba(239, 68, 68, 0.2);
+}
+
 @media (max-width: 768px) {
+    /* MODAL DE EDIÇÃO E CRIAÇÃO - FACELIFT MOBILE */
+    .habit-modal {
+        padding: 24px 20px;
+        border-radius: 24px;
+        width: calc(100% - 32px);
+        max-height: 90vh;
+        overflow-y: auto;
+    }
+
+    .modal-header h2 {
+        font-size: 20px;
+        letter-spacing: -0.5px;
+        max-width: 85%;
+        line-height: 1.2;
+    }
+
+    .modal-row {
+        grid-template-columns: 1fr; /* Coloca os campos em uma só coluna para respirarem */
+        gap: 16px;
+    }
+
+    .color-picker-container {
+        height: 48px; /* Reduz altura exagerada da caixa de cor no mobile */
+    }
+
+    .day-btn {
+        width: 36px;
+        height: 36px; /* Botões de dias ligeiramente menores */
+    }
+
+    .modal-actions {
+        flex-direction: column-reverse; /* Inverte a ordem no mobile: Salvar acima, Cancelar embaixo */
+        gap: 12px;
+        margin-top: 24px;
+    }
+
+    .modal-actions button {
+        width: 100%;
+        height: 52px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 15px;
+    }
+
     /* RESOLVENDO SCROLL DUPLO: Zerar min-height abusivos e paddings */
     .habits-root {
-        padding: 16px;
+        padding: 0;
         padding-bottom: 24px;
         min-height: auto;
         background: transparent;

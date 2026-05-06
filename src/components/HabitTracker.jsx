@@ -471,6 +471,16 @@ const HabitTracker = () => {
                         logs={logs.filter(l => l.habit_id === selectedHabitHistory.id)}
                         onClose={() => setSelectedHabitHistory(null)}
                         calculateStreak={calculateStreak}
+                        onEdit={() => {
+                            setSelectedHabitHistory(null)
+                            setEditingHabit(selectedHabitHistory)
+                        }}
+                        onDelete={async () => {
+                            if (window.confirm('Excluir este hábito e todo seu histórico?')) {
+                                await deleteHabit(selectedHabitHistory.id)
+                                setSelectedHabitHistory(null)
+                            }
+                        }}
                     />
                 )}
             </AnimatePresence>
@@ -478,7 +488,7 @@ const HabitTracker = () => {
     )
 }
 
-const HabitHistoryModal = ({ habit, logs, onClose, calculateStreak }) => {
+const HabitHistoryModal = ({ habit, logs, onClose, calculateStreak, onEdit, onDelete }) => {
     const [viewMode, setViewMode] = useState('weekly')
     const today = new Date()
     today.setHours(0, 0, 0, 0)
@@ -609,33 +619,6 @@ const HabitHistoryModal = ({ habit, logs, onClose, calculateStreak }) => {
                     <button className="close-history" onClick={onClose}>×</button>
                 </div>
 
-                <div className="history-stats">
-                    <div className="h-stat">
-                        <span className="h-label">Sequência</span>
-                        <span className="h-value" style={{ color: '#fbbf24' }}>🔥 {streak}d</span>
-                    </div>
-                    <div className="h-stat">
-                        <span className="h-label">Taxa Geral</span>
-                        <span className="h-value" style={{ color: '#10b981' }}>📈 {successRate}%</span>
-                    </div>
-                    <div className="h-stat">
-                        <span className="h-label">Meta Semanal</span>
-                        <span className="h-value" style={{ color: '#8b5cf6' }}>📅 {weeklyRate}%</span>
-                    </div>
-                    <div className="h-stat">
-                        <span className="h-label">Meta Mensal</span>
-                        <span className="h-value" style={{ color: '#ec4899' }}>🗓️ {monthlyRate}%</span>
-                    </div>
-                    <div className="h-stat">
-                        <span className="h-label">Total Checks</span>
-                        <span className="h-value" style={{ color: habit.color }}>🎯 {totalCompletions}</span>
-                    </div>
-                    <div className="h-stat">
-                        <span className="h-label">Dias Perdidos</span>
-                        <span className="h-value" style={{ color: '#ef4444' }}>❌ {missedDaysCount}</span>
-                    </div>
-                </div>
-
                 <div className="history-view-selector">
                     <button 
                         className={viewMode === 'weekly' ? 'active' : ''} 
@@ -720,6 +703,38 @@ const HabitHistoryModal = ({ habit, logs, onClose, calculateStreak }) => {
                     <div className="legend-item"><span className="l-dot completed" /> Concluído</div>
                     <div className="legend-item"><span className="l-dot failed" /> Falhou</div>
                     <div className="legend-item"><span className="l-dot empty" /> Sem registro / Futuro</div>
+                </div>
+
+                <div className="history-stats" style={{ marginTop: '24px' }}>
+                    <div className="h-stat">
+                        <span className="h-label">Sequência</span>
+                        <span className="h-value" style={{ color: '#fbbf24' }}>🔥 {streak}d</span>
+                    </div>
+                    <div className="h-stat">
+                        <span className="h-label">Taxa Geral</span>
+                        <span className="h-value" style={{ color: '#10b981' }}>📈 {successRate}%</span>
+                    </div>
+                    <div className="h-stat">
+                        <span className="h-label">Meta Semanal</span>
+                        <span className="h-value" style={{ color: '#8b5cf6' }}>📅 {weeklyRate}%</span>
+                    </div>
+                    <div className="h-stat">
+                        <span className="h-label">Meta Mensal</span>
+                        <span className="h-value" style={{ color: '#ec4899' }}>🗓️ {monthlyRate}%</span>
+                    </div>
+                    <div className="h-stat">
+                        <span className="h-label">Total Checks</span>
+                        <span className="h-value" style={{ color: habit.color }}>🎯 {totalCompletions}</span>
+                    </div>
+                    <div className="h-stat">
+                        <span className="h-label">Dias Perdidos</span>
+                        <span className="h-value" style={{ color: '#ef4444' }}>❌ {missedDaysCount}</span>
+                    </div>
+                </div>
+
+                <div className="history-footer-actions">
+                    {onEdit && <button className="h-footer-btn edit" onClick={onEdit}>✎ Editar Hábito</button>}
+                    {onDelete && <button className="h-footer-btn delete" onClick={onDelete}>× Excluir</button>}
                 </div>
             </motion.div>
         </div>
