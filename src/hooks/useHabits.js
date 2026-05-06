@@ -1,6 +1,13 @@
 import { useState, useEffect, useCallback } from 'react'
 import { supabase } from '../supabaseClient'
 
+const getLocalYMD = (date = new Date()) => {
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, '0');
+    const day = String(date.getDate()).padStart(2, '0');
+    return `${year}-${month}-${day}`;
+};
+
 export const useHabits = () => {
     const [habits, setHabits] = useState([])
     const [logs, setLogs] = useState([])
@@ -24,7 +31,7 @@ export const useHabits = () => {
             // 2. Fetch logs for the last 60 days (to calculate streaks)
             const sixtyDaysAgo = new Date()
             sixtyDaysAgo.setDate(sixtyDaysAgo.getDate() - 60)
-            const dateString = sixtyDaysAgo.toISOString().split('T')[0]
+            const dateString = getLocalYMD(sixtyDaysAgo)
 
             const { data: logsData, error: logsError } = await supabase
                 .from('habit_logs')
@@ -46,7 +53,7 @@ export const useHabits = () => {
         fetchHabits()
     }, [fetchHabits])
 
-    const toggleHabit = async (habitId, date = new Date().toISOString().split('T')[0]) => {
+    const toggleHabit = async (habitId, date = getLocalYMD()) => {
         const habit = habits.find(h => h.id === habitId)
         if (!habit) return
 
@@ -169,7 +176,7 @@ export const useHabits = () => {
             currentDate.setDate(currentDate.getDate() - 1)
         }
         
-        const currentStr = currentDate.toISOString().split('T')[0]
+        const currentStr = getLocalYMD(currentDate)
         const isDoneOnCurrent = habitLogs.includes(currentStr)
         
         // If it's a scheduled day and not done today, the streak is still alive if we completed the previous scheduled day
@@ -185,7 +192,7 @@ export const useHabits = () => {
 
         // Now currentDate is the last day that MUST have been completed
         while (streak < 365) {
-            const checkDateStr = currentDate.toISOString().split('T')[0]
+            const checkDateStr = getLocalYMD(currentDate)
             if (habitLogs.includes(checkDateStr)) {
                 streak++
                 // Move to previous scheduled day
