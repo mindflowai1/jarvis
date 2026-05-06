@@ -459,6 +459,8 @@ export default function Tasks({ session }) {
                     setFilterDate={setFilterDate}
                     projectFilters={projectFilters}
                     setProjectFilters={setProjectFilters}
+                    setIsProjectModalOpen={setIsProjectModalOpen}
+                    setEditingProject={setEditingProject}
                 />
             </div>
 

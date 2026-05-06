@@ -1,26 +1,101 @@
 .project-modal-content {
-    max-width: 400px !important;
+    background: radial-gradient(circle at top right, #1e293b 0%, #0f172a 100%);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    backdrop-filter: blur(20px);
+    border-radius: 24px;
+    padding: 0;
+    max-width: 420px;
+    width: 90%;
+    box-shadow: 0 24px 48px rgba(0, 0, 0, 0.4);
+    overflow: hidden;
+    position: relative;
+    z-index: 1001;
+}
+
+.pm-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 24px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.pm-header h2 {
+    font-size: 18px;
+    font-weight: 700;
+    color: #f8fafc;
+    margin: 0;
+}
+
+.pm-close-btn {
+    background: rgba(255, 255, 255, 0.05);
+    border: none;
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #94a3b8;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.pm-close-btn:hover {
+    background: rgba(255, 255, 255, 0.1);
+    color: white;
 }
 
 .project-form {
+    padding: 24px;
     display: flex;
     flex-direction: column;
-    gap: 20px;
-    padding: 20px 0;
+    gap: 24px;
+}
+
+.pm-form-group {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.pm-form-group label {
+    font-size: 12px;
+    font-weight: 600;
+    color: #94a3b8;
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
+}
+
+.pm-input {
+    background: rgba(15, 23, 42, 0.6);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 14px;
+    padding: 16px;
+    color: white;
+    font-size: 16px;
+    transition: all 0.2s;
+    width: 100%;
+    box-sizing: border-box;
+}
+
+.pm-input:focus {
+    outline: none;
+    border-color: #3b82f6;
+    background: rgba(15, 23, 42, 0.8);
 }
 
 .color-grid {
     display: grid;
     grid-template-columns: repeat(5, 1fr);
-    gap: 12px;
-    margin-top: 8px;
+    gap: 14px;
 }
 
 .color-option {
     width: 100%;
     aspect-ratio: 1;
     border-radius: 50%;
-    border: 3px solid transparent;
+    border: 2px solid transparent;
     cursor: pointer;
     transition: all 0.2s ease;
     padding: 0;
@@ -34,13 +109,64 @@
 }
 
 .color-option.selected {
-    border-color: rgba(255, 255, 255, 0.9);
-    box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
+    border-color: white;
     transform: scale(1.1);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
 }
 
-@media (max-width: 480px) {
-    .color-grid {
-        gap: 10px;
+.pm-footer {
+    display: flex;
+    gap: 12px;
+}
+
+.pm-btn-cancel, .pm-btn-save {
+    flex: 1;
+    height: 52px;
+    border-radius: 14px;
+    font-size: 15px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.pm-btn-cancel {
+    background: transparent;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    color: #94a3b8;
+}
+
+.pm-btn-cancel:hover {
+    background: rgba(255, 255, 255, 0.05);
+    color: white;
+}
+
+.pm-btn-save {
+    background: #3b82f6;
+    border: none;
+    color: white;
+}
+
+.pm-btn-save:hover:not(:disabled) {
+    background: #2563eb;
+}
+
+.pm-btn-save:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+@media (max-width: 768px) {
+    .project-modal-content {
+        width: 100%;
+        max-width: 100%;
+        border-radius: 28px 28px 0 0;
+        margin: 0;
+        position: absolute;
+        bottom: 0;
+        border: none;
+        border-top: 1px solid rgba(255, 255, 255, 0.1);
     }
 }

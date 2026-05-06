@@ -14,6 +14,8 @@ export default function MobileTasksBoard({
     setFilterDate,
     projectFilters,
     setProjectFilters,
+    setIsProjectModalOpen,
+    setEditingProject,
 }) {
     const [expandedProjects, setExpandedProjects] = useState({})
 
@@ -60,8 +62,8 @@ export default function MobileTasksBoard({
                         <button
                             className="mtk-icon-btn mtk-add-btn"
                             onClick={() => {
-                                setEditingTask(null)
-                                setIsModalOpen(true)
+                                setEditingProject(null)
+                                setIsProjectModalOpen(true)
                             }}
                         >
                             <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">

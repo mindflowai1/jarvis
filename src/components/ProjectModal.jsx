@@ -50,33 +50,33 @@ const ProjectModal = ({ isOpen, onClose, onSave, project }) => {
     }
 
     return (
-        <div className="modal-overlay" onClick={onClose}>
-            <div className="modal-content project-modal-content" onClick={e => e.stopPropagation()}>
-                <div className="modal-header">
+        <div className="modal-overlay" onClick={onClose} style={{ alignItems: 'flex-end', justifyContent: 'center' }}>
+            <div className="project-modal-content" onClick={e => e.stopPropagation()}>
+                <div className="pm-header">
                     <h2>{project ? 'Editar Projeto' : 'Novo Projeto'}</h2>
-                    <button className="close-btn" onClick={onClose}>
-                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <button className="pm-close-btn" onClick={onClose}>
+                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
                         </svg>
                     </button>
                 </div>
 
                 <form onSubmit={handleSubmit} className="project-form">
-                    <div className="form-group">
+                    <div className="pm-form-group">
                         <label>Nome do Projeto</label>
                         <input
                             type="text"
                             value={name}
                             onChange={(e) => setName(e.target.value)}
-                            className="form-input"
+                            className="pm-input"
                             placeholder="Ex: Trabalho, Estudo, Casa..."
                             required
                             autoFocus
                         />
                     </div>
 
-                    <div className="form-group">
-                        <label>Cor do Projeto</label>
+                    <div className="pm-form-group">
+                        <label>Cor Identificadora</label>
                         <div className="color-grid">
                             {PRESET_COLORS.map(color => (
                                 <button
@@ -97,12 +97,12 @@ const ProjectModal = ({ isOpen, onClose, onSave, project }) => {
                         </div>
                     </div>
 
-                    <div className="modal-actions">
-                        <button type="button" className="btn-cancel" onClick={onClose}>
+                    <div className="pm-footer">
+                        <button type="button" className="pm-btn-cancel" onClick={onClose}>
                             Cancelar
                         </button>
-                        <button type="submit" className="btn-save" disabled={loading}>
-                            {loading ? 'Salvando...' : 'Salvar'}
+                        <button type="submit" className="pm-btn-save" disabled={loading}>
+                            {loading ? 'Salvando...' : 'Criar Projeto'}
                         </button>
                     </div>
                 </form>
