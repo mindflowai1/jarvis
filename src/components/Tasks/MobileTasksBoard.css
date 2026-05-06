@@ -160,6 +160,7 @@
     justify-content: center;
     color: var(--text-muted);
     transition: all 0.2s;
+    overflow: hidden; /* Corta qualquer hitbox vazada do input[type=date] invisivel */
 }
 
 .mtk-project-filter.active {
@@ -174,8 +175,12 @@
     left: 0;
     width: 100%;
     height: 100%;
-    opacity: 0;
+    opacity: 0.01;
     z-index: 1;
+    appearance: none;
+    -webkit-appearance: none;
+    cursor: pointer;
+    box-sizing: border-box;
 }
 
 .mtk-clear-project-filter {
@@ -207,6 +212,8 @@
     align-items: center;
     justify-content: center;
     cursor: pointer;
+    position: relative;
+    z-index: 2;
 }
 
 .mtk-tasks-container {
