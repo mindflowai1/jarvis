@@ -313,7 +313,7 @@ const TransactionModal = ({ isOpen, onClose, onSave, transaction, onDelete }) =>
                             </div>
 
                             <div className="form-group">
-                                <label>Descrição (Opcional)</label>
+                                <label>Descrição</label>
                                 <input
                                     type="text"
                                     name="summary"

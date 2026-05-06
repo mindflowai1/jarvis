@@ -227,11 +227,14 @@ export default function EventModal({ isOpen, onClose, onSave, onDelete, initialE
                     >
                         <div className="modal-header">
                             <h3>{initialEvent ? 'Editar Evento' : 'Novo Evento'}</h3>
-                            {initialEvent && onDelete && (
-                                <button type="button" className="delete-btn-text" onClick={onDelete}>
-                                    Excluir
-                                </button>
-                            )}
+                            <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+                                {initialEvent && onDelete && (
+                                    <button type="button" className="delete-btn-text" onClick={onDelete}>
+                                        Excluir
+                                    </button>
+                                )}
+                                <button type="button" className="close-modal" onClick={onClose}>×</button>
+                            </div>
                         </div>
 
                         <form onSubmit={handleSubmit}>
@@ -243,7 +246,6 @@ export default function EventModal({ isOpen, onClose, onSave, onDelete, initialE
                                     onChange={(e) => setTitle(e.target.value)}
                                     placeholder="Nome do evento"
                                     required
-                                    autoFocus
                                 />
                             </div>
 
