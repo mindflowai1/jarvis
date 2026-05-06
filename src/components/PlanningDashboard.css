@@ -214,8 +214,191 @@
 .mini-stat-card .value.done { color: #4ade80; }
 
 @media (max-width: 768px) {
+    .planning-dashboard {
+        gap: 16px;
+        padding-bottom: 100px;
+    }
+
+    /* Summary: compact horizontal pills */
     .planning-summary {
         grid-template-columns: 1fr;
+        gap: 8px;
+    }
+
+    .mini-stat-card {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 10px 14px;
+        border-radius: 10px;
+    }
+
+    .mini-stat-card label {
+        margin-bottom: 0;
+        font-size: 12px;
+    }
+
+    .mini-stat-card .value {
+        font-size: 16px;
+    }
+
+    /* Month navigator */
+    .month-navigator {
+        padding: 10px 16px;
+        gap: 12px;
+        width: 100%;
+        box-sizing: border-box;
+        border-radius: 12px;
+    }
+
+    .current-month-display h2 {
+        font-size: 16px;
+    }
+
+    .nav-month-btn {
+        width: 32px;
+        height: 32px;
+    }
+
+    /* List header */
+    .planning-list-header {
+        padding: 0 4px;
+    }
+
+    .planning-list-header h3 {
+        font-size: 14px;
+    }
+
+    /* ========= CARDS: PREMIUM MOBILE ========= */
+    .planning-item-card {
+        flex-direction: column;
+        align-items: stretch;
+        padding: 0;
+        gap: 0;
+        border-radius: 14px;
+        overflow: hidden;
+    }
+
+    /* Top: info area */
+    .planning-item-card .t-info {
+        display: flex;
+        gap: 10px;
+        align-items: flex-start;
+        padding: 14px 14px 10px;
+    }
+
+    .planning-item-card .t-icon {
+        width: 36px;
+        height: 36px;
+        background: rgba(255, 255, 255, 0.05);
+        border-radius: 10px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 16px;
+        flex-shrink: 0;
+    }
+
+    .planning-item-card .t-details {
+        flex: 1;
+        min-width: 0;
+    }
+
+    .planning-item-card .t-details h3 {
+        font-size: 14px;
+        margin: 2px 0 4px;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+
+    .planning-item-card .t-details p {
+        font-size: 11px;
+        margin: 0;
+    }
+
+    .type-badge {
+        font-size: 9px;
+        padding: 1px 6px;
+        border-radius: 4px;
+    }
+
+    .installment-info {
+        font-size: 10px;
+        margin-left: 4px;
+    }
+
+    /* Bottom: value + actions + toggle on dark strip */
+    .t-right-side {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        padding: 10px 14px;
+        background: rgba(0, 0, 0, 0.15);
+        border-top: 1px solid rgba(255, 255, 255, 0.04);
+    }
+
+    .t-amount {
+        font-size: 15px;
+        font-weight: 700;
+        flex: 1;
+        order: 0;
+    }
+
+    /* Actions: compact */
+    .planning-item-card .t-actions {
+        order: 1;
+        gap: 6px;
+    }
+
+    .planning-item-card .action-btn {
+        width: 28px;
+        height: 28px;
+        border-radius: 8px;
+        background: rgba(255, 255, 255, 0.06);
+        border-color: rgba(255, 255, 255, 0.1);
+    }
+
+    .planning-item-card .action-btn svg {
+        width: 13px !important;
+        height: 13px !important;
+    }
+
+    /* Paid toggle: float to top-right of card */
+    .paid-toggle {
+        position: absolute;
+        top: 12px;
+        right: 12px;
+        flex-direction: row;
+        align-items: center;
+        gap: 5px;
+        background: rgba(255, 255, 255, 0.06);
+        padding: 4px 10px 4px 4px;
+        border-radius: 20px;
+        z-index: 5;
+    }
+
+    .check-circle {
+        width: 22px;
+        height: 22px;
+    }
+
+    .check-circle svg {
+        width: 12px;
+        height: 12px;
+    }
+
+    .paid-label {
+        font-size: 9px;
+        letter-spacing: 0.5px;
+    }
+
+    .planning-item-card.is-paid .paid-toggle {
+        background: rgba(34, 197, 94, 0.15);
+    }
+
+    .planning-item-card.is-paid .paid-label {
+        color: #4ade80;
     }
 }
 

@@ -67,7 +67,6 @@
     margin: 0;
     font-size: 28px;
     font-weight: 800;
-    font-family: 'JetBrains Mono', monospace;
 }
 
 .hd-balance-header small {
@@ -96,7 +95,6 @@
 .hd-mini-stat .animated-num {
     font-size: 16px;
     font-weight: 700;
-    font-family: 'JetBrains Mono', monospace;
 }
 
 .hd-mini-stat.in .animated-num { color: var(--emerald); }
@@ -109,7 +107,6 @@
 .hd-clock-big {
     font-size: 28px;
     font-weight: 700;
-    font-family: 'JetBrains Mono', monospace;
     line-height: 1;
 }
 
@@ -206,7 +203,7 @@
     border-radius: 12px;
     align-items: center;
 }
-.hd-t-time { font-family: 'JetBrains Mono', monospace; font-size: 11px; color: var(--emerald); font-weight: 700; }
+.hd-t-time { font-size: 11px; color: var(--emerald); font-weight: 700; }
 .hd-t-desc { font-size: 13px; font-weight: 500; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 
 /* HABITS MINI */
@@ -272,7 +269,7 @@
 .hd-tx-info { flex: 1; }
 .hd-tx-info strong { display: block; font-size: 13px; font-weight: 600; }
 .hd-tx-info small { font-size: 11px; color: var(--text-dim); }
-.hd-tx-val { font-family: 'JetBrains Mono', monospace; font-weight: 700; font-size: 13px; }
+.hd-tx-val { font-weight: 700; font-size: 13px; }
 .hd-tx-val.entrada { color: var(--emerald); }
 .hd-tx-val.saida { color: var(--danger); }
 
@@ -349,9 +346,263 @@
 }
 @keyframes spin { to { transform: rotate(360deg); } }
 
-/* --- RESPONSIVE --- */
-@media (max-width: 1024px) {
-    .hd-main-grid { grid-template-columns: 1fr; overflow-y: auto; }
-    .hd-viewport { overflow-y: auto; height: auto; min-height: 100vh; }
-    .hd-col { height: auto; }
+/* --- RESPONSIVE: TABLET --- */
+@media (max-width: 1024px) and (min-width: 769px) {
+    .hd-main-grid { grid-template-columns: 1fr 1fr; }
+    .hd-col.hd-col--wide { grid-column: span 2; }
+}
+
+/* --- RESPONSIVE: MOBILE (FULL REWRITE) --- */
+@media (max-width: 768px) {
+    /* Viewport: edge-to-edge, transparent bg */
+    .hd-viewport {
+        height: auto;
+        min-height: 100vh;
+        overflow-y: auto;
+        overflow-x: hidden;
+        background: transparent;
+        margin: 0 -16px;
+        width: calc(100% + 32px);
+    }
+
+    .hd-ambient-glow {
+        top: -30%;
+        left: -10%;
+        width: 120%;
+        height: 40%;
+        filter: blur(80px);
+        opacity: 0.6;
+    }
+
+    .hd-cockpit-fixed {
+        height: auto;
+        padding: 12px;
+        gap: 14px;
+    }
+
+    /* ---- HEADER: Stack vertical ---- */
+    .hd-header-compact {
+        flex-direction: column;
+        align-items: stretch;
+        padding: 16px;
+        gap: 14px;
+        border-radius: 16px;
+        position: relative;
+    }
+
+    /* Top row: greeting + clock */
+    .hd-id-group {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start;
+    }
+
+    .hd-tag {
+        font-size: 10px;
+        letter-spacing: 1px;
+    }
+
+    .hd-balance-header small {
+        font-size: 9px;
+    }
+
+    .hd-balance-header h2 {
+        font-size: 22px;
+    }
+
+    /* Clock: inline to the right of the greeting */
+    .hd-clock-group {
+        position: absolute;
+        top: 16px;
+        right: 16px;
+    }
+
+    .hd-clock-big {
+        font-size: 18px;
+    }
+
+    .hd-date-small {
+        font-size: 10px;
+    }
+
+    /* Stats mini: side by side below balance */
+    .hd-stats-mini {
+        gap: 0;
+        justify-content: stretch;
+        width: 100%;
+    }
+
+    .hd-mini-stat {
+        flex: 1;
+        background: rgba(255, 255, 255, 0.03);
+        padding: 10px 12px;
+        border-radius: 12px;
+        text-align: center;
+    }
+
+    .hd-mini-stat:first-child {
+        border-radius: 12px 0 0 12px;
+        border-right: 1px solid var(--border);
+    }
+
+    .hd-mini-stat:last-child {
+        border-radius: 0 12px 12px 0;
+    }
+
+    .hd-mini-stat label {
+        font-size: 9px;
+        display: block;
+        margin-bottom: 2px;
+    }
+
+    .hd-mini-stat .animated-num {
+        font-size: 14px;
+    }
+
+    /* ---- MAIN GRID: Single column ---- */
+    .hd-main-grid {
+        display: flex;
+        flex-direction: column;
+        gap: 16px;
+        flex: none;
+    }
+
+    .hd-col {
+        display: flex;
+        flex-direction: column;
+        gap: 16px;
+        height: auto;
+        min-height: auto;
+    }
+
+    /* ---- WIDGETS: Proper sizing ---- */
+    .hd-widget-compact {
+        border-radius: 16px;
+        flex: none !important;
+        min-height: auto;
+    }
+
+    .hd-w-head {
+        padding: 10px 14px;
+    }
+
+    .hd-w-head h3 {
+        font-size: 11px;
+        letter-spacing: 0.8px;
+    }
+
+    .hd-w-head button {
+        font-size: 9px;
+        padding: 3px 8px;
+    }
+
+    .hd-w-body {
+        padding: 10px;
+    }
+
+    /* Agenda items */
+    .hd-t-item {
+        padding: 8px 10px;
+        gap: 10px;
+        border-radius: 10px;
+    }
+
+    .hd-t-time {
+        font-size: 10px;
+        min-width: 40px;
+    }
+
+    .hd-t-desc {
+        font-size: 12px;
+    }
+
+    /* Habits mini: horizontal layout */
+    .hd-habits-mini {
+        padding: 12px;
+        gap: 16px;
+    }
+
+    .hd-ring-small {
+        width: 64px;
+        height: 64px;
+    }
+
+    .hd-ring-text {
+        font-size: 12px;
+    }
+
+    .hd-h-pill strong {
+        font-size: 13px;
+    }
+
+    .hd-h-pill span {
+        font-size: 8px;
+    }
+
+    /* Finance transactions */
+    .hd-tx-row {
+        padding: 8px 10px;
+        gap: 10px;
+        border-radius: 10px;
+    }
+
+    .hd-tx-cat {
+        font-size: 16px;
+    }
+
+    .hd-tx-info strong {
+        font-size: 12px;
+    }
+
+    .hd-tx-info small {
+        font-size: 10px;
+    }
+
+    .hd-tx-val {
+        font-size: 12px;
+    }
+
+    /* Tasks */
+    .hd-op-item {
+        padding: 8px 10px;
+        gap: 10px;
+        border-radius: 10px;
+    }
+
+    .hd-op-text p {
+        font-size: 12px;
+    }
+
+    .hd-op-text span {
+        font-size: 9px;
+    }
+
+    /* Alerts */
+    .hd-al-item {
+        padding: 8px 10px;
+        gap: 10px;
+        border-radius: 10px;
+    }
+
+    .hd-al-day {
+        width: 28px;
+        height: 28px;
+        font-size: 12px;
+        border-radius: 7px;
+    }
+
+    .hd-al-info strong {
+        font-size: 11px;
+    }
+
+    .hd-al-info span {
+        font-size: 9px;
+    }
+
+    /* Empty states */
+    .hd-w-empty {
+        height: auto;
+        padding: 20px 10px;
+        font-size: 12px;
+    }
 }

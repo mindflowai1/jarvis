@@ -76,19 +76,30 @@ export const useHomeDashboard = (session) => {
         try {
             setLoading(true)
 
+            const now = new Date()
+            const firstDay = new Date(now.getFullYear(), now.getMonth(), 1).toISOString().split('T')[0]
+            const lastDay = new Date(now.getFullYear(), now.getMonth() + 1, 0).toISOString().split('T')[0]
+
             const [summaryRes, txRes, pendingRes, allTasksRes, remindersRes, habitsRes, habitLogsRes, calendarEvents] = await Promise.all([
                 supabase.rpc('get_financial_summary', {
-                    start_date: null, end_date: null, search_term: null,
-                    filter_type: null, filter_category: null
+                    start_date: firstDay,
+                    end_date: lastDay,
+                    search_term: null,
+                    filter_type: null,
+                    filter_category: null,
+                    filter_payment_method: null
                 }),
-                supabase.from('transactions').select('*').order('created_at', { ascending: false }).limit(5),
+                supabase.from('transactions').select('*').order('created_at', { ascending: false }).limit(10),
                 supabase.from('notes').select('*').eq('is_completed', false).order('prazo', { ascending: true }).limit(6),
                 supabase.from('notes').select('id, is_completed'),
                 supabase.from('recurring_reminders').select('*').eq('is_active', true).order('due_day', { ascending: true }),
                 supabase.from('habits').select('id').eq('is_active', true),
-                supabase.from('habit_logs').select('habit_id').eq('completed_at', new Date().toISOString().split('T')[0]),
+                supabase.from('habit_logs').select('habit_id').eq('completed_at', now.toISOString().split('T')[0]),
                 fetchCalendarEvents()
             ])
+
+            if (summaryRes.error) console.error('Dashboard Summary Error:', summaryRes.error)
+            if (txRes.error) console.error('Dashboard TX Error:', txRes.error)
 
             // Stats
             if (summaryRes.data?.[0]) {
