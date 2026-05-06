@@ -1,4 +1,3 @@
-/* TransactionModal.css - Clean, Minimalist Premium Design */
 .modal-overlay {
     position: fixed;
     top: 0;
@@ -11,6 +10,11 @@
     justify-content: center;
     align-items: center;
     z-index: 10000;
+    box-sizing: border-box;
+}
+
+.modal-content.minimal-modal, .modal-content.minimal-modal * {
+    box-sizing: border-box;
 }
 
 .modal-content.minimal-modal {
