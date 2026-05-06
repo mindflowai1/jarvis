@@ -4,7 +4,7 @@
     left: 0;
     right: 0;
     bottom: 0;
-    background-color: rgba(10, 15, 25, 0.7);
+    background-color: rgba(0, 0, 0, 0.7);
     backdrop-filter: blur(8px);
     display: flex;
     justify-content: center;
@@ -18,112 +18,108 @@
 }
 
 .modal-content.minimal-modal {
-    background: #0f172a;
-    border: 1px solid rgba(255, 255, 255, 0.05);
-    border-radius: 20px;
-    padding: 24px;
+    background: radial-gradient(circle at top right, #1e293b 0%, #0f172a 100%);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    backdrop-filter: blur(20px);
+    border-radius: 24px;
+    padding: 0;
     width: 90%;
     max-width: 420px;
-    box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.6);
-    position: relative;
-    max-height: 95vh;
+    box-shadow: 0 24px 48px rgba(0, 0, 0, 0.4);
     display: flex;
     flex-direction: column;
+    max-height: 95vh;
 }
 
 .modal-header {
     display: flex;
     justify-content: space-between;
-    align-items: flex-start;
-    margin-bottom: 20px;
+    align-items: center;
+    padding: 24px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.05);
     flex-shrink: 0;
 }
 
 .modal-header h2 {
     margin: 0;
     font-size: 18px;
-    font-weight: 600;
+    font-weight: 700;
     color: #f8fafc;
-    letter-spacing: -0.02em;
 }
 
 .close-btn {
-    background: transparent;
+    background: rgba(255, 255, 255, 0.05);
     border: none;
-    color: #64748b;
-    cursor: pointer;
-    padding: 4px;
+    width: 32px;
+    height: 32px;
     border-radius: 50%;
     display: flex;
     align-items: center;
     justify-content: center;
-    transition: color 0.2s, background 0.2s;
+    color: #94a3b8;
+    cursor: pointer;
+    transition: all 0.2s;
+    padding: 0;
 }
 
 .close-btn:hover {
-    color: #f8fafc;
-    background: rgba(255, 255, 255, 0.05);
+    background: rgba(255, 255, 255, 0.1);
+    color: white;
 }
 
 .transaction-form {
     display: flex;
     flex-direction: column;
-    gap: 16px;
+    gap: 20px;
     overflow-y: auto;
-    overflow-x: visible; /* To let dropdowns try to pop out */
-    padding-right: 4px;
+    overflow-x: hidden;
+    padding: 24px;
+    flex: 1;
+    min-height: 0;
 }
 
-/* Custom scrollbar for form scroll */
-.transaction-form::-webkit-scrollbar {
-    width: 4px;
-}
-.transaction-form::-webkit-scrollbar-track {
-    background: transparent;
-}
-.transaction-form::-webkit-scrollbar-thumb {
-    background: #334155;
-    border-radius: 4px;
-}
+.transaction-form::-webkit-scrollbar { width: 4px; }
+.transaction-form::-webkit-scrollbar-track { background: transparent; }
+.transaction-form::-webkit-scrollbar-thumb { background: #334155; border-radius: 4px; }
 
-/* Minimalist Form Groups */
 .form-group {
     display: flex;
     flex-direction: column;
-    gap: 6px;
+    gap: 10px;
     flex-shrink: 0;
 }
 
 .form-group label {
-    font-size: 13px;
-    font-weight: 500;
+    font-size: 12px;
+    font-weight: 600;
     color: #94a3b8;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
 }
 
 .minimal-input {
-    background: #1e293b;
-    border: 1px solid rgba(255, 255, 255, 0.05);
-    padding: 12px 14px;
-    border-radius: 10px;
-    color: #f8fafc;
-    font-size: 14px;
-    outline: none;
-    transition: all 0.2s ease;
+    background: rgba(15, 23, 42, 0.6);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 14px;
+    padding: 16px;
+    color: white;
+    font-size: 16px;
+    transition: all 0.2s;
     width: 100%;
-    font-family: inherit;
-}
-
-.minimal-input::placeholder {
-    color: #475569;
 }
 
 .minimal-input:focus {
-    background: #1e293b;
+    outline: none;
     border-color: #3b82f6;
-    box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.1);
+    background: rgba(15, 23, 42, 0.8);
 }
 
-/* Currency Wrapper */
+.minimal-input::-webkit-calendar-picker-indicator {
+    filter: invert(1);
+    opacity: 0.5;
+    cursor: pointer;
+}
+
 .currency-wrapper {
     position: relative;
     display: flex;
@@ -132,24 +128,22 @@
 
 .currency-symbol {
     position: absolute;
-    left: 14px;
+    left: 16px;
     color: #64748b;
-    font-size: 14px;
-    font-weight: 500;
+    font-size: 16px;
+    font-weight: 600;
     pointer-events: none;
 }
 
 .currency-wrapper .minimal-input {
-    padding-left: 38px;
-    font-size: 16px;
-    font-weight: 500;
+    padding-left: 48px;
+    font-weight: 600;
 }
 
-/* Payment Method Grid */
 .payment-method-grid {
     display: grid;
     grid-template-columns: repeat(4, 1fr);
-    gap: 8px;
+    gap: 10px;
 }
 
 .payment-method-btn {
@@ -158,28 +152,20 @@
     align-items: center;
     justify-content: center;
     gap: 6px;
-    padding: 10px 4px;
+    padding: 12px 4px;
     background: rgba(255, 255, 255, 0.03);
     border: 1px solid rgba(255, 255, 255, 0.05);
-    border-radius: 12px;
+    border-radius: 14px;
     color: #94a3b8;
     cursor: pointer;
     transition: all 0.2s ease;
-    font-family: inherit;
 }
 
-.payment-method-btn .method-icon {
-    font-size: 18px;
-}
-
-.payment-method-btn .method-label {
-    font-size: 11px;
-    font-weight: 500;
-}
+.payment-method-btn .method-icon { font-size: 18px; }
+.payment-method-btn .method-label { font-size: 11px; font-weight: 600; }
 
 .payment-method-btn:hover {
     background: rgba(255, 255, 255, 0.05);
-    border-color: rgba(255, 255, 255, 0.1);
 }
 
 .payment-method-btn.active {
@@ -188,59 +174,32 @@
     color: #3b82f6;
 }
 
-.payment-method-btn.credit-btn {
-    border-style: dashed;
-}
+.payment-method-btn.credit-btn { border-style: dashed; }
+.payment-method-btn.credit-btn:hover { background: rgba(139, 92, 246, 0.1); border-color: #8b5cf6; color: #a78bfa; }
 
-.payment-method-btn.credit-btn:hover {
-    background: rgba(139, 92, 246, 0.1);
-    border-color: #8b5cf6;
-    color: #a78bfa;
-}
-
-/* Custom Select Dropdown (Minimal) */
-.custom-select-container {
-    position: relative;
-    width: 100%;
-}
+/* Dropdown */
+.custom-select-container { position: relative; width: 100%; }
 
 .custom-select-trigger {
-    background: #1e293b;
-    border: 1px solid rgba(255, 255, 255, 0.05);
-    padding: 12px 14px;
-    border-radius: 10px;
-    color: #f8fafc;
-    font-size: 14px;
+    background: rgba(15, 23, 42, 0.6);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    padding: 16px;
+    border-radius: 14px;
+    color: white;
+    font-size: 16px;
     width: 100%;
     text-align: left;
     cursor: pointer;
     display: flex;
     justify-content: space-between;
     align-items: center;
-    transition: all 0.2s ease;
-    font-family: inherit;
+    transition: all 0.2s;
 }
 
-.custom-select-trigger:hover {
-    border-color: rgba(255, 255, 255, 0.1);
-}
+.custom-select-trigger.is-open { border-color: #3b82f6; }
+.custom-select-trigger.disabled { opacity: 0.5; cursor: not-allowed; }
+.custom-select-trigger .placeholder { color: #475569; }
 
-.custom-select-trigger.is-open {
-    border-color: #3b82f6;
-}
-
-.custom-select-trigger.disabled {
-    background: rgba(30, 41, 59, 0.5);
-    color: #64748b;
-    cursor: not-allowed;
-    border-color: rgba(255, 255, 255, 0.02);
-}
-
-.custom-select-trigger .placeholder {
-    color: #475569;
-}
-
-/* We push the dropdown up slightly if it's near the bottom, but here we just leave minimal css logic */
 .custom-select-dropdown {
     position: absolute;
     top: calc(100% + 4px);
@@ -248,162 +207,96 @@
     right: 0;
     background: #1e293b;
     border: 1px solid #334155;
-    border-radius: 10px;
-    max-height: 180px;
+    border-radius: 14px;
+    max-height: 200px;
     overflow-y: auto;
     z-index: 50;
-    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.5);
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.5);
 }
 
-/* Custom scrollbar for dropdown */
-.custom-select-dropdown::-webkit-scrollbar {
-    width: 5px;
-}
-.custom-select-dropdown::-webkit-scrollbar-track {
-    background: rgba(0, 0, 0, 0.1);
-    border-radius: 4px;
-}
-.custom-select-dropdown::-webkit-scrollbar-thumb {
-    background: #475569;
-    border-radius: 4px;
-}
+.custom-select-dropdown::-webkit-scrollbar { width: 5px; }
+.custom-select-dropdown::-webkit-scrollbar-thumb { background: #475569; border-radius: 4px; }
 
 .custom-option {
-    padding: 10px 14px;
+    padding: 14px 16px;
     color: #cbd5e1;
-    font-size: 13px;
+    font-size: 15px;
     cursor: pointer;
-    transition: background 0.15s ease;
+    transition: background 0.15s;
     display: flex;
     align-items: center;
-    gap: 8px;
+    gap: 10px;
 }
 
-.custom-option:hover {
-    background: rgba(59, 130, 246, 0.1);
-    color: #f8fafc;
-}
+.custom-option:hover { background: rgba(59, 130, 246, 0.1); color: #f8fafc; }
+.custom-option.selected { background: rgba(59, 130, 246, 0.15); color: #3b82f6; font-weight: 600; }
 
-.custom-option.selected {
-    background: rgba(59, 130, 246, 0.15);
-    color: #3b82f6;
-    font-weight: 500;
-}
-
-/* Form Actions */
 .modal-actions {
     display: flex;
     gap: 12px;
-    margin-top: 8px;
-    padding-top: 16px;
-    border-top: 1px solid rgba(255, 255, 255, 0.05);
     flex-shrink: 0;
+    margin-top: auto;
+    padding-bottom: 24px; /* Garante que os botões não colem no fundo se rolar tudo */
 }
 
-.btn-delete-modal {
+.btn-cancel, .btn-save {
+    flex: 1;
+    height: 52px;
+    border-radius: 14px;
+    font-size: 15px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s;
     display: flex;
     align-items: center;
     justify-content: center;
-    padding: 10px 12px;
-    border-radius: 10px;
-    background: transparent;
-    border: 1px solid rgba(239, 68, 68, 0.2);
-    color: #ef4444;
-    cursor: pointer;
-    transition: all 0.2s ease;
-}
-
-.btn-delete-modal:hover {
-    background: rgba(239, 68, 68, 0.15);
-    border-color: rgba(239, 68, 68, 0.4);
-}
-
-.btn-delete-modal:active {
-    transform: scale(0.95);
-}
-
-.btn-delete-modal:disabled {
-    opacity: 0.5;
-    cursor: not-allowed;
-    transform: none;
 }
 
 .btn-cancel {
-    flex: 1;
-    padding: 12px;
-    border-radius: 10px;
     background: transparent;
-    border: 1px solid transparent;
+    border: 1px solid rgba(255, 255, 255, 0.1);
     color: #94a3b8;
-    cursor: pointer;
-    font-weight: 500;
-    font-size: 14px;
-    transition: all 0.2s;
 }
 
-.btn-cancel:hover {
-    color: #f8fafc;
-    background: rgba(255, 255, 255, 0.05);
-}
+.btn-cancel:hover { background: rgba(255, 255, 255, 0.05); color: white; }
 
 .btn-save {
-    flex: 1;
-    padding: 12px;
-    border-radius: 10px;
-    background: #f8fafc;
-    color: #0f172a;
+    background: #3b82f6;
     border: none;
-    cursor: pointer;
-    font-weight: 600;
-    font-size: 14px;
-    transition: all 0.2s;
+    color: white;
+}
+
+.btn-save:hover:not(:disabled) { background: #2563eb; }
+.btn-save:disabled { opacity: 0.5; cursor: not-allowed; }
+
+.btn-delete-modal {
+    width: 52px;
+    height: 52px;
+    border-radius: 14px;
+    background: rgba(239, 68, 68, 0.1);
+    border: 1px solid rgba(239, 68, 68, 0.2);
+    color: #ef4444;
     display: flex;
     align-items: center;
     justify-content: center;
-    gap: 8px;
+    cursor: pointer;
+    transition: all 0.2s;
 }
 
-.btn-save:hover {
-    background: #e2e8f0;
-    transform: translateY(-1px);
+.btn-delete-modal:hover {
+    background: rgba(239, 68, 68, 0.2);
 }
 
-.btn-save:disabled {
-    opacity: 0.5;
-    cursor: not-allowed;
-    transform: none;
-}
-
-/* Mobile specific tweaks */
-@media (max-width: 480px) {
+@media (max-width: 768px) {
     .modal-content.minimal-modal {
-        padding: 20px 16px;
-        width: 95%;
+        width: 100%;
+        max-width: 100%;
+        border-radius: 28px 28px 0 0;
+        margin: 0;
+        position: absolute;
+        bottom: 0;
+        border: none;
+        border-top: 1px solid rgba(255, 255, 255, 0.1);
         max-height: 90vh;
-    }
-    
-    .transaction-form {
-        gap: 12px;
-    }
-    
-    .minimal-input {
-        padding: 10px 12px;
-    }
-    
-    .custom-select-trigger {
-        padding: 10px 12px;
-    }
-    
-    .modal-header {
-        margin-bottom: 16px;
-    }
-    
-    .custom-select-dropdown {
-        max-height: 150px;
-    }
-    
-    .modal-actions {
-        margin-top: 4px;
-        padding-top: 12px;
     }
 }
