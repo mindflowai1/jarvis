@@ -1630,14 +1630,29 @@
         grid-template-columns: auto 1fr auto;
         align-items: center;
         gap: 16px;
-        padding: 12px 0;
+        padding: 14px 0;
         border-radius: 0;
         background: transparent;
         backdrop-filter: none;
         -webkit-backdrop-filter: none;
         border: none;
-        border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+        border-bottom: 1px solid rgba(255, 255, 255, 0.06);
         box-shadow: none;
+    }
+
+    /* Kill ALL hover/active/done color changes on item row */
+    .habit-item:hover,
+    .habit-item:active {
+        transform: none;
+        background: transparent;
+        border-color: rgba(255, 255, 255, 0.06);
+        box-shadow: none;
+    }
+
+    .habit-item.is-done {
+        border-color: rgba(255, 255, 255, 0.06);
+        box-shadow: none;
+        animation: none;
     }
 
     .habit-item:last-child {
@@ -1656,7 +1671,7 @@
     }
 
     .habit-item__actions {
-        display: none; /* Esconde ações na lista limpa, usuário pode clicar no item para editar se precisar */
+        display: none;
     }
 
     .habit-item__body {
@@ -1673,10 +1688,16 @@
     }
 
     .habit-item__body h3 {
-        font-size: 16px;
-        font-weight: 500;
+        font-size: 15px;
+        font-weight: 600;
         color: #f8fafc;
         margin: 0;
+    }
+
+    /* No strikethrough — just subtle text color change */
+    .habit-item.is-done .habit-item__body h3 {
+        text-decoration: none;
+        color: #64748b;
     }
 
     .goal-badge {
@@ -1691,8 +1712,19 @@
         color: #64748b;
     }
 
+    /* Show progress bar for multi-goal habits */
     .progress-container {
-        display: none; /* Muito poluído para uma lista simples */
+        display: block;
+        margin-top: 6px;
+    }
+
+    .progress-bg {
+        height: 3px;
+        border-radius: 2px;
+    }
+    
+    .habit-item.is-done .habit-item__streak {
+        opacity: 0.5;
     }
 
     .off-day-badge {
@@ -1721,10 +1753,10 @@
     }
 
     .check-text {
-        display: none; /* Esconde o texto '✓ Concluído' */
+        display: none;
     }
 
-    /* Desenha o ícone de check via CSS para o botão vazio */
+    /* Check icon via CSS */
     .check-btn::after {
         content: '';
         width: 5px;
@@ -1738,23 +1770,13 @@
     }
 
     .check-btn.active {
-        background: var(--habit-color) !important;
-        border-color: var(--habit-color) !important;
-        box-shadow: 0 0 10px rgba(16, 185, 129, 0.2) !important;
+        background: #10b981 !important;
+        border-color: #10b981 !important;
+        box-shadow: none !important;
     }
 
     .check-btn.active::after {
         opacity: 1;
-    }
-
-    /* Efeito visual riscado se concluído (opcional para ficar mais app de TODO) */
-    .habit-item.is-done .habit-item__body h3 {
-        text-decoration: line-through;
-        color: #64748b;
-    }
-    
-    .habit-item.is-done .habit-item__streak {
-        opacity: 0.5;
     }
 
     /* Seção de repouso */
