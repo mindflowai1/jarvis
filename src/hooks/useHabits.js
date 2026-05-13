@@ -57,20 +57,26 @@ export const useHabits = () => {
         const habit = habits.find(h => h.id === habitId)
         if (!habit) return
 
-        const habitTodayLogs = logs.filter(l => l.habit_id === habitId && l.completed_at === date)
+        // Filtra os logs ignorando a hora (caso o completed_at seja timestamptz)
+        const habitTodayLogs = logs.filter(l => l.habit_id === habitId && l.completed_at.startsWith(date))
         const isFullyDone = habitTodayLogs.length >= habit.goal
 
         // --- OPTIMISTIC UPDATE ---
         const oldLogs = [...logs]
+        let logToRemove = null
+        // Build an ISO string for the target date (noon to avoid timezone edge cases)
+        const targetIso = `${date}T12:00:00.000Z`
+
         if (isFullyDone) {
-            // Remove all logs for this habit today (reset progress)
-            setLogs(prev => prev.filter(l => !(l.habit_id === habitId && l.completed_at === date)))
+            // Zera todos os logs desse dia (remove todos de uma vez)
+            const logIdsToRemove = habitTodayLogs.map(l => l.id)
+            setLogs(prev => prev.filter(l => !logIdsToRemove.includes(l.id)))
         } else {
-            // Add one temporary log
+            // Adiciona um log temporário usando a data-alvo, não a data de agora
             const tempLog = { 
                 id: `temp-${Math.random()}`, 
                 habit_id: habitId, 
-                completed_at: date,
+                completed_at: targetIso,
                 is_optimistic: true 
             }
             setLogs(prev => [...prev, tempLog])
@@ -81,12 +87,14 @@ export const useHabits = () => {
             if (!user) throw new Error("User not authenticated")
 
             if (isFullyDone) {
+                // Deleta TODOS os logs desse hábito nesse dia
                 const { error } = await supabase
                     .from('habit_logs')
                     .delete()
                     .eq('habit_id', habitId)
-                    .eq('completed_at', date)
                     .eq('user_id', user.id)
+                    .gte('completed_at', `${date}T00:00:00.000Z`)
+                    .lt('completed_at', `${date}T23:59:59.999Z`)
                 if (error) throw error
             } else {
                 const { error } = await supabase
@@ -94,7 +102,7 @@ export const useHabits = () => {
                     .insert([{
                         habit_id: habitId,
                         user_id: user.id,
-                        completed_at: date
+                        completed_at: targetIso
                     }])
                 if (error) throw error
             }
@@ -103,6 +111,7 @@ export const useHabits = () => {
             fetchHabits(true)
         } catch (error) {
             console.error('Error toggling habit:', error)
+            alert("Erro ao salvar no banco de dados: " + (error.message || error.toString()) + "\n\nPossivelmente o Supabase está bloqueando múltiplos registros no mesmo dia devido a uma restrição (Unique Constraint).")
             setLogs(oldLogs) // Rollback on error
         }
     }
@@ -157,7 +166,7 @@ export const useHabits = () => {
 
         const habitLogs = logs
             .filter(l => l.habit_id === habitId)
-            .map(l => l.completed_at)
+            .map(l => l.completed_at.split('T')[0])
             .sort((a, b) => new Date(b) - new Date(a))
 
         if (habitLogs.length === 0) return 0

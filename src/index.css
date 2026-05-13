@@ -328,10 +328,9 @@
     }
 
     .footer-credits {
-        position: absolute;
-        bottom: 24px;
         width: 100%;
         text-align: center;
+        margin-top: auto;
     }
 
     .footer-credits p {

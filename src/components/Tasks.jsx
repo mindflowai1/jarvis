@@ -26,7 +26,7 @@ export default function Tasks({ session }) {
     const fetchData = async () => {
         try {
             setLoading(true)
-            
+
             // 1. Fetch Projects
             const { data: projectsData, error: projectsError } = await supabase
                 .from('task_projects')
@@ -201,12 +201,12 @@ export default function Tasks({ session }) {
     // Filter notes locally
     const getFilteredNotes = () => {
         let result = notes;
-        
+
         // Aplica filtro global se existir
         if (filterDate) {
             result = result.filter(n => n.prazo === filterDate);
         }
-        
+
         return result;
     }
 
@@ -266,7 +266,7 @@ export default function Tasks({ session }) {
                             </svg>
                             Novo Projeto
                         </button>
-                        
+
                         <button className="add-btn" onClick={() => {
                             setEditingTask(null)
                             setIsModalOpen(true)
@@ -291,14 +291,14 @@ export default function Tasks({ session }) {
                             }}>Criar Primeiro Projeto</button>
                         </div>
                     ) : (
-                            projects.map(project => {
+                        projects.map(project => {
                             const projectSpecificDate = projectFilters[project.id] || ''
-                            
+
                             // Filtra tarefas deste projeto e aplica o filtro de data específico do projeto
                             const projectTasks = filteredNotes.filter(n => {
                                 const isProjectTask = n.project_id === project.id
                                 if (!isProjectTask) return false
-                                
+
                                 if (projectSpecificDate) {
                                     return n.prazo === projectSpecificDate
                                 }
@@ -319,8 +319,8 @@ export default function Tasks({ session }) {
                                         </div>
                                         <div className="project-actions">
                                             <div className={`project-filter-mini ${projectSpecificDate ? 'active' : ''}`}>
-                                                <input 
-                                                    type="date" 
+                                                <input
+                                                    type="date"
                                                     value={projectSpecificDate}
                                                     onChange={(e) => setProjectFilters(prev => ({
                                                         ...prev,
@@ -332,7 +332,7 @@ export default function Tasks({ session }) {
                                                     <path strokeLinecap="round" strokeLinejoin="round" d="M6.75 3v2.25M17.25 3v2.25M3 18.75V7.5a2.25 2.25 0 012.25-2.25h13.5A2.25 2.25 0 0121 7.5v11.25m-18 0A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75m-18 0v-7.5A2.25 2.25 0 015.25 9h13.5A2.25 2.25 0 0121 11.25v7.5" />
                                                 </svg>
                                                 {projectSpecificDate && (
-                                                    <button 
+                                                    <button
                                                         className="clear-project-filter"
                                                         onClick={() => setProjectFilters(prev => ({
                                                             ...prev,
@@ -386,23 +386,23 @@ export default function Tasks({ session }) {
                                             <div className="done-tasks-section">
                                                 <button className="toggle-done-btn" onClick={() => toggleProjectExpanded(project.id)}>
                                                     {isExpanded ? 'Ocultar concluídas' : `Ver concluídas (${doneTasks.length})`}
-                                                    <svg 
-                                                        xmlns="http://www.w3.org/2000/svg" 
-                                                        fill="none" 
-                                                        viewBox="0 0 24 24" 
-                                                        strokeWidth={2} 
-                                                        stroke="currentColor" 
-                                                        width="12" 
+                                                    <svg
+                                                        xmlns="http://www.w3.org/2000/svg"
+                                                        fill="none"
+                                                        viewBox="0 0 24 24"
+                                                        strokeWidth={2}
+                                                        stroke="currentColor"
+                                                        width="12"
                                                         height="12"
                                                         style={{ transform: isExpanded ? 'rotate(180deg)' : 'none', transition: 'transform 0.2s' }}
                                                     >
                                                         <path strokeLinecap="round" strokeLinejoin="round" d="M19.5 8.25l-7.5 7.5-7.5-7.5" />
                                                     </svg>
                                                 </button>
-                                                
+
                                                 <AnimatePresence>
                                                     {isExpanded && (
-                                                        <motion.div 
+                                                        <motion.div
                                                             initial={{ opacity: 0, height: 0 }}
                                                             animate={{ opacity: 1, height: 'auto' }}
                                                             exit={{ opacity: 0, height: 0 }}
@@ -428,7 +428,7 @@ export default function Tasks({ session }) {
                                             </div>
                                         )}
                                     </div>
-                                    
+
                                     <button className="add-task-inline" onClick={() => {
                                         setEditingTask({ project_id: project.id })
                                         setIsModalOpen(true)
@@ -461,6 +461,7 @@ export default function Tasks({ session }) {
                     setProjectFilters={setProjectFilters}
                     setIsProjectModalOpen={setIsProjectModalOpen}
                     setEditingProject={setEditingProject}
+                    handleDeleteProject={handleDeleteProject}
                 />
             </div>
 
@@ -483,21 +484,23 @@ export default function Tasks({ session }) {
 }
 
 function KanbanCard({ note, formatDate, isDone, onEdit, onDelete, onToggleStatus }) {
+    const isOverdue = !isDone && note.prazo && new Date(note.prazo + 'T23:59:59') < new Date();
+
     return (
         <motion.div
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, scale: 0.95 }}
             whileHover={{ scale: 1.01 }}
-            className={`note-card project-task-card ${isDone ? 'completed' : ''}`}
+            className={`note-card project-task-card ${isDone ? 'completed' : ''} ${isOverdue ? 'overdue' : ''}`}
             onClick={(e) => {
-                if (e.target.closest('.card-actions') || e.target.closest('.task-check')) return;
+                if (e.target.closest('.card-actions') || e.target.closest('.task-check') || e.target.closest('.task-check-circle')) return;
                 onEdit();
             }}
         >
             <div className="task-body">
-                <button 
-                    className={`task-check ${isDone ? 'checked' : ''}`} 
+                <button
+                    className={`task-check ${isDone ? 'checked' : ''}`}
                     onClick={(e) => {
                         e.stopPropagation();
                         onToggleStatus();
@@ -517,11 +520,12 @@ function KanbanCard({ note, formatDate, isDone, onEdit, onDelete, onToggleStatus
                                 <path fillRule="evenodd" d="M6.75 2.25A.75.75 0 017.5 3v1.5h9V3A.75.75 0 0118 3v1.5h.75a3 3 0 013 3v11.25a3 3 0 01-3 3H5.25a3 3 0 01-3-3V7.5a3 3 0 013-3H6V3a.75.75 0 01.75-.75zm13.5 9a1.5 1.5 0 00-1.5-1.5H5.25a1.5 1.5 0 00-1.5 1.5v7.5a1.5 1.5 0 001.5 1.5h13.5a1.5 1.5 0 001.5-1.5v-7.5z" clipRule="evenodd" />
                             </svg>
                             {formatDate(note.prazo)}
+                            {isOverdue && <span className="overdue-label">Vencida</span>}
                         </span>
                     )}
                 </div>
             </div>
-            
+
             <div className="card-actions">
                 <button className="icon-btn delete-btn" onClick={(e) => {
                     e.stopPropagation();

@@ -16,6 +16,7 @@ export default function MobileTasksBoard({
     setProjectFilters,
     setIsProjectModalOpen,
     setEditingProject,
+    handleDeleteProject,
 }) {
     const [expandedProjects, setExpandedProjects] = useState({})
 
@@ -84,12 +85,12 @@ export default function MobileTasksBoard({
                 ) : (
                     projects.map(project => {
                         const projectSpecificDate = projectFilters[project.id] || ''
-                        
+
                         // Filtra tarefas deste projeto e aplica o filtro de data específico do projeto
                         const projectTasks = filteredNotes.filter(n => {
                             const isProjectTask = n.project_id === project.id
                             if (!isProjectTask) return false
-                            
+
                             if (projectSpecificDate) {
                                 return n.prazo === projectSpecificDate
                             }
@@ -105,13 +106,30 @@ export default function MobileTasksBoard({
                                 <div className="mtk-project-header">
                                     <div className="mtk-project-info">
                                         <span className="mtk-project-dot" style={{ backgroundColor: project.color }}></span>
-                                        <h3 className="mtk-project-name">{project.name}</h3>
+                                        <h3
+                                            className="mtk-project-name"
+                                            onClick={() => {
+                                                setEditingProject(project)
+                                                setIsProjectModalOpen(true)
+                                            }}
+                                        >
+                                            {project.name}
+                                        </h3>
                                         <span className="mtk-project-count">{todoTasks.length}</span>
+                                        <button
+                                            className="mtk-delete-project-btn"
+                                            onClick={() => handleDeleteProject(project.id, project.name)}
+                                            title="Excluir Projeto"
+                                        >
+                                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" width="14" height="14">
+                                                <path fillRule="evenodd" d="M16.5 4.478v.227a48.816 48.816 0 013.878.512.75.75 0 11-.256 1.478l-.209-.035-1.005 13.07a3 3 0 01-2.991 2.77H8.084a3 3 0 01-2.991-2.77L4.087 6.66l-.209.035a.75.75 0 01-.256-1.478A48.567 48.567 0 017.5 4.705v-.227c0-1.564 1.213-2.9 2.816-2.951a52.662 52.662 0 013.369 0c1.603.051 2.815 1.387 2.815 2.951zm-6.136-1.452a51.196 51.196 0 013.273 0C14.39 3.05 15 3.684 15 4.478v.113a49.488 49.488 0 00-6 0v-.113c0-.794.609-1.428 1.364-1.452zm-.355 5.945a.75.75 0 10-1.5 0v8.25a.75.75 0 101.5 0v-8.25zm4.5 0a.75.75 0 00-1.5 0v8.25a.75.75 0 001.5 0v-8.25z" clipRule="evenodd" />
+                                            </svg>
+                                        </button>
                                     </div>
                                     <div className="mtk-project-header-actions">
                                         <div className={`mtk-project-filter ${projectSpecificDate ? 'active' : ''}`}>
-                                            <input 
-                                                type="date" 
+                                            <input
+                                                type="date"
                                                 value={projectSpecificDate}
                                                 onChange={(e) => setProjectFilters(prev => ({
                                                     ...prev,
@@ -122,7 +140,7 @@ export default function MobileTasksBoard({
                                                 <path strokeLinecap="round" strokeLinejoin="round" d="M6.75 3v2.25M17.25 3v2.25M3 18.75V7.5a2.25 2.25 0 012.25-2.25h13.5A2.25 2.25 0 0121 7.5v11.25m-18 0A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75m-18 0v-7.5A2.25 2.25 0 015.25 9h13.5A2.25 2.25 0 0121 11.25v7.5" />
                                             </svg>
                                             {projectSpecificDate && (
-                                                <button 
+                                                <button
                                                     className="mtk-clear-project-filter"
                                                     onClick={() => setProjectFilters(prev => ({
                                                         ...prev,
@@ -133,7 +151,7 @@ export default function MobileTasksBoard({
                                                 </button>
                                             )}
                                         </div>
-                                        <button 
+                                        <button
                                             className="mtk-add-task-inline"
                                             onClick={() => {
                                                 setEditingTask({ project_id: project.id })
@@ -168,18 +186,18 @@ export default function MobileTasksBoard({
 
                                     {doneTasks.length > 0 && (
                                         <div className="mtk-done-section">
-                                            <button 
+                                            <button
                                                 className="mtk-toggle-done"
                                                 onClick={() => toggleProjectExpanded(project.id)}
                                             >
                                                 {isExpanded ? 'Ocultar concluídas' : `Ver concluídas (${doneTasks.length})`}
-                                                <svg 
-                                                    xmlns="http://www.w3.org/2000/svg" 
-                                                    fill="none" 
-                                                    viewBox="0 0 24 24" 
-                                                    strokeWidth={2} 
-                                                    stroke="currentColor" 
-                                                    width="12" 
+                                                <svg
+                                                    xmlns="http://www.w3.org/2000/svg"
+                                                    fill="none"
+                                                    viewBox="0 0 24 24"
+                                                    strokeWidth={2}
+                                                    stroke="currentColor"
+                                                    width="12"
                                                     height="12"
                                                     style={{ transform: isExpanded ? 'rotate(180deg)' : 'none', transition: 'transform 0.2s' }}
                                                 >
@@ -267,7 +285,7 @@ function MobileTaskCard({
             className={`mtk-card ${isDone ? 'mtk-card-done' : ''} ${getDeadlineClass()}`}
             onClick={handleEdit}
         >
-            <div 
+            <div
                 className={`mtk-checkbox ${isDone ? 'checked' : ''}`}
                 onClick={(e) => {
                     e.stopPropagation()
@@ -291,6 +309,7 @@ function MobileTaskCard({
                             <path fillRule="evenodd" d="M6.75 2.25A.75.75 0 017.5 3v1.5h9V3A.75.75 0 0118 3v1.5h.75a3 3 0 013 3v11.25a3 3 0 01-3 3H5.25a3 3 0 01-3-3V7.5a3 3 0 013-3H6V3a.75.75 0 01.75-.75zm13.5 9a1.5 1.5 0 00-1.5-1.5H5.25a1.5 1.5 0 00-1.5 1.5v7.5a1.5 1.5 0 001.5 1.5h13.5a1.5 1.5 0 001.5-1.5v-7.5z" clipRule="evenodd" />
                         </svg>
                         {formatDate(note.prazo)}
+                        {getDeadlineClass() === 'mtk-overdue' && <span className="mtk-overdue-label">Vencida</span>}
                     </span>
                 )}
             </div>

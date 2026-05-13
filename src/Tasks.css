@@ -378,7 +378,7 @@
     font-weight: bold;
     cursor: pointer;
     z-index: 2;
-    box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
 }
 
 .clear-project-filter:hover {
@@ -463,6 +463,33 @@
 .project-task-card.completed p {
     text-decoration: line-through;
     color: var(--text-muted);
+}
+
+/* Overdue Task Styles */
+.project-task-card.overdue {
+    border-color: rgba(239, 68, 68, 0.4);
+    background: rgba(239, 68, 68, 0.05);
+}
+
+.project-task-card.overdue:hover {
+    border-color: rgba(239, 68, 68, 0.6);
+    background: rgba(239, 68, 68, 0.08);
+}
+
+.project-task-card.overdue .note-date {
+    color: #ef4444;
+    font-weight: 600;
+}
+
+.overdue-label {
+    margin-left: 8px;
+    background: #ef4444;
+    color: white;
+    padding: 1px 6px;
+    border-radius: 4px;
+    font-size: 10px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
 }
 
 .add-task-inline {

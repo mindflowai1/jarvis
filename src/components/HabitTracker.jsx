@@ -16,7 +16,8 @@ const HabitTracker = () => {
         color: '#10b981',
         frequency: 'daily',
         goal: 1,
-        days_of_week: [0, 1, 2, 3, 4, 5, 6]
+        days_of_week: [0, 1, 2, 3, 4, 5, 6],
+        description: ''
     })
 
     const date = new Date();
@@ -29,18 +30,29 @@ const HabitTracker = () => {
         const currentDayIndex = new Date().getDay();
         const habitsScheduledToday = habits.filter(h => (h.days_of_week || [0,1,2,3,4,5,6]).includes(currentDayIndex));
         
-        const totalToday = habitsScheduledToday.length;
-        const completedToday = habitsScheduledToday.filter(h => {
-            const habitLogs = logs.filter(l => l.habit_id === h.id && l.completed_at === today);
-            return habitLogs.length >= h.goal;
-        }).length;
+        let totalGoalItems = 0;
+        let completedGoalItems = 0;
+        let fullyCompletedHabits = 0;
+
+        habitsScheduledToday.forEach(h => {
+            const goal = h.goal || 1;
+            totalGoalItems += goal;
+            
+            const habitLogs = logs.filter(l => l.habit_id === h.id && l.completed_at.startsWith(today));
+            const done = Math.min(habitLogs.length, goal);
+            
+            completedGoalItems += done;
+            if (done >= goal) {
+                fullyCompletedHabits += 1;
+            }
+        });
         
-        const percent = totalToday > 0 ? Math.round((completedToday / totalToday) * 100) : 0;
+        const percent = totalGoalItems > 0 ? Math.round((completedGoalItems / totalGoalItems) * 100) : 0;
         
         return { 
             totalHabits: habits.length, 
-            totalToday, 
-            completedToday, 
+            totalToday: habitsScheduledToday.length, 
+            completedToday: fullyCompletedHabits, 
             percent 
         };
     }, [habits, logs, today])
@@ -55,7 +67,7 @@ const HabitTracker = () => {
         if (success) {
             setIsAdding(false)
             setEditingHabit(null)
-            setNewHabit({ title: '', icon: '✨', color: '#10b981', frequency: 'daily', goal: 1, days_of_week: [0, 1, 2, 3, 4, 5, 6] })
+            setNewHabit({ title: '', icon: '✨', color: '#10b981', frequency: 'daily', goal: 1, days_of_week: [0, 1, 2, 3, 4, 5, 6], description: '' })
         }
     }
 
@@ -140,7 +152,7 @@ const HabitTracker = () => {
                         const habitsResting = habits.filter(h => !(h.days_of_week || [0,1,2,3,4,5,6]).includes(currentDayIndex));
 
                         const renderHabitCard = (habit, index) => {
-                            const habitTodayLogs = logs.filter(l => l.habit_id === habit.id && l.completed_at === today)
+                            const habitTodayLogs = logs.filter(l => l.habit_id === habit.id && l.completed_at.startsWith(today))
                             const doneCount = habitTodayLogs.length
                             const isFullyDone = doneCount >= habit.goal
                             const progress = Math.min(100, (doneCount / habit.goal) * 100)
@@ -322,6 +334,16 @@ const HabitTracker = () => {
                                         onChange={e => editingHabit ? setEditingHabit({...editingHabit, title: e.target.value}) : setNewHabit({...newHabit, title: e.target.value})}
                                     />
                                 </div>
+                                <div className="modal-field">
+                                    <label>Descrição (opcional)</label>
+                                    <textarea 
+                                        className="modal-input modal-textarea"
+                                        placeholder="Ex: Pelo menos 10 minutos focados"
+                                        rows="2"
+                                        value={editingHabit ? (editingHabit.description || '') : newHabit.description}
+                                        onChange={e => editingHabit ? setEditingHabit({...editingHabit, description: e.target.value}) : setNewHabit({...newHabit, description: e.target.value})}
+                                    />
+                                </div>
                                 <div className="modal-row">
                                     <div className="modal-field">
                                         <label>Emoji</label>
@@ -475,6 +497,7 @@ const HabitTracker = () => {
                         logs={logs.filter(l => l.habit_id === selectedHabitHistory.id)}
                         onClose={() => setSelectedHabitHistory(null)}
                         calculateStreak={calculateStreak}
+                        onToggle={async (date) => await toggleHabit(selectedHabitHistory.id, date)}
                         onEdit={() => {
                             setSelectedHabitHistory(null)
                             setEditingHabit(selectedHabitHistory)
@@ -492,8 +515,8 @@ const HabitTracker = () => {
     )
 }
 
-const HabitHistoryModal = ({ habit, logs, onClose, calculateStreak, onEdit, onDelete }) => {
-    const [viewMode, setViewMode] = useState('weekly')
+const HabitHistoryModal = ({ habit, logs, onClose, calculateStreak, onEdit, onDelete, onToggle }) => {
+    const [viewMode, setViewMode] = useState('monthly') // changed default to monthly as it looks better for github style grid
     const today = new Date()
     today.setHours(0, 0, 0, 0)
     
@@ -548,7 +571,7 @@ const HabitHistoryModal = ({ habit, logs, onClose, calculateStreak, onEdit, onDe
         if (date < startDate) return 'pre-creation'
         
         const isScheduled = scheduledDays.includes(date.getDay())
-        const dayLogs = logs.filter(l => l.completed_at === dateStr)
+        const dayLogs = logs.filter(l => l.completed_at.startsWith(dateStr))
         const isDone = dayLogs.length >= habit.goal
         
         if (isDone) return 'completed'
@@ -601,6 +624,23 @@ const HabitHistoryModal = ({ habit, logs, onClose, calculateStreak, onEdit, onDe
         mCurr.setDate(mCurr.getDate() + 1)
     }
 
+    const currentWeekDays = Array.from({ length: 7 }, (_, i) => {
+        const d = new Date(startOfWeek)
+        d.setDate(startOfWeek.getDate() + i)
+        d.setHours(0, 0, 0, 0)
+        return d
+    })
+
+    const handleDayClick = (date, status) => {
+        if (status !== 'future' && onToggle) {
+            const d = new Date(date)
+            const year = d.getFullYear()
+            const month = String(d.getMonth() + 1).padStart(2, '0')
+            const day = String(d.getDate()).padStart(2, '0')
+            onToggle(`${year}-${month}-${day}`)
+        }
+    }
+
     return (
         <div className="habit-modal-overlay" onClick={onClose}>
             <motion.div 
@@ -627,44 +667,41 @@ const HabitHistoryModal = ({ habit, logs, onClose, calculateStreak, onEdit, onDe
                     <button 
                         className={viewMode === 'weekly' ? 'active' : ''} 
                         onClick={() => setViewMode('weekly')}
-                        style={{ '--active-color': habit.color }}
                     >
                         Vista Semanal
                     </button>
                     <button 
                         className={viewMode === 'monthly' ? 'active' : ''} 
                         onClick={() => setViewMode('monthly')}
-                        style={{ '--active-color': habit.color }}
                     >
                         Vista Mensal
                     </button>
                 </div>
 
                 {viewMode === 'weekly' ? (
-                    <div className="history-calendar-grid">
-                        <div className="calendar-day-names" style={{ gridTemplateColumns: `repeat(${filteredDayHeaders.length}, 1fr)` }}>
-                            {filteredDayHeaders.map(h => <span key={h.id}>{h.label}</span>)}
+                    <div className="history-calendar-grid weekly-single">
+                        <div className="calendar-day-names" style={{ gridTemplateColumns: 'repeat(7, 1fr)' }}>
+                            {allDayHeaders.map(h => <span key={h.id}>{h.label}</span>)}
                         </div>
-                        <div className="calendar-grid" style={{ gridTemplateColumns: `repeat(${filteredDayHeaders.length}, 1fr)` }}>
-                            {filteredDays.map((date, i) => {
+                        <div className="calendar-grid" style={{ gridTemplateColumns: 'repeat(7, 1fr)' }}>
+                            {currentWeekDays.map((date, i) => {
                                 const status = getDayStatus(date)
                                 const isToday = date.toISOString().split('T')[0] === today.toISOString().split('T')[0]
                                 
                                 return (
                                     <motion.div 
                                         key={i}
-                                        className={`calendar-day ${status} ${isToday ? 'is-today' : ''}`}
+                                        className={`calendar-day ${status} ${isToday ? 'is-today' : ''} ${status !== 'future' ? 'is-clickable' : ''}`}
                                         style={{ '--habit-color': habit.color }}
                                         initial={{ opacity: 0, scale: 0 }}
                                         animate={{ opacity: 1, scale: 1 }}
-                                        transition={{ delay: i * 0.005 }}
-                                        title={date.toLocaleDateString()}
+                                        transition={{ delay: i * 0.03 }}
+                                        title={`${date.toLocaleDateString()} - Clique para marcar/desmarcar`}
+                                        onClick={() => handleDayClick(date, status)}
+                                        whileHover={status !== 'future' ? { scale: 1.1 } : {}}
+                                        whileTap={status !== 'future' ? { scale: 0.9 } : {}}
                                     >
                                         <span className="day-number">{date.getDate()}</span>
-                                        <div className="day-indicator" style={{ 
-                                            backgroundColor: status === 'completed' ? '#10b981' : 
-                                                             status === 'failed' ? '#ef4444' : 'transparent'
-                                        }} />
                                     </motion.div>
                                 )
                             })}
@@ -684,18 +721,17 @@ const HabitHistoryModal = ({ habit, logs, onClose, calculateStreak, onEdit, onDe
                                 return (
                                     <motion.div 
                                         key={i}
-                                        className={`calendar-day ${status} ${isToday ? 'is-today' : ''} ${!isCurrentMonth ? 'other-month' : ''}`}
+                                        className={`calendar-day ${status} ${isToday ? 'is-today' : ''} ${!isCurrentMonth ? 'other-month' : ''} ${status !== 'future' && isCurrentMonth ? 'is-clickable' : ''}`}
                                         style={{ '--habit-color': habit.color }}
                                         initial={{ opacity: 0, scale: 0 }}
                                         animate={{ opacity: 1, scale: 1 }}
                                         transition={{ delay: i * 0.005 }}
-                                        title={date.toLocaleDateString()}
+                                        title={`${date.toLocaleDateString()} - Clique para marcar/desmarcar`}
+                                        onClick={() => isCurrentMonth && handleDayClick(date, status)}
+                                        whileHover={status !== 'future' && isCurrentMonth ? { scale: 1.1 } : {}}
+                                        whileTap={status !== 'future' && isCurrentMonth ? { scale: 0.9 } : {}}
                                     >
                                         <span className="day-number">{date.getDate()}</span>
-                                        <div className="day-indicator" style={{ 
-                                            backgroundColor: status === 'completed' ? '#10b981' : 
-                                                             status === 'failed' ? '#ef4444' : 'transparent'
-                                        }} />
                                     </motion.div>
                                 )
                             })}

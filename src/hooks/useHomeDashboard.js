@@ -79,6 +79,13 @@ export const useHomeDashboard = (session) => {
             const now = new Date()
             const firstDay = new Date(now.getFullYear(), now.getMonth(), 1).toISOString().split('T')[0]
             const lastDay = new Date(now.getFullYear(), now.getMonth() + 1, 0).toISOString().split('T')[0]
+            const startOfDay = new Date(now.getFullYear(), now.getMonth(), now.getDate(), 0, 0, 0).toISOString()
+            const endOfDay = new Date(now.getFullYear(), now.getMonth(), now.getDate(), 23, 59, 59).toISOString()
+
+            const year = now.getFullYear();
+            const month = String(now.getMonth() + 1).padStart(2, '0');
+            const day = String(now.getDate()).padStart(2, '0');
+            const todayStr = `${year}-${month}-${day}`;
 
             const [summaryRes, txRes, pendingRes, allTasksRes, remindersRes, habitsRes, habitLogsRes, calendarEvents] = await Promise.all([
                 supabase.rpc('get_financial_summary', {
@@ -93,8 +100,8 @@ export const useHomeDashboard = (session) => {
                 supabase.from('notes').select('*').eq('is_completed', false).order('prazo', { ascending: true }).limit(6),
                 supabase.from('notes').select('id, is_completed'),
                 supabase.from('recurring_reminders').select('*').eq('is_active', true).order('due_day', { ascending: true }),
-                supabase.from('habits').select('id').eq('is_active', true),
-                supabase.from('habit_logs').select('habit_id').eq('completed_at', now.toISOString().split('T')[0]),
+                supabase.from('habits').select('id, goal, days_of_week').eq('is_active', true),
+                supabase.from('habit_logs').select('habit_id, completed_at').gte('completed_at', todayStr),
                 fetchCalendarEvents()
             ])
 
@@ -132,13 +139,34 @@ export const useHomeDashboard = (session) => {
             // Calendar
             setUpcomingEvents(calendarEvents)
 
-            // Habit Progress
-            const totalHabits = habitsRes.data?.length || 0
-            const doneHabits = habitLogsRes.data?.length || 0
+            // Habit Progress (Mirroring HabitTracker logic)
+            const activeHabits = habitsRes.data || []
+            const todayLogs = habitLogsRes.data || []
+            const currentDayIndex = now.getDay()
+            
+            const habitsScheduledToday = activeHabits.filter(h => (h.days_of_week || [0,1,2,3,4,5,6]).includes(currentDayIndex))
+            
+            let totalGoalItems = 0;
+            let completedGoalItems = 0;
+            let fullyCompletedHabits = 0;
+
+            habitsScheduledToday.forEach(h => {
+                const goal = h.goal || 1;
+                totalGoalItems += goal;
+                
+                const logsForHabit = todayLogs.filter(l => l.habit_id === h.id && l.completed_at.startsWith(todayStr));
+                const done = Math.min(logsForHabit.length, goal);
+                
+                completedGoalItems += done;
+                if (done >= goal) {
+                    fullyCompletedHabits += 1;
+                }
+            });
+
             setHabitProgress({
-                done: doneHabits,
-                total: totalHabits,
-                percent: totalHabits > 0 ? Math.round((doneHabits / totalHabits) * 100) : 0
+                done: fullyCompletedHabits,
+                total: habitsScheduledToday.length,
+                percent: totalGoalItems > 0 ? Math.round((completedGoalItems / totalGoalItems) * 100) : 0
             })
 
         } catch (error) {

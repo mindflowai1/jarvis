@@ -53,7 +53,7 @@ const TaskModal = ({ isOpen, onClose, onSave, task, projects }) => {
     }
 
     return (
-        <div className="modal-overlay" onClick={onClose} style={{ alignItems: 'flex-end', justifyContent: 'center' }}>
+        <div className="modal-overlay" onClick={onClose}>
             <div className="task-modal-content" onClick={e => e.stopPropagation()}>
                 <div className="tm-header">
                     <h2>{task?.id ? 'Editar Tarefa' : 'Nova Tarefa'}</h2>
