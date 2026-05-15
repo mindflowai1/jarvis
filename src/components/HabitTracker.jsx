@@ -568,7 +568,6 @@ const HabitHistoryModal = ({ habit, logs, onClose, calculateStreak, onEdit, onDe
         const todayStr = today.toISOString().split('T')[0]
         
         if (date > today) return 'future'
-        if (date < startDate) return 'pre-creation'
         
         const isScheduled = scheduledDays.includes(date.getDay())
         const dayLogs = logs.filter(l => l.completed_at.startsWith(dateStr))
@@ -580,10 +579,21 @@ const HabitHistoryModal = ({ habit, logs, onClose, calculateStreak, onEdit, onDe
         return 'failed'
     }
 
+    // Calcular data efetiva de início (mínimo entre criação e primeiro log)
+    const logDates = logs.map(l => new Date(l.completed_at).getTime())
+    const createdDate = new Date(habit.created_at).getTime()
+    const effectiveStartTime = logDates.length > 0 ? Math.min(createdDate, ...logDates) : createdDate
+    const effectiveStartDate = new Date(effectiveStartTime)
+    effectiveStartDate.setHours(0, 0, 0, 0)
+
     const totalCompletions = logs.length
     const streak = calculateStreak(habit.id)
     
-    const activeScheduledDaysCount = filteredDays.filter(d => d >= startDate && d <= today).length
+    const activeScheduledDaysCount = filteredDays.filter(d => {
+        const checkDate = new Date(d)
+        checkDate.setHours(0, 0, 0, 0)
+        return checkDate >= effectiveStartDate && d <= today
+    }).length
     const completedDaysCount = filteredDays.filter(d => getDayStatus(d) === 'completed').length
     const missedDaysCount = filteredDays.filter(d => getDayStatus(d) === 'failed').length
     const successRate = Math.min(100, Math.round((completedDaysCount / Math.max(1, activeScheduledDaysCount)) * 100))
@@ -594,8 +604,9 @@ const HabitHistoryModal = ({ habit, logs, onClose, calculateStreak, onEdit, onDe
     const weeklyTotalDays = Array.from({ length: 7 }, (_, i) => {
         const d = new Date(startOfWeek)
         d.setDate(startOfWeek.getDate() + i)
+        d.setHours(0, 0, 0, 0)
         return d
-    }).filter(d => d >= startDate && scheduledDays.includes(d.getDay())).length
+    }).filter(d => d >= effectiveStartDate && scheduledDays.includes(d.getDay())).length
     
     const weeklyDone = filteredDays.filter(d => d >= startOfWeek && d <= today && getDayStatus(d) === 'completed').length
     const weeklyRate = weeklyTotalDays > 0 ? Math.round((weeklyDone / weeklyTotalDays) * 100) : 0
@@ -604,8 +615,9 @@ const HabitHistoryModal = ({ habit, logs, onClose, calculateStreak, onEdit, onDe
     const endOfMonth = new Date(today.getFullYear(), today.getMonth() + 1, 0)
     const monthlyTotalDays = Array.from({ length: endOfMonth.getDate() }, (_, i) => {
         const d = new Date(today.getFullYear(), today.getMonth(), 1 + i)
+        d.setHours(0, 0, 0, 0)
         return d
-    }).filter(d => d >= startDate && scheduledDays.includes(d.getDay())).length
+    }).filter(d => d >= effectiveStartDate && scheduledDays.includes(d.getDay())).length
     
     const monthlyDone = filteredDays.filter(d => d >= startOfMonth && d <= today && getDayStatus(d) === 'completed').length
     const monthlyRate = monthlyTotalDays > 0 ? Math.round((monthlyDone / monthlyTotalDays) * 100) : 0

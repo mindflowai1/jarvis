@@ -67,7 +67,9 @@ export default function Tasks({ session }) {
                     .update({
                         content: taskData.text,
                         prazo: taskData.prazo,
-                        project_id: taskData.project_id
+                        project_id: taskData.project_id,
+                        recurrence_period: taskData.recurrence_period || null,
+                        recurrence_day: taskData.recurrence_day != null ? taskData.recurrence_day : null
                     })
                     .eq('id', editingTask.id)
 
@@ -81,7 +83,9 @@ export default function Tasks({ session }) {
                         content: taskData.text,
                         is_completed: false,
                         prazo: taskData.prazo,
-                        project_id: taskData.project_id
+                        project_id: taskData.project_id,
+                        recurrence_period: taskData.recurrence_period || null,
+                        recurrence_day: taskData.recurrence_day != null ? taskData.recurrence_day : null
                     })
 
                 if (error) throw error
@@ -161,7 +165,7 @@ export default function Tasks({ session }) {
             if (error) throw error
         } catch (error) {
             console.error('Error updating task:', error)
-            fetchData() // Revert by fetching
+            fetchData()
             alert('Erro ao atualizar tarefa')
         }
     }
@@ -520,6 +524,17 @@ function KanbanCard({ note, formatDate, isDone, onEdit, onDelete, onToggleStatus
                                 <path fillRule="evenodd" d="M6.75 2.25A.75.75 0 017.5 3v1.5h9V3A.75.75 0 0118 3v1.5h.75a3 3 0 013 3v11.25a3 3 0 01-3 3H5.25a3 3 0 01-3-3V7.5a3 3 0 013-3H6V3a.75.75 0 01.75-.75zm13.5 9a1.5 1.5 0 00-1.5-1.5H5.25a1.5 1.5 0 00-1.5 1.5v7.5a1.5 1.5 0 001.5 1.5h13.5a1.5 1.5 0 001.5-1.5v-7.5z" clipRule="evenodd" />
                             </svg>
                             {formatDate(note.prazo)}
+                            {note.recurrence_period && (
+                                <span className="recurrence-badge" title={{
+                                    daily: 'Repete diariamente',
+                                    weekly: 'Repete semanalmente',
+                                    monthly: 'Repete mensalmente'
+                                }[note.recurrence_period] || ''}>
+                                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" width="10" height="10">
+                                        <path fillRule="evenodd" d="M4.755 10.059a7.5 7.5 0 0112.548-3.364l1.903 1.903h-3.183a.75.75 0 100 1.5h4.992a.75.75 0 00.75-.75V4.356a.75.75 0 00-1.5 0v3.18l-1.9-1.9A9 9 0 003.306 9.67a.75.75 0 101.45.388zm15.408 3.352a.75.75 0 00-.919.53 7.5 7.5 0 01-12.548 3.364l-1.902-1.903h3.183a.75.75 0 000-1.5H2.984a.75.75 0 00-.75.75v4.992a.75.75 0 001.5 0v-3.18l1.9 1.9a9 9 0 0015.059-4.035.75.75 0 00-.53-.918z" clipRule="evenodd" />
+                                    </svg>
+                                </span>
+                            )}
                             {isOverdue && <span className="overdue-label">Vencida</span>}
                         </span>
                     )}

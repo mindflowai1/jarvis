@@ -126,15 +126,12 @@ export const useHomeDashboard = (session) => {
             const doneCount = allTasks.filter(t => t.is_completed).length
             setTaskProgress({ done: doneCount, total: allTasks.length })
 
-            // Reminders
+            // Reminders: Only future due dates within the next 7 days
             const today = new Date().getDate()
-            const mapped = (remindersRes.data || []).map(r => {
-                let status = 'safe'
-                if (r.due_day < today) status = 'past'
-                else if (r.due_day - today <= 3) status = 'near'
-                return { ...r, status }
-            })
-            setNearReminders(mapped)
+            const filteredReminders = (remindersRes.data || [])
+                .filter(r => r.due_day >= today && (r.due_day - today) < 7)
+                .map(r => ({ ...r, status: 'near' }))
+            setNearReminders(filteredReminders)
 
             // Calendar
             setUpcomingEvents(calendarEvents)

@@ -250,11 +250,10 @@ const HomeDashboard = ({ session, userName, onNavigate }) => {
                                 ) : (
                                     <div className="hd-al-list">
                                         {nearReminders.slice(0, 3).map(bill => (
-                                            <div key={bill.id} className={`hd-al-item ${bill.status}`}>
+                                            <div key={bill.id} className="hd-al-item">
                                                 <div className="hd-al-day">{bill.due_day}</div>
                                                 <div className="hd-al-info">
                                                     <strong>{cleanSummary(bill.summary)}</strong>
-                                                    <span>{bill.status === 'past' ? 'Atrasado' : 'Próximo'}</span>
                                                 </div>
                                             </div>
                                         ))}

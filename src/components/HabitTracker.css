@@ -1155,9 +1155,9 @@
     background: rgba(255, 255, 255, 0.1);
 }
 
-.calendar-day.pre-creation, 
 .calendar-day.future {
     opacity: 0.2;
+    cursor: not-allowed;
 }
 
 .calendar-day.other-month {
