@@ -12,7 +12,8 @@ import {
     UserPlus,
     ChevronLeft,
     Database,
-    Activity
+    Activity,
+    Key
 } from 'lucide-react'
 // import './AdminDashboard.css' // Imported globally in index.css
 
@@ -126,6 +127,38 @@ const AdminDashboard = ({ session }) => {
             alert('Falha ao enviar convite. Verifique os logs e se a Edge Function está ativa.')
         } finally {
             setProcessing(false)
+        }
+    }
+
+    const handleResetPassword = async (userId, userEmail) => {
+        if (!window.confirm(`Tem certeza que deseja resetar a senha de ${userEmail} para "123456"?`)) {
+            return;
+        }
+
+        try {
+            const { data: { session }, error: sessionError } = await supabase.auth.getSession()
+            if (sessionError || !session) throw new Error("Sessão não encontrada.")
+
+            // Usando fetch direto para ler o corpo de erro exato
+            const response = await fetch(`https://hebdwwedyttlxyabiiva.supabase.co/functions/v1/admin-reset-password`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${session.access_token}`
+                },
+                body: JSON.stringify({ userId: userId })
+            })
+
+            const data = await response.json()
+
+            if (!response.ok) {
+                throw new Error(data.error || 'Erro desconhecido na Edge Function')
+            }
+
+            alert('Senha resetada com sucesso para: 123456');
+        } catch (error) {
+            console.error('Erro ao resetar senha:', error)
+            alert('Falha ao resetar senha: ' + error.message)
         }
     }
 
@@ -244,6 +277,7 @@ const AdminDashboard = ({ session }) => {
                                 <th>WhatsApp</th>
                                 <th>Status</th>
                                 <th>Vencimento</th>
+                                <th>Ações</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -336,6 +370,17 @@ const AdminDashboard = ({ session }) => {
                                                 padding: '4px',
                                             }}
                                         />
+                                    </td>
+                                    <td>
+                                        <button
+                                            onClick={() => handleResetPassword(user.user_id, user.email)}
+                                            className="admin-btn-secondary"
+                                            style={{ padding: '6px 10px', fontSize: '12px', display: 'flex', alignItems: 'center', gap: '6px' }}
+                                            title="Resetar senha para 123456"
+                                        >
+                                            <Key size={14} />
+                                            Resetar Senha
+                                        </button>
                                     </td>
                                 </tr>
                             ))}
