@@ -13,7 +13,8 @@ import {
     ChevronLeft,
     Database,
     Activity,
-    Key
+    Key,
+    Eraser
 } from 'lucide-react'
 // import './AdminDashboard.css' // Imported globally in index.css
 
@@ -159,6 +160,37 @@ const AdminDashboard = ({ session }) => {
         } catch (error) {
             console.error('Erro ao resetar senha:', error)
             alert('Falha ao resetar senha: ' + error.message)
+        }
+    }
+
+    const handleResetData = async (userId, userEmail) => {
+        if (!window.confirm(`ATENÇÃO: Você está prestes a apagar TODOS os registros (finanças, hábitos, tarefas) do usuário ${userEmail}.\n\nEsta ação é irreversível.\n\nDeseja continuar?`)) {
+            return;
+        }
+
+        try {
+            const { data: { session }, error: sessionError } = await supabase.auth.getSession()
+            if (sessionError || !session) throw new Error("Sessão não encontrada.")
+
+            const response = await fetch(`https://hebdwwedyttlxyabiiva.supabase.co/functions/v1/admin-reset-user-data`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${session.access_token}`
+                },
+                body: JSON.stringify({ targetUserId: userId })
+            })
+
+            const data = await response.json()
+
+            if (!response.ok) {
+                throw new Error(data.error || 'Erro desconhecido na Edge Function')
+            }
+
+            alert('Dados do usuário apagados com sucesso!');
+        } catch (error) {
+            console.error('Erro ao resetar dados:', error)
+            alert('Falha ao resetar dados do usuário: ' + error.message)
         }
     }
 
@@ -372,15 +404,26 @@ const AdminDashboard = ({ session }) => {
                                         />
                                     </td>
                                     <td>
-                                        <button
-                                            onClick={() => handleResetPassword(user.user_id, user.email)}
-                                            className="admin-btn-secondary"
-                                            style={{ padding: '6px 10px', fontSize: '12px', display: 'flex', alignItems: 'center', gap: '6px' }}
-                                            title="Resetar senha para 123456"
-                                        >
-                                            <Key size={14} />
-                                            Resetar Senha
-                                        </button>
+                                        <div style={{ display: 'flex', gap: '8px' }}>
+                                            <button
+                                                onClick={() => handleResetPassword(user.user_id, user.email)}
+                                                className="admin-btn-secondary"
+                                                style={{ padding: '6px 10px', fontSize: '12px', display: 'flex', alignItems: 'center', gap: '6px' }}
+                                                title="Resetar senha para 123456"
+                                            >
+                                                <Key size={14} />
+                                                Resetar Senha
+                                            </button>
+                                            <button
+                                                onClick={() => handleResetData(user.user_id, user.email)}
+                                                className="admin-btn-secondary"
+                                                style={{ padding: '6px 10px', fontSize: '12px', display: 'flex', alignItems: 'center', gap: '6px', color: '#fca5a5', borderColor: 'rgba(248, 113, 113, 0.3)' }}
+                                                title="Limpar todos os dados do usuário"
+                                            >
+                                                <Eraser size={14} />
+                                                Limpar Dados
+                                            </button>
+                                        </div>
                                     </td>
                                 </tr>
                             ))}
