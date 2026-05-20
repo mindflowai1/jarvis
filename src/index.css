@@ -2,6 +2,7 @@
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
 @import url('https://fonts.googleapis.com/css2?family=Rajdhani:wght@300;400;500;600;700&family=Orbitron:wght@400;500;600;700;800;900&display=swap');
 @import url('https://fonts.googleapis.com/css2?family=Noto+Sans:wght@400;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Instrument+Serif:ital,wght@0,400;1,400&family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap');
 @import url('https://fonts.googleapis.com/icon?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200');
 @import './UserProfile.css';
 @import './Tasks.css';
@@ -25,9 +26,23 @@
     --color-background-navy: #0a192f;
     --color-surface-dark: #112240;
 
+    /* Jarvis Obsidian Design System Colors */
+    --color-accent-cyan: #0cf2cd;
+    --color-accent-emerald: #25d366;
+    --color-accent-purple: #8b5cf6;
+    --color-bg-space: #030712;
+    --color-bg-obsidian: #090e1a;
+    --color-bg-glass-card: rgba(17, 24, 39, 0.45);
+    --color-border-glass: rgba(255, 255, 255, 0.05);
+    --color-border-glass-hover: rgba(12, 242, 205, 0.25);
+
     --font-display: "Space Grotesk", sans-serif;
     --font-body: "Inter", sans-serif;
     --font-noto: "Noto Sans", sans-serif;
+
+    /* Jarvis Obsidian Design System Fonts */
+    --font-display-premium: "Instrument Serif", serif;
+    --font-body-jakarta: "Plus Jakarta Sans", sans-serif;
 
     --animate-float: float 6s ease-in-out infinite;
     --animate-float-delayed: float 6s ease-in-out infinite 3s;
@@ -79,6 +94,146 @@
             filter: blur(60px);
         }
     }
+
+    /* High-Performance Liquid Glow Animations for Tech Backgrounds - Hyper Charged */
+    --animate-liquid-fast-1: liquid-glow-fast-1 18s ease-in-out infinite;
+    --animate-liquid-fast-2: liquid-glow-fast-2 22s ease-in-out infinite;
+    --animate-liquid-fast-3: liquid-glow-fast-3 26s ease-in-out infinite;
+
+    /* Column-Sliding Structural Animations (Floating Bands - Hyper Travel) */
+    --animate-col-slide-hyper-1: col-slide-hyper-1 22s ease-in-out infinite;
+    --animate-col-slide-hyper-2: col-slide-hyper-2 28s ease-in-out infinite;
+    --animate-col-slide-hyper-3: col-slide-hyper-3 25s ease-in-out infinite;
+
+    /* Dynamic Neon Laser sweeps */
+    --animate-laser-sweep: laser-sweep 8s linear infinite;
+
+    /* Nebula Hue Rotation Color Cycle */
+    --animate-nebula-cycle: nebula-cycle 38s linear infinite;
+
+    /* Live Data Feed Bar Fluctuations */
+    --animate-fluctuate-1: fluctuate-1 3.5s ease-in-out infinite;
+    --animate-fluctuate-2: fluctuate-2 4.5s ease-in-out infinite;
+    --animate-fluctuate-3: fluctuate-3 4s ease-in-out infinite;
+    --animate-fluctuate-4: fluctuate-4 5.5s ease-in-out infinite;
+    --animate-fluctuate-5: fluctuate-5 5s ease-in-out infinite;
+
+    @keyframes nebula-cycle {
+        0%, 100% { filter: hue-rotate(-8deg); }
+        50% { filter: hue-rotate(12deg); }
+    }
+
+    @keyframes laser-sweep {
+        0% {
+            transform: translateX(-120vw) skewX(-20deg);
+            opacity: 0;
+        }
+        20% {
+            opacity: 0.8;
+        }
+        80% {
+            opacity: 0.8;
+        }
+        100% {
+            transform: translateX(120vw) skewX(-20deg);
+            opacity: 0;
+        }
+    }
+
+    @keyframes liquid-glow-fast-1 {
+        0%, 100% {
+            transform: scale(1) translate(0px, 0px);
+        }
+        50% {
+            transform: scale(1.3) translate(75px, -60px);
+        }
+    }
+
+    @keyframes liquid-glow-fast-2 {
+        0%, 100% {
+            transform: scale(1) translate(0px, 0px);
+        }
+        50% {
+            transform: scale(1.35) translate(-85px, 60px);
+        }
+    }
+
+    @keyframes liquid-glow-fast-3 {
+        0%, 100% {
+            transform: scale(1) translate(0px, 0px) rotate(0deg);
+        }
+        50% {
+            transform: scale(1.25) translate(70px, -70px) rotate(180deg);
+        }
+    }
+
+    @keyframes col-slide-hyper-1 {
+        0%, 100% {
+            transform: translateX(0px) skewX(-16deg);
+        }
+        50% {
+            transform: translateX(-130px) skewX(-24deg);
+        }
+    }
+
+    @keyframes col-slide-hyper-2 {
+        0%, 100% {
+            transform: translateX(0px) skewX(-24deg);
+        }
+        50% {
+            transform: translateX(150px) skewX(-16deg);
+        }
+    }
+
+    @keyframes col-slide-hyper-3 {
+        0%, 100% {
+            transform: translateX(0px) skewX(-20deg);
+        }
+        50% {
+            transform: translateX(-110px) skewX(-23deg);
+        }
+    }
+
+    @keyframes fluctuate-1 {
+        0%, 100% { height: 40%; }
+        50% { height: 60%; }
+    }
+
+    @keyframes fluctuate-2 {
+        0%, 100% { height: 65%; }
+        50% { height: 45%; }
+    }
+
+    @keyframes fluctuate-3 {
+        0%, 100% { height: 50%; }
+        50% { height: 80%; }
+    }
+
+    @keyframes fluctuate-4 {
+        0%, 100% { height: 80%; }
+        50% { height: 55%; }
+    }
+
+    @keyframes fluctuate-5 {
+        0%, 100% { height: 95%; }
+        50% { height: 75%; }
+    }
+}
+
+@utility premium-text-shadow {
+    text-shadow: 0 2px 12px rgba(0, 0, 0, 0.75), 
+                 0 8px 30px rgba(0, 0, 0, 0.5),
+                 0 0 50px rgba(0, 0, 0, 0.35);
+}
+
+@utility premium-subtext-shadow {
+    text-shadow: 0 1px 8px rgba(0, 0, 0, 0.8),
+                 0 4px 20px rgba(0, 0, 0, 0.55);
+}
+
+@utility filter-drop-shadow {
+    filter: drop-shadow(0 2px 8px rgba(0, 0, 0, 0.75)) 
+            drop-shadow(0 5px 20px rgba(0, 0, 0, 0.45));
 }
 
 @utility glass-panel {
@@ -917,3 +1072,92 @@
     0%, 100% { opacity: 0.8; }
     50% { opacity: 1; text-shadow: 0 0 15px rgba(59, 130, 246, 0.5); }
 }
+
+/* ==========================================================================
+   Dashboard Custom Tech Cursor styling
+   ========================================================================== */
+
+/* Hides default cursor ONLY on desktop when hovering the dashboard and its children */
+@media (pointer: fine) {
+    .dashboard-container,
+    .dashboard-container * {
+        cursor: none !important;
+    }
+
+    /* Core Styles for Custom Cursor Elements */
+    .custom-cursor-dot {
+        width: 8px;
+        height: 8px;
+        background-color: #00f0ff; /* Electric Cyan */
+        border-radius: 50%;
+        position: fixed;
+        top: 0;
+        left: 0;
+        z-index: 999999;
+        pointer-events: none;
+        margin: -4px 0 0 -4px; /* Centers the dot on translate coordinates */
+        opacity: 0;
+        transition: opacity 0.2s ease, width 0.2s ease, height 0.2s ease, background-color 0.3s ease;
+        box-shadow: 0 0 10px rgba(0, 240, 255, 0.8), 0 0 20px rgba(0, 240, 255, 0.4);
+        will-change: transform;
+    }
+
+    .custom-cursor-ring {
+        width: 36px;
+        height: 36px;
+        border: 1.5px solid rgba(0, 240, 255, 0.45); /* Translúcido Cyan */
+        border-radius: 50%;
+        position: fixed;
+        top: 0;
+        left: 0;
+        z-index: 999998;
+        pointer-events: none;
+        margin: -18px 0 0 -18px; /* Centers the ring on translate coordinates */
+        opacity: 0;
+        box-shadow: 0 0 15px rgba(0, 240, 255, 0.15);
+        transition: 
+            opacity 0.2s ease, 
+            width 0.25s cubic-bezier(0.25, 1, 0.5, 1), 
+            height 0.25s cubic-bezier(0.25, 1, 0.5, 1), 
+            border-color 0.3s ease, 
+            background-color 0.3s ease,
+            margin 0.25s cubic-bezier(0.25, 1, 0.5, 1);
+        will-change: transform;
+    }
+
+    /* Hovering interactive elements: expand and glow in cyan/gold fusion */
+    .custom-cursor-ring.cursor-hovered {
+        width: 48px;
+        height: 48px;
+        margin: -24px 0 0 -24px;
+        border-color: rgba(255, 167, 81, 0.8); /* Elegant Gold #ffa751 */
+        background-color: rgba(0, 240, 255, 0.05); /* Very light cyan hue filling */
+        box-shadow: 
+            0 0 20px rgba(255, 167, 81, 0.4),
+            inset 0 0 10px rgba(0, 240, 255, 0.2);
+    }
+
+    .custom-cursor-dot.dot-hovered {
+        width: 6px;
+        height: 6px;
+        margin: -3px 0 0 -3px;
+        background-color: #ffa751; /* Elegant Gold */
+        box-shadow: 0 0 12px rgba(255, 167, 81, 1);
+    }
+
+    /* Clicking dynamic state: contracts the ring tightly around the dot */
+    .custom-cursor-ring.cursor-clicked {
+        width: 18px;
+        height: 18px;
+        margin: -9px 0 0 -9px;
+        border-color: #00f0ff;
+        background-color: rgba(0, 240, 255, 0.2);
+        box-shadow: 0 0 12px rgba(0, 240, 255, 0.6);
+        transition: 
+            width 0.1s cubic-bezier(0.1, 0.8, 0.3, 1), 
+            height 0.1s cubic-bezier(0.1, 0.8, 0.3, 1), 
+            margin 0.1s cubic-bezier(0.1, 0.8, 0.3, 1),
+            border-color 0.1s ease,
+            background-color 0.1s ease;
+    }
+}

@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import { supabase } from '../supabaseClient'
 import CalendarAgenda from '../components/CalendarAgenda'
 import PhoneNumberModal from '../components/PhoneNumberModal'
@@ -114,6 +114,7 @@ const Dashboard = ({ session }) => {
 
     return (
         <div className="dashboard-container">
+            <CustomCursor />
             {showPhoneModal && (
                 <PhoneNumberModal
                     session={session}
@@ -311,4 +312,133 @@ const Dashboard = ({ session }) => {
     )
 }
 
+// Custom Tech Cursor Component for maximum performance and premium visuals
+const CustomCursor = () => {
+    const dotRef = useRef(null);
+    const ringRef = useRef(null);
+    const rafId = useRef(null);
+
+    useEffect(() => {
+        // Detect mobile/tablet/touch screens
+        const isTouch = window.matchMedia('(pointer: coarse)').matches || 
+                        ('ontouchstart' in window) || 
+                        (navigator.maxTouchPoints > 0);
+        if (isTouch) return;
+
+        const dot = dotRef.current;
+        const ring = ringRef.current;
+        if (!dot || !ring) return;
+
+        let mouseX = 0;
+        let mouseY = 0;
+        let ringX = 0;
+        let ringY = 0;
+        let visible = false;
+
+        const lerp = (start, end, amt) => (1 - amt) * start + amt * end;
+
+        const handleMouseMove = (e) => {
+            mouseX = e.clientX;
+            mouseY = e.clientY;
+
+            if (!visible) {
+                visible = true;
+                dot.style.opacity = '1';
+                ring.style.opacity = '1';
+                ringX = mouseX;
+                ringY = mouseY;
+            }
+
+            // Direct-to-DOM GPU translation for dot (centers via negative CSS margin)
+            dot.style.transform = `translate3d(${mouseX}px, ${mouseY}px, 0)`;
+        };
+
+        const handleMouseDown = () => {
+            ring.classList.add('cursor-clicked');
+        };
+
+        const handleMouseUp = () => {
+            ring.classList.remove('cursor-clicked');
+        };
+
+        const handleMouseOver = (e) => {
+            const target = e.target;
+            if (!target) return;
+            const isClickable = target.closest('a, button, [role="button"], input, select, textarea, [onclick], .clickable') ||
+                                (window.getComputedStyle(target).cursor === 'pointer');
+            if (isClickable) {
+                ring.classList.add('cursor-hovered');
+                dot.classList.add('dot-hovered');
+            }
+        };
+
+        const handleMouseOut = (e) => {
+            const target = e.target;
+            if (!target) return;
+            const isClickable = target.closest('a, button, [role="button"], input, select, textarea, [onclick], .clickable') ||
+                                (window.getComputedStyle(target).cursor === 'pointer');
+            if (isClickable) {
+                ring.classList.remove('cursor-hovered');
+                dot.classList.remove('dot-hovered');
+            }
+        };
+
+        const handleMouseLeaveWindow = () => {
+            dot.style.opacity = '0';
+            ring.style.opacity = '0';
+        };
+
+        const handleMouseEnterWindow = () => {
+            if (visible) {
+                dot.style.opacity = '1';
+                ring.style.opacity = '1';
+            }
+        };
+
+        window.addEventListener('mousemove', handleMouseMove, { passive: true });
+        window.addEventListener('mousedown', handleMouseDown);
+        window.addEventListener('mouseup', handleMouseUp);
+        window.addEventListener('mouseover', handleMouseOver);
+        window.addEventListener('mouseout', handleMouseOut);
+        document.addEventListener('mouseleave', handleMouseLeaveWindow);
+        document.addEventListener('mouseenter', handleMouseEnterWindow);
+
+        // LERP loop for trailing ring
+        let active = true;
+        const updateRing = () => {
+            if (!active) return;
+
+            if (visible) {
+                ringX = lerp(ringX, mouseX, 0.15);
+                ringY = lerp(ringY, mouseY, 0.15);
+                ring.style.transform = `translate3d(${ringX}px, ${ringY}px, 0)`;
+            }
+
+            rafId.current = requestAnimationFrame(updateRing);
+        };
+
+        rafId.current = requestAnimationFrame(updateRing);
+
+        return () => {
+            active = false;
+            if (rafId.current) cancelAnimationFrame(rafId.current);
+            window.removeEventListener('mousemove', handleMouseMove);
+            window.removeEventListener('mousedown', handleMouseDown);
+            window.removeEventListener('mouseup', handleMouseUp);
+            window.removeEventListener('mouseover', handleMouseOver);
+            window.removeEventListener('mouseout', handleMouseOut);
+            document.removeEventListener('mouseleave', handleMouseLeaveWindow);
+            document.removeEventListener('mouseenter', handleMouseEnterWindow);
+        };
+    }, []);
+
+    return (
+        <>
+            <div ref={dotRef} className="custom-cursor-dot" />
+            <div ref={ringRef} className="custom-cursor-ring" />
+        </>
+    );
+};
+
 export default Dashboard
+

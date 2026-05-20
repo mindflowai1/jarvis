@@ -1,1197 +1,1001 @@
-import React, { Suspense, useState, useEffect } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
-import { Link } from 'react-router-dom';
-import ParticleWave3D from './ParticleWave3D';
+import React, { useState, useEffect, useRef } from 'react';
+import { motion, AnimatePresence, useScroll, useSpring } from 'framer-motion';
+import { Sparkles, ArrowRight, Play, CheckCircle2, Shield, MessageSquare, Calendar, TrendingUp, Sparkle, Mic, Volume2, X, DollarSign, Flame, ChevronLeft, ChevronRight } from 'lucide-react';
 
-// ── Componentes Utilitários ──────────────────────────────────────────
+const situations = [
+    {
+        tabLabel: "Acordando na segunda",
+        emoji: "🌅",
+        userMessage: "Jarvis, o que eu tenho programado para hoje e qual é a primeira tarefa da minha semana?",
+        jarvisReply: "Bom dia, chefe! Você tem 3 compromissos hoje. O primeiro é a Reunião de Alinhamento às 10:00. Sua primeira tarefa pendente é 'Revisar proposta do Controle-C'.",
+        category: "Agenda & Tarefas",
+        tags: ["Agenda", "Tarefas"],
+        metricLabel: "Progresso Semanal",
+        metricValue: "12%",
+        metricBarWidth: "w-[12%]",
+        floatingTitle: "Agenda",
+        floatingVal: "Reunião de Alinhamento",
+        floatingIcon: "📅",
+        floatingColor: "text-accent-purple bg-accent-purple/10",
+        videoUrl: "https://pub-91424e7b1d9d42bba2633f0dd91bcea1.r2.dev/hero-segunda.mp4"
+    },
+    {
+        tabLabel: "Na fila do café",
+        emoji: "☕",
+        userMessage: "Jarvis, comprei um cappuccino e um pão na chapa. Deu R$ 18,50 no débito.",
+        jarvisReply: "Anotado, chefe! R$ 18,50 lançados em Alimentação. Seu gasto na categoria esta semana está em R$ 94,20 (dentro da meta de R$ 250).",
+        category: "Finanças Pessoais",
+        tags: ["Finanças", "Alimentação"],
+        metricLabel: "Orçamento Diário",
+        metricValue: "45%",
+        metricBarWidth: "w-[45%]",
+        floatingTitle: "Finanças",
+        floatingVal: "Starbucks: R$ 18,50",
+        floatingIcon: "💰",
+        floatingColor: "text-accent-emerald bg-accent-emerald/10",
+        videoUrl: "https://pub-91424e7b1d9d42bba2633f0dd91bcea1.r2.dev/hero-fila-cafe.mp4"
+    },
+    {
+        tabLabel: "Briefing diário",
+        emoji: "📊",
+        userMessage: "Jarvis, me dá um resumo do meu orçamento e compromissos de hoje de forma rápida.",
+        jarvisReply: "Resumo pronto! Compromissos: 2 reuniões à tarde. Gastos de hoje: R$ 0,00 lançados. Saldo restante do mês dentro do planejado. Você está no caminho certo!",
+        category: "Relatórios & Resumos",
+        tags: ["Briefing", "Sincronizado"],
+        metricLabel: "Previsão Mensal",
+        metricValue: "Meta Batida",
+        metricBarWidth: "w-[100%]",
+        floatingTitle: "Meta",
+        floatingVal: "+ R$ 1.500,00 poupados",
+        floatingIcon: "📈",
+        floatingColor: "text-accent-cyan bg-accent-cyan/10",
+        videoUrl: "https://pub-91424e7b1d9d42bba2633f0dd91bcea1.r2.dev/hero-briefing.mp4"
+    },
+    {
+        tabLabel: "Querendo aprender",
+        emoji: "💡",
+        userMessage: "Jarvis, salve esse link sobre Inteligência Artificial na minha base de conhecimento para ler mais tarde.",
+        jarvisReply: "Link salvo com sucesso na sua Base de Conhecimento! Marquei como 'Tecnologia' e 'Leitura'. Deseja que eu agende um lembrete para domingo às 19:00?",
+        category: "Base de Conhecimento",
+        tags: ["Conhecimento", "Leitura"],
+        metricLabel: "Artigos Salvos",
+        metricValue: "8 links",
+        metricBarWidth: "w-[65%]",
+        floatingTitle: "Base de Conhecimento",
+        floatingVal: "Salvo com sucesso",
+        floatingIcon: "💡",
+        floatingColor: "text-amber-400 bg-amber-400/10",
+        videoUrl: "https://pub-91424e7b1d9d42bba2633f0dd91bcea1.r2.dev/hero-reuniao.mp4"
+    },
+    {
+        tabLabel: "Sexta à noite",
+        emoji: "🎉",
+        userMessage: "Jarvis, acabei de treinar agora na academia. Marca como concluído meu hábito de exercícios.",
+        jarvisReply: "Excelente trabalho, chefe! Hábito de 'Exercícios Físicos' marcado. Você completou 5 dias seguidos! Streak de fogo ativado: 🔥 5 dias!",
+        category: "Gestão de Hábitos",
+        tags: ["Habits", "🔥 Streak!"],
+        metricLabel: "Hábito Semanal",
+        metricValue: "🔥 5 dias seguidos",
+        metricBarWidth: "w-[83%]",
+        floatingTitle: "Saúde",
+        floatingVal: "Exercícios Feitos",
+        floatingIcon: "🏋️",
+        floatingColor: "text-rose-500 bg-rose-500/10",
+        videoUrl: "https://pub-91424e7b1d9d42bba2633f0dd91bcea1.r2.dev/hero-sexta.mp4"
+    },
+    {
+        tabLabel: "Final do mês",
+        emoji: "📈",
+        userMessage: "Jarvis, como fecharam minhas contas este mês? Consegui poupar o planejado?",
+        jarvisReply: "Parabéns, chefe! Você poupou R$ 1.500,00 este mês, superando a meta em 15%. Seus maiores gastos foram Alimentação e Lazer. Relatório detalhado disponível no painel!",
+        category: "Finanças Avançadas",
+        tags: ["Balanço", "Relatório"],
+        metricLabel: "Saldo Economizado",
+        metricValue: "115% da meta",
+        metricBarWidth: "w-[100%]",
+        floatingTitle: "Economia",
+        floatingVal: "+ R$ 1.500,00",
+        floatingIcon: "💰",
+        floatingColor: "text-accent-emerald bg-accent-emerald/10",
+        videoUrl: "https://pub-91424e7b1d9d42bba2633f0dd91bcea1.r2.dev/hero-final-mes.mp4"
+    }
+];
 
-const Typewriter = ({ words, typingSpeed = 70, deletingSpeed = 40, pauseDelay = 2500 }) => {
-    const [index, setIndex] = useState(0);
-    const [subIndex, setSubIndex] = useState(0);
-    const [reverse, setReverse] = useState(false);
-    const [cursorVisible, setCursorVisible] = useState(true);
 
-    // Realistic blinking cursor
+const LandingPage = () => {
+    const containerRef = useRef(null);
+    const timelineRef = useRef(null);
+    const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+    const [activeTab, setActiveTab] = useState(0);
+    const [showDemoModal, setShowDemoModal] = useState(false);
+    const [simStep, setSimStep] = useState(0); // 0: audio processing, 1: processed/revealed
+
+    // States and refs for interactive micro-interfaces in timeline cards
+    const [activeFinanceCategory, setActiveFinanceCategory] = useState(null);
+    const [tasks, setTasks] = useState([
+        { id: 1, text: "Revisar proposta comercial", completed: true },
+        { id: 2, text: "Lançar custos de alimentação", completed: false },
+        { id: 3, text: "Treinar 40min de cardio", completed: false }
+    ]);
+    const toggleTask = (id) => {
+        setTasks(prev => prev.map(t => t.id === id ? { ...t, completed: !t.completed } : t));
+    };
+
+    const [habitDays, setHabitDays] = useState([
+        { day: "Seg", done: true },
+        { day: "Ter", done: true },
+        { day: "Qua", done: true },
+        { day: "Qui", done: true },
+        { day: "Sex", done: true },
+        { day: "Sáb", done: true },
+        { day: "Dom", done: false }
+    ]);
+    const toggleHabitDay = (index) => {
+        setHabitDays(prev => prev.map((d, idx) => idx === index ? { ...d, done: !d.done } : d));
+    };
+
+    const budgetData = [
+        { category: "Alimentação", current: 185, max: 250, color: "bg-[#ffa751]" },
+        { category: "Transporte", current: 90, max: 150, color: "bg-[#ffe259]" },
+        { category: "Lazer", current: 310, max: 300, color: "bg-rose-500" }
+    ];
+
+    const { scrollYProgress } = useScroll({
+        target: timelineRef,
+        offset: ["start 60%", "end 85%"]
+    });
+    const scaleY = useSpring(scrollYProgress, { stiffness: 100, damping: 30, restDelta: 0.001 });
+
     useEffect(() => {
-        const interval = setInterval(() => setCursorVisible((v) => !v), 530);
-        return () => clearInterval(interval);
+        let isCancelled = false;
+        setSimStep(0);
+
+        // Sync with video audio processing (approx 1.8 seconds)
+        const timer = setTimeout(() => {
+            if (isCancelled) return;
+            setSimStep(1);
+        }, 1800);
+
+        return () => {
+            isCancelled = true;
+            clearTimeout(timer);
+        };
+    }, [activeTab]);
+
+    // Auto-cycle situations showcase every 8 seconds to automatically present all features
+    useEffect(() => {
+        const cycleTimer = setInterval(() => {
+            setActiveTab((prev) => (prev + 1) % situations.length);
+        }, 8000);
+        return () => clearInterval(cycleTimer);
     }, []);
 
-    // Force cursor visible while actively typing or deleting
+    // High-performance cursor tracking for dynamic background glow spotlight
     useEffect(() => {
-        setCursorVisible(true);
-    }, [subIndex]);
+        const container = containerRef.current;
+        if (!container) return;
 
-    useEffect(() => {
-        if (index >= words.length) {
-            setIndex(0);
-            return;
+        const handleMouseMove = (e) => {
+            const rect = container.getBoundingClientRect();
+            const x = e.clientX - rect.left;
+            const y = e.clientY - rect.top;
+            container.style.setProperty('--mouse-x', `${x}px`);
+            container.style.setProperty('--mouse-y', `${y}px`);
+        };
+
+        container.addEventListener('mousemove', handleMouseMove);
+        return () => {
+            container.removeEventListener('mousemove', handleMouseMove);
+        };
+    }, []);
+
+    // Animações do Framer Motion - Tactile Spring
+    const containerVariants = {
+        hidden: { opacity: 0 },
+        visible: {
+            opacity: 1,
+            transition: {
+                staggerChildren: 0.12,
+                delayChildren: 0.05
+            }
         }
+    };
 
-        const currentWord = words[index];
-
-        if (subIndex === currentWord.length && !reverse) {
-            // Once the word is fully typed, wait before reversing
-            const timeout = setTimeout(() => setReverse(true), pauseDelay);
-            return () => clearTimeout(timeout);
+    const itemVariants = {
+        hidden: { opacity: 0, y: 30 },
+        visible: {
+            opacity: 1,
+            y: 0,
+            transition: { type: "spring", stiffness: 90, damping: 20 }
         }
-
-        if (subIndex === 0 && reverse) {
-            // Once fully deleted, wait a tiny bit and move to next word
-            setReverse(false);
-            setIndex((prev) => (prev + 1) % words.length);
-            return;
-        }
-
-        // Realistic typing dynamics:
-        // - Occasional micro-pauses for human effect (10% chance to pause)
-        // - Randomized delays for each keystroke
-        const isPause = !reverse && Math.random() < 0.1;
-        const baseDelay = reverse ? deletingSpeed : typingSpeed;
-        const randomVariation = (Math.random() * baseDelay) - (baseDelay / 2);
-        let finalDelay = Math.max(20, baseDelay + randomVariation);
-
-        if (isPause) finalDelay += 150; // Add human hesitation
-
-        const timeout = setTimeout(() => {
-            setSubIndex((prev) => prev + (reverse ? -1 : 1));
-        }, finalDelay);
-
-        return () => clearTimeout(timeout);
-    }, [subIndex, index, reverse, words, typingSpeed, deletingSpeed, pauseDelay]);
-
-    return (
-        <span className="inline-flex items-center min-h-[1.2em] relative">
-            <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#0cf2cd] to-[#25D366]">
-                {words[index].substring(0, subIndex)}
-            </span>
-            <span
-                className={`inline-block text-[#0cf2cd] font-light ml-[2px] -translate-y-[2px] transition-opacity duration-75 ${cursorVisible ? 'opacity-100' : 'opacity-0'
-                    }`}
-            >
-                |
-            </span>
-        </span>
-    );
-};
-
-/* ═══════════════════════════════════════════════════════════════════
-   CONTROLE-C — Landing Page de Conversão (SaaS)
-   100 % Tailwind CSS v4 · React · Three.js
-   ═══════════════════════════════════════════════════════════════════ */
-
-// ── Dados ────────────────────────────────────────────────────────────
-
-const FEATURES_BENTO = [
-    {
-        title: 'Controle Financeiro Inteligente',
-        desc: 'Registre gastos por voz ou texto. O Controle-C categoriza automaticamente e mostra gráficos claros de para onde seu dinheiro vai.',
-        icon: '💰',
-        span: 'md:col-span-2',
-        visual: 'chart',
-    },
-    {
-        title: 'Google Agenda Integrada',
-        desc: 'Seus compromissos sincronizados em tempo real. Diga "agende reunião amanhã às 15h" e pronto.',
-        icon: '📅',
-        span: '',
-        visual: 'calendar',
-    },
-    {
-        title: 'Kanban de Tarefas',
-        desc: 'Organize sua vida em cards com status: A Fazer, Em Andamento e Concluído. Tudo por voz.',
-        icon: '📋',
-        span: '',
-        visual: 'kanban',
-    },
-    {
-        title: 'Áudio Inteligente',
-        desc: 'Fale naturalmente. A IA transcreve, entende a intenção e executa a ação certa automaticamente.',
-        icon: '🎙️',
-        span: '',
-        visual: 'audio',
-    },
-    {
-        title: 'Tudo no WhatsApp',
-        desc: 'Sem apps novos. Sem cadastros complicados. Envie uma mensagem e o Controle-C resolve. Texto, imagem de recibos ou áudio.',
-        icon: '💬',
-        span: 'md:row-span-2',
-        visual: 'whatsapp',
-    },
-    {
-        title: 'Lembretes de Contas Recorrentes',
-        desc: 'Nunca mais esqueça um vencimento. O Controle-C avisa sobre aluguel, internet, streaming e todas as suas contas fixas antes do prazo.',
-        icon: '🔔',
-        span: 'md:col-span-2',
-        visual: 'reminders',
-    },
-];
-
-const STEPS = [
-    { num: '01', icon: '🎙️', title: 'Envie um áudio', desc: 'Fale naturalmente: "Gastei 50 reais no almoço hoje"' },
-    { num: '02', icon: '🤖', title: 'A IA processa', desc: 'O Controle-C entende, categoriza e registra automaticamente' },
-    { num: '03', icon: '✅', title: 'Pronto!', desc: 'Gasto registrado, lembrete agendado e notificação enviada via WhatsApp' },
-];
-
-const PRICING = [
-    {
-        name: 'Mensal',
-        price: '80',
-        period: '/mês',
-        popular: false,
-        features: [
-            'Registro ilimitado de gastos',
-            'Categorização automática por IA',
-            'Integração Google Agenda',
-            'Kanban de tarefas',
-            'Lembretes via WhatsApp',
-            'Suporte por WhatsApp',
-        ],
-    },
-    {
-        name: 'Anual',
-        price: '800',
-        period: '/ano',
-        popular: true,
-        badge: 'Economize 17%',
-        features: [
-            'Tudo do plano Mensal',
-            'Relatórios financeiros avançados',
-            'Prioridade no suporte',
-            'Exportação de dados (CSV/PDF)',
-            'Múltiplas contas financeiras',
-            'Acesso antecipado a novos recursos',
-        ],
-    },
-];
-
-const TESTIMONIALS = [
-    {
-        name: 'Marina Silva',
-        role: 'Empreendedora',
-        text: 'Eu nunca consegui me organizar financeiramente até conhecer o Controle-C. Agora é só mandar um áudio e tudo fica registrado!',
-        rating: 5,
-    },
-    {
-        name: 'Carlos Eduardo',
-        role: 'Desenvolvedor',
-        text: 'A integração com o Google Calendar é sensacional. Minha agenda nunca esteve tão organizada e eu nem preciso abrir um app.',
-        rating: 5,
-    },
-    {
-        name: 'Ana Beatriz',
-        role: 'Designer Freelancer',
-        text: 'O kanban por WhatsApp mudou minha vida. Organizo meus projetos, prazos e finanças em um lugar só. Recomendo demais!',
-        rating: 5,
-    },
-];
-
-const FAQS = [
-    { q: 'O Controle-C funciona em qual WhatsApp?', a: 'Funciona no WhatsApp comum e no WhatsApp Business, tanto no celular quanto no WhatsApp Web. Basta adicionar nosso número e começar a conversar.' },
-    { q: 'Meus dados financeiros estão seguros?', a: 'Sim! Utilizamos criptografia de ponta a ponta e nossos servidores seguem todas as normas da LGPD. Seus dados nunca são compartilhados com terceiros.' },
-    { q: 'Posso cancelar a qualquer momento?', a: 'Claro! Não existe fidelidade. Você pode cancelar sua assinatura a qualquer momento direto pelo WhatsApp, sem burocracia.' },
-    { q: 'Como funciona o reconhecimento de áudio?', a: 'Nossa IA utiliza modelos avançados de processamento de linguagem natural. Basta falar normalmente e ela entende a intenção, valor, categoria e data automaticamente.' },
-    { q: 'O Google Calendar sincroniza automaticamente?', a: 'Sim! Após conectar sua conta Google (processo de 1 clique), todos os compromissos criados pelo Controle-C aparecem instantaneamente na sua agenda.' },
-];
-
-// ── Componentes Internos ─────────────────────────────────────────────
-
-const StarRating = ({ count }) => (
-    <div className="flex gap-1">
-        {Array.from({ length: count }).map((_, i) => (
-            <span key={i} className="text-[#0cf2cd] text-sm">★</span>
-        ))}
-    </div>
-);
-
-const FAQItem = ({ q, a }) => (
-    <details className="group border-b border-white/5 last:border-0">
-        <summary className="flex items-center justify-between cursor-pointer py-5 text-white font-medium text-base sm:text-lg list-none select-none transition-colors group-open:text-[#0cf2cd]">
-            {q}
-            <span className="text-slate-500 transition-transform duration-300 group-open:rotate-45 text-2xl ml-4 shrink-0">+</span>
-        </summary>
-        <p className="text-slate-400 text-sm sm:text-base pb-5 pr-8 leading-relaxed">{a}</p>
-    </details>
-);
-
-const MiniChart = () => (
-    <div className="flex items-end gap-1.5 h-16 mt-4">
-        {[35, 55, 40, 70, 50, 80, 92].map((h, i) => (
-            <div
-                key={i}
-                className="flex-1 rounded-t-sm transition-all duration-500"
-                style={{
-                    height: `${h}%`,
-                    background: i === 6
-                        ? 'linear-gradient(to top, #0cf2cd, #25D366)'
-                        : 'rgba(12,242,205,0.15)',
-                }}
-            />
-        ))}
-    </div>
-);
-
-const MiniKanban = () => (
-    <div className="grid grid-cols-3 gap-2 mt-4">
-        {['A Fazer', 'Fazendo', 'Feito'].map((col, i) => (
-            <div key={i} className="flex flex-col gap-1.5">
-                <span className="text-[10px] uppercase tracking-wider text-slate-500 font-semibold">{col}</span>
-                {[1, 2].map((_, j) => (
-                    <div key={j} className={`h-5 rounded-md ${i === 2 ? 'bg-[#0cf2cd]/20 border border-[#0cf2cd]/30' : 'bg-white/5 border border-white/10'}`} />
-                ))}
-            </div>
-        ))}
-    </div>
-);
-
-const AudioWave = () => (
-    <div className="flex items-center gap-[3px] h-10 mt-4">
-        {[8, 16, 24, 14, 10, 20, 12, 18, 8, 14, 22, 10, 16].map((h, i) => (
-            <div
-                key={i}
-                className="w-[3px] rounded-full bg-[#0cf2cd] animate-pulse"
-                style={{ height: `${h}px`, animationDelay: `${i * 0.1}s`, animationDuration: '1.2s' }}
-            />
-        ))}
-    </div>
-);
-
-const WhatsAppMock = () => (
-    <div className="mt-4 space-y-2.5">
-        {/* User msg */}
-        <div className="self-end ml-auto max-w-[85%] bg-[#005c4b] rounded-lg rounded-tr-none p-2.5 text-white text-xs">
-            <div className="flex items-center gap-2 text-[10px] text-slate-300 mb-1">
-                <span>🎙️</span> <span>0:08</span>
-            </div>
-            <div className="flex items-end justify-end gap-1 text-[10px] text-slate-400">
-                <span>10:42</span>
-                <span className="text-[#53bdeb]">✓✓</span>
-            </div>
-        </div>
-        {/* Bot msg */}
-        <div className="max-w-[85%] bg-[#202c33] rounded-lg rounded-tl-none p-2.5 text-white text-xs">
-            <p>✅ Registrei: <strong className="text-[#0cf2cd]">Almoço — R$ 45,00</strong></p>
-            <p className="text-slate-400 text-[10px] mt-1">Categoria: Alimentação</p>
-        </div>
-    </div>
-);
-
-const BentoCard = ({ feature }) => {
-    const visuals = {
-        chart: <MiniChart />,
-        kanban: <MiniKanban />,
-        audio: <AudioWave />,
-        whatsapp: <WhatsAppMock />,
-        reminders: (
-            <div className="mt-4 space-y-2">
-                {[
-                    { label: 'Netflix', date: 'Vence em 2 dias', amount: 'R$ 55,90', color: 'bg-red-500' },
-                    { label: 'Aluguel', date: 'Vence em 5 dias', amount: 'R$ 1.800,00', color: 'bg-amber-500' },
-                    { label: 'Internet', date: 'Vence em 8 dias', amount: 'R$ 119,90', color: 'bg-blue-500' },
-                ].map((bill, i) => (
-                    <div key={i} className="flex items-center gap-3 bg-white/5 rounded-lg p-2.5 border border-white/10">
-                        <div className={`w-2 h-2 rounded-full ${bill.color}`} />
-                        <div className="flex-1">
-                            <span className="text-slate-300 text-xs">{bill.label}</span>
-                            <span className="text-slate-500 text-[10px] ml-2">{bill.date}</span>
-                        </div>
-                        <span className="text-white text-xs font-semibold">{bill.amount}</span>
-                    </div>
-                ))}
-            </div>
-        ),
-        calendar: (
-            <div className="mt-4 bg-white/5 rounded-lg p-3 border border-white/10">
-                <div className="flex items-center gap-2 text-xs">
-                    <span className="w-2 h-2 rounded-full bg-blue-400"></span>
-                    <span className="text-slate-300">Reunião com cliente — 15:00</span>
-                </div>
-                <div className="flex items-center gap-2 text-xs mt-2">
-                    <span className="w-2 h-2 rounded-full bg-[#0cf2cd]"></span>
-                    <span className="text-slate-300">Dentista — 17:30</span>
-                </div>
-            </div>
-        ),
     };
 
     return (
-        <div className={`group relative overflow-hidden rounded-2xl border border-white/5 bg-gradient-to-br from-slate-900 to-slate-950 p-6 sm:p-8 hover:border-[#0cf2cd]/30 transition-all duration-500 ${feature.span}`}>
-            {/* Glow sutil no hover */}
-            <div className="absolute -top-20 -right-20 w-40 h-40 bg-[#0cf2cd]/0 group-hover:bg-[#0cf2cd]/10 rounded-full blur-3xl transition-all duration-700 pointer-events-none" />
-            <div className="relative z-10">
-                <span className="text-3xl">{feature.icon}</span>
-                <h3 className="text-white font-bold text-lg mt-4 mb-2">{feature.title}</h3>
-                <p className="text-slate-400 text-sm leading-relaxed">{feature.desc}</p>
-                {visuals[feature.visual]}
-            </div>
-        </div>
-    );
-};
-
-// ── Componente Principal ─────────────────────────────────────────────
-
-const LandingPage = () => {
-    const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
-
-    return (
-        <div className="relative bg-gray-950 text-white font-sans scroll-smooth overflow-x-hidden w-full max-w-[100vw]">
-            {/* ═══════════════ NAVBAR ═══════════════ */}
-            <nav className="sticky top-0 z-50 backdrop-blur-xl bg-gray-950/80 border-b border-white/5">
-                <div className="max-w-7xl mx-auto px-6 lg:px-8 flex items-center justify-between h-16 sm:h-20">
-                    {/* Logo */}
-                    <a href="#" className="flex items-center gap-3 group">
-                        <img src="/logo-controle-c.png" alt="Controle-C Logo" className="h-10 sm:h-12 w-auto object-contain drop-shadow-[0_0_15px_rgba(12,242,205,0.2)] group-hover:drop-shadow-[0_0_25px_rgba(12,242,205,0.4)] transition-all" />
-                        <span className="font-bold text-lg tracking-tight text-white">Controle-C</span>
-                    </a>
-
-                    {/* Nav Links (Desktop) */}
-                    <div className="hidden md:flex items-center gap-8 text-sm text-slate-400">
-                        <a href="#recursos" className="hover:text-white transition-colors">Recursos</a>
-                        <a href="#precos" className="hover:text-white transition-colors">Preços</a>
-                        <a href="#faq" className="hover:text-white transition-colors">FAQ</a>
-                    </div>
-
-                    {/* CTA + Login (Desktop) */}
-                    <div className="hidden md:flex items-center gap-4">
-                        <a href="/login" className="text-sm text-slate-400 hover:text-white transition-colors font-medium">
-                            Entrar
-                        </a>
-                        <a href="#precos" className="inline-flex items-center gap-2 bg-[#0cf2cd] hover:bg-[#1efadb] text-gray-950 font-bold text-sm py-2.5 px-6 rounded-xl shadow-[0_0_20px_rgba(12,242,205,0.2)] hover:shadow-[0_0_30px_rgba(12,242,205,0.4)] transition-all duration-300">
-                            Assinar Agora
-                        </a>
-                    </div>
-
-                    {/* Hamburger (Mobile) */}
-                    <button
-                        onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-                        className="md:hidden flex flex-col gap-1.5 p-2"
-                        aria-label="Menu"
-                    >
-                        <span className={`w-6 h-0.5 bg-white transition-all duration-300 ${mobileMenuOpen ? 'rotate-45 translate-y-2' : ''}`} />
-                        <span className={`w-6 h-0.5 bg-white transition-all duration-300 ${mobileMenuOpen ? 'opacity-0' : ''}`} />
-                        <span className={`w-6 h-0.5 bg-white transition-all duration-300 ${mobileMenuOpen ? '-rotate-45 -translate-y-2' : ''}`} />
-                    </button>
+        <div ref={containerRef} className="min-h-screen bg-bg-space text-text-main font-body-jakarta overflow-x-hidden relative">
+            
+            {/* ── INTERACTIVE CURSOR SPOTLIGHT GLOW (Prevalece em toda a página) ── */}
+            <div 
+                className="absolute inset-0 pointer-events-none z-[1] mix-blend-screen"
+                style={{
+                    background: 'radial-gradient(450px circle at var(--mouse-x, -999px) var(--mouse-y, -999px), rgba(6,182,212,0.18) 0%, rgba(29,78,216,0.06) 45%, transparent 80%)',
+                }}
+            />
+            
+            {/* ── HERO WRAPPER (Restringe o background e glows ao Hero) ── */}
+            <div className="relative overflow-hidden w-full">
+                
+                {/* ── HIGH-FIDELITY REF BACKGROUND (Multi-Column Diagonal Split - Vivid Tech - Hyper Animated) ──── */}
+            {/* Base escura profunda e Wrapper do Ciclo Nebular de Cores */}
+            <div className="absolute inset-0 bg-[#010307] pointer-events-none z-0 overflow-hidden animate-nebula-cycle">
+                
+                {/* COLUNA 1: Extremo Esquerdo (Deep Royal Blue & Sapphire) */}
+                <div 
+                    className="absolute top-0 left-[-20%] w-[45vw] h-[120vh] -skew-x-[20deg] origin-top border-r border-white/[0.03] pointer-events-none z-0 overflow-hidden mix-blend-screen"
+                    style={{
+                        background: 'linear-gradient(135deg, rgba(29,78,216,0.06) 0%, #010307 100%)'
+                    }}
+                >
+                    {/* Glow Interno Azul Real & Ciano Premium */}
+                    <div 
+                        className="absolute top-[-10%] left-[-10%] w-[120%] h-[75%] rounded-full blur-[100px] animate-liquid-fast-1"
+                        style={{
+                            background: 'radial-gradient(circle, rgba(37,99,235,0.35) 0%, rgba(6,182,212,0.12) 60%, transparent 100%)'
+                        }}
+                    />
                 </div>
 
-                {/* Mobile Drawer */}
-                <AnimatePresence>
-                    {mobileMenuOpen && (
-                        <motion.div
-                            initial={{ opacity: 0, height: 0 }}
-                            animate={{ opacity: 1, height: 'auto' }}
-                            exit={{ opacity: 0, height: 0 }}
-                            transition={{ duration: 0.3, ease: 'easeInOut' }}
-                            className="md:hidden border-t border-white/5 bg-gray-950/95 backdrop-blur-xl flex flex-col overflow-hidden"
+                {/* COLUNA 2: Centro-Esquerda (Brilho Ciano Elétrico / Cyan Glow) */}
+                <div 
+                    className="absolute top-0 left-[22%] w-[30vw] h-[120vh] origin-top border-r border-white/[0.04] pointer-events-none z-0 shadow-[-20px_0_40px_rgba(0,0,0,0.85)] overflow-hidden mix-blend-screen animate-col-slide-hyper-1"
+                    style={{
+                        background: 'linear-gradient(135deg, rgba(6,182,212,0.08) 0%, #010408 100%)'
+                    }}
+                >
+                    {/* Glow Principal Ciano muito vibrante e vivo */}
+                    <div 
+                        className="absolute top-[10%] left-[-20%] w-[140%] h-[65%] rounded-full blur-[110px] animate-liquid-fast-2"
+                        style={{
+                            background: 'radial-gradient(circle, rgba(6,182,212,0.60) 0%, rgba(59,130,246,0.30) 45%, transparent 100%)'
+                        }}
+                    />
+                </div>
+
+                {/* COLUNA 3: Centro-Direita (Glow Azul Royal Elétrico / Electric Blue) */}
+                <div 
+                    className="absolute top-0 left-[48%] w-[28vw] h-[120vh] origin-top border-r border-white/[0.05] border-l border-white/[0.02] pointer-events-none z-0 shadow-[-25px_0_50px_rgba(0,0,0,0.9)] overflow-hidden mix-blend-screen animate-col-slide-hyper-2"
+                    style={{
+                        background: 'linear-gradient(135deg, rgba(0,102,255,0.08) 0%, #010307 100%)'
+                    }}
+                >
+                    {/* Glow Azul Royal de Alta Intensidade e Vivacidade */}
+                    <div 
+                        className="absolute top-[20%] left-[-15%] w-[130%] h-[60%] rounded-full blur-[90px] animate-liquid-fast-3"
+                        style={{
+                            background: 'radial-gradient(circle, rgba(0,102,255,0.65) 0%, rgba(56,189,248,0.20) 50%, transparent 100%)'
+                        }}
+                    />
+                </div>
+
+                {/* COLUNA 4: Extremo Direito (Glow Deep Cobalt & Sky Blue) */}
+                {/* Esta coluna carrega a nossa linha de corte super iluminada em Cyan e o glow azul principal */}
+                <div 
+                    className="absolute top-0 left-[72%] w-[40vw] h-[120vh] border-l border-accent-cyan/50 origin-top pointer-events-none z-0 shadow-[-25px_0_80px_rgba(0,0,0,0.95),-8px_0_40px_rgba(12,242,205,0.45)] overflow-hidden animate-col-slide-hyper-3"
+                    style={{
+                        background: 'linear-gradient(135deg, rgba(29,78,216,0.08) 0%, #010307 100%)'
+                    }}
+                >
+                    {/* Glow Interno no Separador para destacar a borda diagonal com brilho ciano */}
+                    <div className="absolute inset-0 bg-[linear-gradient(to_bottom,rgba(6,182,212,0.12),transparent_50%)] pointer-events-none" />
+
+                    {/* LADO DIREITO (Dentro da fatia diagonal): Glow Azul/Ciano Tech super vivo */}
+                    <div className="absolute inset-0 skew-x-[20deg] origin-top mix-blend-screen">
+                        <div 
+                            className="absolute top-[-5%] right-[-10%] w-[115%] h-[80%] rounded-full blur-[100px] sm:blur-[130px] opacity-100 animate-liquid-fast-1"
+                            style={{
+                                background: 'radial-gradient(circle, rgba(30,64,175,0.55) 0%, rgba(56,189,248,0.25) 45%, rgba(0,0,0,0) 80%)'
+                            }}
+                        />
+                    </div>
+                </div>
+                {/* Sutil malha de pontos para adicionar textura tech premium sobre toda a tela */}
+                <div className="absolute inset-0 bg-[radial-gradient(rgba(255,255,255,0.02)_1px,transparent_1px)] [background-size:40px_40px] pointer-events-none z-0 mix-blend-overlay" />
+            </div>
+
+
+
+            {/* ── HERO SECTION (Centered & Premium Editorial) ────────────────── */}
+            <header className="relative pt-20 pb-4 sm:pt-24 sm:pb-6 flex flex-col items-center justify-center z-10 w-full">
+                <div className="max-w-5xl mx-auto px-6 w-full flex flex-col items-center text-center">
+                    
+                    {/* Elementos Centrais de Texto */}
+                    <motion.div 
+                        variants={containerVariants}
+                        initial="hidden"
+                        animate="visible"
+                        className="flex flex-col items-center w-full"
+                    >
+                        {/* Elegant Minimal Badge */}
+                        <motion.div 
+                            variants={itemVariants}
+                            className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full border border-border-glass bg-white/[0.02] text-text-muted text-xs sm:text-sm font-medium mb-4 backdrop-blur-md animate-pulse"
                         >
-                            <div className="px-6 pb-6 pt-4 flex flex-col gap-4">
-                                <a href="#recursos" onClick={() => setMobileMenuOpen(false)} className="text-slate-300 hover:text-white py-2 text-base">Recursos</a>
-                                <a href="#precos" onClick={() => setMobileMenuOpen(false)} className="text-slate-300 hover:text-white py-2 text-base">Preços</a>
-                                <a href="#faq" onClick={() => setMobileMenuOpen(false)} className="text-slate-300 hover:text-white py-2 text-base">FAQ</a>
-                                <a href="/login" onClick={() => setMobileMenuOpen(false)} className="text-slate-300 hover:text-white py-2 text-base border-t border-white/5 pt-4">Entrar</a>
-                                <a href="#precos" onClick={() => setMobileMenuOpen(false)} className="mt-2 text-center bg-[#0cf2cd] text-gray-950 font-bold py-3 px-6 rounded-xl">
-                                    Assinar Agora
-                                </a>
+                            <Sparkle className="w-3.5 h-3.5 text-accent-cyan" />
+                            <span>✨ +2.000 pessoas no controle da própria rotina</span>
+                            <span className="w-1.5 h-1.5 rounded-full bg-accent-cyan/40" />
+                        </motion.div>
+
+                        {/* Centered Editorial Headline (Jakarta + Instrument Serif Contrast) */}
+                        <motion.h1 
+                            variants={itemVariants}
+                            className="font-body-jakarta font-extrabold text-4xl sm:text-5xl md:text-6xl text-white tracking-tight leading-[1.15] mb-4 max-w-4xl premium-text-shadow"
+                        >
+                            O único aplicativo que você precisa <br className="hidden sm:block" /> para organizar{' '}
+                            <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#ffe259] to-[#ffa751]">
+                                sua vida.
+                            </span>
+                        </motion.h1>
+
+                        {/* Premium Editorial Subheadline */}
+                        <motion.p 
+                            variants={itemVariants}
+                            className="text-text-muted text-sm sm:text-base lg:text-lg font-normal leading-relaxed max-w-2xl mb-6 premium-subtext-shadow"
+                        >
+                            O assistente de IA que vive no seu WhatsApp. Envie um áudio para registrar gastos, agendar compromissos e organizar tarefas. Sem apps complexos.
+                        </motion.p>
+
+                        {/* Centered CTAs */}
+                        <motion.div 
+                            variants={itemVariants}
+                            className="flex flex-col sm:flex-row items-center justify-center gap-4 w-full sm:w-auto"
+                        >
+                            <a 
+                                href="#precos" 
+                                className="inline-flex items-center justify-center gap-2 bg-white text-bg-space font-semibold text-sm py-3.5 px-8 rounded-full shadow-[0_4px_25px_rgba(255,255,255,0.15)] hover:bg-slate-100 hover:scale-[1.02] active:scale-100 transition-all duration-300 w-full sm:w-auto cursor-pointer"
+                            >
+                                Testar Grátis no WhatsApp
+                                <ArrowRight className="w-4 h-4 text-bg-space" />
+                            </a>
+                            <button 
+                                onClick={() => setShowDemoModal(true)}
+                                className="inline-flex items-center justify-center gap-2 bg-white/5 hover:bg-white/10 text-white font-semibold text-sm py-3.5 px-8 rounded-full border border-border-glass hover:border-white/20 hover:scale-[1.02] active:scale-100 transition-all duration-300 backdrop-blur-md w-full sm:w-auto cursor-pointer"
+                            >
+                                <Play className="w-3.5 h-3.5 fill-white text-white" />
+                                Ver Vídeo Demo
+                            </button>
+                        </motion.div>
+
+                        {/* Trust Assurances below CTAs */}
+                        <motion.div 
+                            variants={itemVariants}
+                            className="mt-4 flex flex-wrap items-center justify-center gap-x-6 gap-y-2 text-xs text-text-muted"
+                        >
+                            <span className="flex items-center gap-1.5">
+                                <CheckCircle2 className="w-3.5 h-3.5 text-accent-cyan" /> 100% Grátis para testar
+                            </span>
+                            <span className="hidden sm:inline opacity-30">•</span>
+                            <span className="flex items-center gap-1.5">
+                                <Sparkles className="w-3.5 h-3.5 text-accent-cyan" /> Configuração em 1 minuto
+                            </span>
+                            <span className="hidden sm:inline opacity-30">•</span>
+                            <span className="flex items-center gap-1.5">
+                                <Shield className="w-3.5 h-3.5 text-accent-cyan" /> Sem necessidade de cartão
+                            </span>
+                        </motion.div>
+
+                    </motion.div>
+
+                    {/* GRAND CENTERPIECE DEVICE (Product-as-the-Demo Showcase) */}
+                    <motion.div 
+                        initial={{ opacity: 0, y: 50, scale: 0.96 }}
+                        animate={{ opacity: 1, y: 0, scale: 1 }}
+                        transition={{ type: "spring", stiffness: 70, damping: 22, delay: 0.45 }}
+                        className="w-full max-w-5xl relative z-10 mt-10 sm:mt-14"
+                    >
+                        
+                        {/* O Console de Dashboard Horizontal (Editorial & Clean) */}
+                        <div className="w-full bg-[#010307]/60 backdrop-blur-3xl border border-white/[0.08] rounded-2xl shadow-[0_25px_60px_rgba(0,0,0,0.8)] overflow-hidden transition-all duration-500 hover:border-white/[0.15]">
+                            
+                            {/* Top Bar da Janela (Browser Mockup Style) */}
+                            <div className="flex items-center justify-between px-5 py-3.5 border-b border-white/[0.06] bg-white/[0.02]">
+                                <div className="flex gap-2">
+                                    <div className="w-3 h-3 rounded-full bg-[#ff5f56]" />
+                                    <div className="w-3 h-3 rounded-full bg-[#ffbd2e]" />
+                                    <div className="w-3 h-3 rounded-full bg-[#27c93f]" />
+                                </div>
+                                <div className="px-5 py-1.5 rounded-full bg-[#010307]/50 border border-white/[0.08] text-xs text-text-muted select-none">
+                                    app.jarvis.io
+                                </div>
+                                <div className="flex items-center gap-2">
+                                    <span className="w-2 h-2 rounded-full bg-[#25D366] animate-pulse" />
+                                    <span className="text-[10px] text-text-muted font-bold tracking-wide uppercase">Jarvis Conectado</span>
+                                </div>
+                            </div>
+
+                            {/* Conteúdo do Console Integrado */}
+                            <div className="w-full aspect-video bg-[#010307]/30 relative overflow-hidden flex items-center justify-center">
+                                {/* Glow interno sutil */}
+                                <div className="absolute inset-0 bg-gradient-to-tr from-accent-cyan/5 to-transparent pointer-events-none" />
+                                
+                                <motion.video
+                                    key={situations[activeTab].videoUrl}
+                                    initial={{ opacity: 0, scale: 0.99 }}
+                                    animate={{ opacity: 1, scale: 1 }}
+                                    exit={{ opacity: 0, scale: 0.99 }}
+                                    transition={{ duration: 0.4, ease: "easeOut" }}
+                                    src={situations[activeTab].videoUrl}
+                                    autoPlay
+                                    muted
+                                    loop
+                                    playsInline
+                                    preload="auto"
+                                    className="w-full h-full object-cover"
+                                />
+                                
+                                {/* Sutil overlay de reflexo de vidro */}
+                                <div className="absolute inset-0 pointer-events-none bg-gradient-to-tr from-white/0 via-white/[0.02] to-white/[0.06]" />
+                            </div>
+                        </div>
+
+                        {/* Elementos Flutuantes Dinâmicos Reativos */}
+                        {/* Calendário/Metadado Dinâmico 1 no lado esquerdo */}
+                        <div 
+                            className="absolute -top-6 -left-8 bg-bg-space/95 border border-white/[0.12] rounded-lg p-3.5 shadow-2xl hidden md:flex items-center gap-3 animate-float pointer-events-none transition-all duration-300"
+                            style={{ animationDuration: "7s" }}
+                        >
+                            <div className={`w-8 h-8 rounded-md flex items-center justify-center text-sm ${situations[activeTab].floatingColor}`}>
+                                {situations[activeTab].floatingIcon}
+                            </div>
+                            <div className="text-left">
+                                <p className="text-[9px] text-text-dimmed">{situations[activeTab].floatingTitle}</p>
+                                <p className="text-[11px] text-white font-bold">{situations[activeTab].floatingVal}</p>
+                            </div>
+                        </div>
+
+                        {/* Metadado Dinâmico 2 no lado direito */}
+                        <div 
+                            className="absolute -bottom-6 -right-6 bg-bg-space/95 border border-white/[0.12] rounded-lg p-3.5 shadow-2xl hidden md:flex items-center gap-3 animate-float-delayed pointer-events-none transition-all duration-300"
+                            style={{ animationDuration: "5.5s" }}
+                        >
+                            <div className="w-8 h-8 rounded-md bg-accent-emerald/10 flex items-center justify-center text-accent-emerald text-sm">✓</div>
+                            <div className="text-left">
+                                <p className="text-[9px] text-text-dimmed">WhatsApp Sync</p>
+                                <p className="text-[11px] text-accent-cyan font-bold">100% Sincronizado</p>
+                            </div>
+                        </div>
+                    </motion.div>
+
+                </div>
+            </header>
+            
+            </div>
+
+            {/* ── TIMELINE SECTION: COMO O CONTROLE-C RESOLVE SUA VIDA ── */}
+            <section ref={timelineRef} id="funcionamento" className="relative py-28 z-10 w-full max-w-5xl mx-auto px-6">
+                
+                {/* Header da Seção */}
+                <div className="text-center mb-20 flex flex-col items-center">
+                    <motion.div 
+                        initial={{ opacity: 0, y: 15, scale: 0.97, filter: "blur(12px)" }}
+                        whileInView={{ opacity: 1, y: 0, scale: 1, filter: "blur(0px)" }}
+                        viewport={{ once: false, margin: "-180px 0px -100px 0px" }}
+                        transition={{ type: "spring", stiffness: 15, damping: 13, mass: 1.4 }}
+                        className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full border border-white/[0.08] bg-white/[0.02] text-xs font-semibold uppercase tracking-wider text-[#ffa751] mb-4 backdrop-blur-md"
+                    >
+                        <Sparkle className="w-3.5 h-3.5 text-[#ffa751]" />
+                        <span>Funcionamento</span>
+                    </motion.div>
+                    
+                    <motion.h2 
+                        initial={{ opacity: 0, y: 15, scale: 0.98, filter: "blur(15px)" }}
+                        whileInView={{ opacity: 1, y: 0, scale: 1, filter: "blur(0px)" }}
+                        viewport={{ once: false, margin: "-180px 0px -100px 0px" }}
+                        transition={{ type: "spring", stiffness: 15, damping: 13, mass: 1.4, delay: 0.15 }}
+                        className="text-3xl sm:text-4xl md:text-5xl font-extrabold text-white tracking-tight leading-tight mb-4 max-w-2xl premium-text-shadow"
+                    >
+                        Como o Controle-C resolve sua vida
+                    </motion.h2>
+                    
+                    <motion.p 
+                        initial={{ opacity: 0, y: 12, scale: 0.99, filter: "blur(10px)" }}
+                        whileInView={{ opacity: 1, y: 0, scale: 1, filter: "blur(0px)" }}
+                        viewport={{ once: false, margin: "-180px 0px -100px 0px" }}
+                        transition={{ type: "spring", stiffness: 15, damping: 13, mass: 1.4, delay: 0.3 }}
+                        className="text-text-muted text-sm sm:text-base max-w-xl leading-relaxed"
+                    >
+                        O assistente de IA recebe e processa suas mensagens de áudio ou texto pelo WhatsApp, organizando sua rotina em segundo plano em menos de 5 segundos.
+                    </motion.p>
+                </div>
+
+                {/* Grid da Linha do Tempo */}
+                <div className="relative w-full">
+                    
+                    {/* Linha Fina de Fundo (Rail) */}
+                    <div className="absolute left-4 md:left-1/2 top-0 bottom-0 w-[2px] bg-white/[0.05] -translate-x-[1px]" />
+                    
+                    {/* Linha Ativa com Crescimento via Scroll */}
+                    <motion.div 
+                        className="absolute left-4 md:left-1/2 top-0 bottom-0 w-[2px] bg-gradient-to-b from-[#ffe259] via-[#ffa751] to-[#00f0ff] origin-top -translate-x-[1px]"
+                        style={{ scaleY }}
+                    />
+
+                    {/* Espaçador superior da linha do tempo */}
+                    <div className="h-6" />
+
+                    {/* Card 1: Finanças */}
+                    <div className="relative flex flex-col md:flex-row items-start md:justify-between mb-24 w-full pl-12 md:pl-0">
+                        {/* Ponto de Junção no Trilho */}
+                        <motion.div 
+                            initial={{ scale: 0.7, borderColor: "rgba(255,255,255,0.1)", boxShadow: "0 0 0px rgba(0,0,0,0)" }}
+                            whileInView={{ scale: 1.1, borderColor: "#ffa751", boxShadow: "0 0 15px rgba(250,167,81,0.4)" }}
+                            viewport={{ once: false, margin: "-180px 0px -100px 0px" }}
+                            transition={{ type: "spring", stiffness: 100, damping: 15 }}
+                            className="absolute left-[3px] md:left-1/2 top-4 md:-translate-x-1/2 w-6 h-6 rounded-full bg-[#010307] border-2 flex items-center justify-center z-20"
+                        >
+                            <motion.span 
+                                initial={{ scale: 0, opacity: 0 }}
+                                whileInView={{ scale: 1, opacity: 1 }}
+                                viewport={{ once: false, margin: "-180px 0px -100px 0px" }}
+                                className="w-2 h-2 rounded-full bg-[#ffa751]" 
+                            />
+                        </motion.div>
+                        
+                        {/* Card Lado Esquerdo */}
+                        <motion.div 
+                            initial={{ opacity: 0, y: 15, scale: 0.98, filter: "blur(15px)" }}
+                            whileInView={{ opacity: 1, y: 0, scale: 1, filter: "blur(0px)" }}
+                            viewport={{ once: false, margin: "-180px 0px -100px 0px" }}
+                            transition={{ type: "spring", stiffness: 15, damping: 13, mass: 1.4 }}
+                            className="w-full md:w-[45%] bg-[#010307]/50 backdrop-blur-xl border border-white/[0.08] hover:border-[#ffa751]/30 hover:shadow-[0_0_30px_rgba(250,167,81,0.06)] rounded-2xl p-6 transition-all duration-500 text-left"
+                        >
+                            <div className="flex items-center gap-3 mb-4">
+                                <div className="w-10 h-10 rounded-xl bg-[#ffa751]/10 border border-[#ffa751]/20 flex items-center justify-center text-[#ffa751]">
+                                    <DollarSign className="w-5 h-5" />
+                                </div>
+                                <h3 className="text-xl font-bold text-white">Suas Finanças no Automático</h3>
+                            </div>
+                            <p className="text-text-muted text-sm leading-relaxed mb-6">
+                                Envie um áudio simples como <span className="text-[#ffa751] font-mono italic bg-[#ffa751]/5 px-1.5 py-0.5 rounded">"gastei R$ 45 com janta"</span> e o Controle-C categoriza instantaneamente, atualiza seu orçamento mensal e sinaliza se você estiver perto do limite.
+                            </p>
+                            
+                            {/* Micro-Interface Interativa de Finanças */}
+                            <div className="bg-[#010307]/60 border border-white/[0.06] rounded-xl p-4 space-y-3">
+                                <div className="flex items-center justify-between text-xs text-text-dimmed">
+                                    <span>Orçamentos do Mês</span>
+                                    <span className="text-[#ffa751] text-[10px] font-bold tracking-wide uppercase animate-pulse">● Live Sync</span>
+                                </div>
+                                {budgetData.map((b, i) => (
+                                    <div 
+                                        key={i}
+                                        onMouseEnter={() => setActiveFinanceCategory(i)}
+                                        onMouseLeave={() => setActiveFinanceCategory(null)}
+                                        className="space-y-1.5 cursor-pointer group"
+                                    >
+                                        <div className="flex justify-between text-xs transition-colors group-hover:text-white">
+                                            <span className="text-text-muted font-medium group-hover:text-white">{b.category}</span>
+                                            <span className="text-text-dimmed group-hover:text-[#ffa751]">
+                                                R$ {b.current} <span className="opacity-40">/ R$ {b.max}</span>
+                                            </span>
+                                        </div>
+                                        <div className="h-1.5 w-full bg-white/[0.04] rounded-full overflow-hidden border border-white/[0.02]">
+                                            <motion.div 
+                                                initial={{ width: 0 }}
+                                                whileInView={{ width: `${(b.current / b.max) * 100}%` }}
+                                                viewport={{ once: true }}
+                                                transition={{ duration: 1, ease: "easeOut" }}
+                                                className={`h-full ${b.color} rounded-full transition-all duration-300 ${activeFinanceCategory === i ? 'brightness-125 shadow-[0_0_10px_rgba(250,167,81,0.5)]' : ''}`}
+                                            />
+                                        </div>
+                                    </div>
+                                ))}
                             </div>
                         </motion.div>
-                    )}
-                </AnimatePresence>
-            </nav>
+                        
+                        {/* Lado Direito Invisível no Desktop (Para balancear a estrutura alternada) */}
+                        <div className="hidden md:block w-[45%]" />
+                    </div>
 
-            {/* ═══════════════ HERO ═══════════════ */}
-            <section className="relative min-h-[90vh] sm:h-[calc(100vh-5rem)] pt-12 pb-6 sm:pt-16 sm:pb-8 flex flex-col w-full overflow-hidden">
-                {/* Background Glows */}
-                <div className="absolute top-[-20%] left-[-10%] w-[600px] h-[600px] bg-[#0cf2cd]/8 rounded-full blur-[120px] pointer-events-none z-0" />
-                <div className="absolute bottom-[-20%] right-[-10%] w-[500px] h-[500px] bg-[#25D366]/5 rounded-full blur-[100px] pointer-events-none z-0" />
-
-                {/* 3D Particle Wave — Full Background (flipped) */}
-                <div className="absolute inset-0 z-0 pointer-events-none opacity-50 sm:opacity-60 lg:opacity-70" style={{ transform: 'scaleY(-1)' }}>
-                    <Suspense fallback={
-                        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-60 h-60 rounded-full bg-[#0cf2cd]/10 blur-3xl animate-pulse" />
-                    }>
-                        <ParticleWave3D />
-                    </Suspense>
-                </div>
-
-                {/* Main Content — 2 columns on desktop */}
-                <div className="relative z-10 w-full max-w-7xl mx-auto px-6 lg:px-8 flex-1 flex flex-col justify-center lg:grid lg:grid-cols-2 lg:items-center lg:gap-12">
-
-                    {/* Left: Text Column */}
-                    <motion.div
-                        className="max-w-2xl w-full relative"
-                        initial={{ opacity: 0, x: -30 }}
-                        animate={{ opacity: 1, x: 0 }}
-                        transition={{ duration: 0.8, ease: "easeOut" }}
-                    >
-                        {/* Subtle dark gradient behind text for legibility */}
-                        <div className="absolute -inset-x-8 -inset-y-6 bg-gradient-to-r from-gray-950/80 via-gray-950/60 to-transparent rounded-3xl pointer-events-none -z-10" />
-
-                        {/* Badge */}
-                        <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full border border-[#0cf2cd]/20 bg-[#0cf2cd]/5 text-[#0cf2cd] text-xs sm:text-sm font-semibold mb-4 sm:mb-6 backdrop-blur-md whitespace-normal sm:whitespace-nowrap">
-                            <span className="w-1.5 h-1.5 rounded-full bg-[#0cf2cd] animate-pulse shrink-0" />
-                            <span>Novo: Integração com Google Calendar 🚀</span>
-                        </div>
-
-                        {/* Headline */}
-                        <h1 className="text-4xl sm:text-5xl lg:text-5xl xl:text-6xl font-extrabold tracking-tight leading-[1.08] text-white mb-4 sm:mb-5 min-h-[4em] sm:min-h-[2.8em] break-words" style={{ textShadow: '0 2px 20px rgba(0,0,0,0.5), 0 4px 40px rgba(0,0,0,0.3)' }}>
-                            A IA que organiza, <br className="hidden sm:block" /> em um áudio{' '}
-                            <div className="mt-2 block">
-                                <Typewriter words={['sua agenda.', 'sua vida financeira.', 'seus afazeres.', 'suas contas.']} />
+                    {/* Card 2: Agenda */}
+                    <div className="relative flex flex-col md:flex-row-reverse items-start md:justify-between mb-24 w-full pl-12 md:pl-0">
+                        {/* Ponto de Junção no Trilho */}
+                        <motion.div 
+                            initial={{ scale: 0.7, borderColor: "rgba(255,255,255,0.1)", boxShadow: "0 0 0px rgba(0,0,0,0)" }}
+                            whileInView={{ scale: 1.1, borderColor: "#00f0ff", boxShadow: "0 0 15px rgba(0,240,255,0.4)" }}
+                            viewport={{ once: false, margin: "-180px 0px -100px 0px" }}
+                            transition={{ type: "spring", stiffness: 100, damping: 15 }}
+                            className="absolute left-[3px] md:left-1/2 top-4 md:-translate-x-1/2 w-6 h-6 rounded-full bg-[#010307] border-2 flex items-center justify-center z-20"
+                        >
+                            <motion.span 
+                                initial={{ scale: 0, opacity: 0 }}
+                                whileInView={{ scale: 1, opacity: 1 }}
+                                viewport={{ once: false, margin: "-180px 0px -100px 0px" }}
+                                className="w-2 h-2 rounded-full bg-[#00f0ff]" 
+                            />
+                        </motion.div>
+                        
+                        {/* Card Lado Direito */}
+                        <motion.div 
+                            initial={{ opacity: 0, y: 15, scale: 0.98, filter: "blur(15px)" }}
+                            whileInView={{ opacity: 1, y: 0, scale: 1, filter: "blur(0px)" }}
+                            viewport={{ once: false, margin: "-180px 0px -100px 0px" }}
+                            transition={{ type: "spring", stiffness: 15, damping: 13, mass: 1.4 }}
+                            className="w-full md:w-[45%] bg-[#010307]/50 backdrop-blur-xl border border-white/[0.08] hover:border-[#00f0ff]/30 hover:shadow-[0_0_30px_rgba(0,240,255,0.06)] rounded-2xl p-6 transition-all duration-500 text-left"
+                        >
+                            <div className="flex items-center gap-3 mb-4">
+                                <div className="w-10 h-10 rounded-xl bg-[#00f0ff]/10 border border-[#00f0ff]/20 flex items-center justify-center text-[#00f0ff]">
+                                    <Calendar className="w-5 h-5" />
+                                </div>
+                                <h3 className="text-xl font-bold text-white">Compromissos sem Esforço</h3>
                             </div>
-                        </h1>
-
-                        {/* Subtitle */}
-                        <p className="text-slate-300 text-base sm:text-lg lg:text-xl leading-relaxed max-w-xl mb-6 sm:mb-8" style={{ textShadow: '0 1px 12px rgba(0,0,0,0.6)' }}>
-                            O assistente de IA que vive no seu WhatsApp. Envie um áudio para registrar gastos, agendar compromissos e organizar tarefas. Sem apps complexos.
-                        </p>
-
-                        {/* CTAs */}
-                        <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-4 w-full sm:w-auto">
-                            <a href="#precos" className="inline-flex items-center justify-center gap-2 bg-[#0cf2cd] hover:bg-[#1efadb] text-gray-950 font-bold text-base py-3.5 px-8 rounded-xl shadow-[0_0_30px_rgba(12,242,205,0.25)] hover:shadow-[0_0_45px_rgba(12,242,205,0.45)] transition-all duration-300 w-full sm:w-auto">
-                                Assinar Agora →
-                            </a>
-                            <a href="#como-funciona" className="inline-flex items-center justify-center gap-2 bg-white/5 hover:bg-white/10 text-white font-semibold text-base py-3.5 px-8 rounded-xl border border-white/10 hover:border-white/20 transition-all duration-300 backdrop-blur-sm w-full sm:w-auto">
-                                Como funciona?
-                            </a>
-                        </div>
-                    </motion.div>
-
-                    {/* Right: Floating Feature Cards (desktop only) */}
-                    <motion.div
-                        className="hidden lg:block relative"
-                        style={{ perspective: '1200px' }}
-                        initial={{ opacity: 0, x: 30 }}
-                        animate={{ opacity: 1, x: 0 }}
-                        transition={{ duration: 0.8, ease: "easeOut", delay: 0.2 }}
-                    >
-                        <div className="relative w-full h-[420px]">
-                            {/* Card 1 — WhatsApp (front, largest) */}
-                            <div
-                                className="absolute top-[0px] right-[10px] w-[320px] bg-white/[0.07] backdrop-blur-xl border border-white/[0.12] rounded-2xl p-5 shadow-2xl transition-all duration-500 hover:bg-white/[0.10] hover:border-[#0cf2cd]/20 hover:shadow-[0_8px_40px_rgba(12,242,205,0.12)] group"
-                                style={{ transform: 'rotateY(-6deg) rotateX(2deg) translateZ(40px)', animation: 'heroFloat1 6s ease-in-out infinite' }}
-                            >
-                                <div className="flex items-center gap-3 mb-3">
-                                    <div className="w-9 h-9 rounded-xl bg-[#25D366]/20 flex items-center justify-center text-lg">💬</div>
-                                    <div>
-                                        <p className="text-white font-semibold text-sm">WhatsApp</p>
-                                        <p className="text-slate-500 text-[11px]">Agora mesmo</p>
+                            <p className="text-text-muted text-sm leading-relaxed mb-6">
+                                Diga <span className="text-[#00f0ff] font-mono italic bg-[#00f0ff]/5 px-1.5 py-0.5 rounded">"lembrar de ligar para o cliente amanhã às 14h"</span> e o Controle-C agenda diretamente na sua agenda digital. Sem formulários chatos ou aplicativos de gerenciamento complexos.
+                            </p>
+                            
+                            {/* Micro-Interface Interativa de Agenda */}
+                            <div className="bg-[#010307]/60 border border-white/[0.06] rounded-xl p-4">
+                                <div className="flex items-center justify-between text-xs text-text-dimmed mb-3">
+                                    <span>Calendário Jarvis</span>
+                                    <span className="text-[#00f0ff] text-[9px] font-bold">Terça-feira, 20 Mai</span>
+                                </div>
+                                <div className="space-y-2.5">
+                                    <div className="flex gap-3 items-center p-2 rounded-lg bg-white/[0.02] border border-white/[0.04]">
+                                        <div className="text-[10px] text-text-dimmed font-bold w-10 text-right leading-none">
+                                            10:00 <br /><span className="text-[8px] font-normal opacity-50">11:00</span>
+                                        </div>
+                                        <div className="w-1 h-8 rounded-full bg-[#ffa751]" />
+                                        <div className="text-xs">
+                                            <p className="font-bold text-white leading-tight">Reunião de Alinhamento</p>
+                                            <p className="text-[10px] text-text-dimmed">Sincronizado</p>
+                                        </div>
                                     </div>
-                                    <div className="ml-auto w-2 h-2 rounded-full bg-[#25D366] animate-pulse" />
-                                </div>
-                                <div className="bg-[#005c4b]/40 rounded-lg rounded-tr-none p-3 mb-2">
-                                    <p className="text-white/90 text-xs leading-relaxed">🎙️ "Gastei 45 reais no almoço hoje e tenho reunião amanhã às 3 da tarde"</p>
-                                </div>
-                                <div className="bg-white/5 rounded-lg rounded-tl-none p-3 ml-4">
-                                    <p className="text-[#0cf2cd]/90 text-xs leading-relaxed">✅ Registrei R$ 45 em Alimentação e agendei reunião para amanhã 15:00.</p>
+                                    <motion.div 
+                                        whileHover={{ scale: 1.01 }}
+                                        className="flex gap-3 items-center p-2 rounded-lg bg-[#00f0ff]/5 border border-[#00f0ff]/15 shadow-[0_0_15px_rgba(0,240,255,0.04)] cursor-pointer group"
+                                    >
+                                        <div className="text-[10px] text-[#00f0ff] font-bold w-10 text-right leading-none">
+                                            14:00 <br /><span className="text-[8px] font-normal opacity-60">14:15</span>
+                                        </div>
+                                        <div className="w-1 h-8 rounded-full bg-[#00f0ff] animate-pulse" />
+                                        <div className="text-xs">
+                                            <p className="font-bold text-white group-hover:text-[#00f0ff] transition-colors leading-tight">Ligar para Cliente</p>
+                                            <p className="text-[10px] text-[#00f0ff] font-semibold flex items-center gap-1">
+                                                <span className="w-1 h-1 rounded-full bg-[#00f0ff] animate-ping" />
+                                                Criado via Áudio no WhatsApp
+                                            </p>
+                                        </div>
+                                    </motion.div>
                                 </div>
                             </div>
+                        </motion.div>
+                        
+                        {/* Lado Esquerdo Invisível no Desktop */}
+                        <div className="hidden md:block w-[45%]" />
+                    </div>
 
-                            {/* Card 2 — Agenda */}
-                            <div
-                                className="absolute top-[135px] right-[50px] w-[280px] bg-white/[0.05] backdrop-blur-lg border border-white/[0.08] rounded-2xl p-4 shadow-xl transition-all duration-500 hover:bg-white/[0.08] hover:border-[#0cf2cd]/15"
-                                style={{ transform: 'rotateY(-4deg) rotateX(1deg) translateZ(20px)', animation: 'heroFloat2 7s ease-in-out infinite' }}
-                            >
-                                <div className="flex items-center gap-3 mb-3">
-                                    <div className="w-8 h-8 rounded-lg bg-blue-500/20 flex items-center justify-center text-base">📅</div>
-                                    <p className="text-white font-semibold text-sm">Agenda</p>
+                    {/* Card 3: Projetos */}
+                    <div className="relative flex flex-col md:flex-row items-start md:justify-between mb-24 w-full pl-12 md:pl-0">
+                        {/* Ponto de Junção no Trilho */}
+                        <motion.div 
+                            initial={{ scale: 0.7, borderColor: "rgba(255,255,255,0.1)", boxShadow: "0 0 0px rgba(0,0,0,0)" }}
+                            whileInView={{ scale: 1.1, borderColor: "#a855f7", boxShadow: "0 0 15px rgba(168,85,247,0.4)" }}
+                            viewport={{ once: false, margin: "-180px 0px -100px 0px" }}
+                            transition={{ type: "spring", stiffness: 100, damping: 15 }}
+                            className="absolute left-[3px] md:left-1/2 top-4 md:-translate-x-1/2 w-6 h-6 rounded-full bg-[#010307] border-2 flex items-center justify-center z-20"
+                        >
+                            <motion.span 
+                                initial={{ scale: 0, opacity: 0 }}
+                                whileInView={{ scale: 1, opacity: 1 }}
+                                viewport={{ once: false, margin: "-180px 0px -100px 0px" }}
+                                className="w-2 h-2 rounded-full bg-[#a855f7]" 
+                            />
+                        </motion.div>
+                        
+                        {/* Card Lado Esquerdo */}
+                        <motion.div 
+                            initial={{ opacity: 0, y: 15, scale: 0.98, filter: "blur(15px)" }}
+                            whileInView={{ opacity: 1, y: 0, scale: 1, filter: "blur(0px)" }}
+                            viewport={{ once: false, margin: "-180px 0px -100px 0px" }}
+                            transition={{ type: "spring", stiffness: 15, damping: 13, mass: 1.4 }}
+                            className="w-full md:w-[45%] bg-[#010307]/50 backdrop-blur-xl border border-white/[0.08] hover:border-[#a855f7]/30 hover:shadow-[0_0_30px_rgba(168,85,247,0.06)] rounded-2xl p-6 transition-all duration-500 text-left"
+                        >
+                            <div className="flex items-center gap-3 mb-4">
+                                <div className="w-10 h-10 rounded-xl bg-[#a855f7]/10 border border-[#a855f7]/20 flex items-center justify-center text-[#a855f7]">
+                                    <Sparkles className="w-5 h-5" />
+                                </div>
+                                <h3 className="text-xl font-bold text-white">Tarefas e Projetos Integrados</h3>
+                            </div>
+                            <p className="text-text-muted text-sm leading-relaxed mb-6">
+                                Registre pendências, anote insights ou salve links do seu dia. O assistente estrutura suas listas, cria tags para priorizar e lembra você ativamente de concluir as tarefas mais urgentes.
+                            </p>
+                            
+                            {/* Micro-Interface Interativa de Tarefas */}
+                            <div className="bg-[#010307]/60 border border-white/[0.06] rounded-xl p-4">
+                                <div className="flex items-center justify-between text-xs text-text-dimmed mb-3">
+                                    <span>Lista de Tarefas Ativas</span>
+                                    <span className="text-[10px] text-[#a855f7]">Clique para marcar</span>
                                 </div>
                                 <div className="space-y-2">
-                                    <div className="flex items-center gap-2 text-xs">
-                                        <span className="w-1 h-6 rounded-full bg-blue-400 shrink-0" />
-                                        <div>
-                                            <p className="text-white/80 font-medium">Reunião com cliente</p>
-                                            <p className="text-slate-500">Amanhã · 15:00</p>
-                                        </div>
-                                    </div>
-                                    <div className="flex items-center gap-2 text-xs">
-                                        <span className="w-1 h-6 rounded-full bg-purple-400 shrink-0" />
-                                        <div>
-                                            <p className="text-white/80 font-medium">Check-up médico</p>
-                                            <p className="text-slate-500">Quinta · 10:00</p>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-
-                            {/* Card 3 — Finanças */}
-                            <div
-                                className="absolute top-[250px] right-[85px] w-[260px] bg-white/[0.04] backdrop-blur-lg border border-white/[0.06] rounded-2xl p-4 shadow-lg transition-all duration-500 hover:bg-white/[0.07] hover:border-[#0cf2cd]/10"
-                                style={{ transform: 'rotateY(-3deg) translateZ(0px)', animation: 'heroFloat3 8s ease-in-out infinite' }}
-                            >
-                                <div className="flex items-center gap-3 mb-3">
-                                    <div className="w-8 h-8 rounded-lg bg-emerald-500/20 flex items-center justify-center text-base">💰</div>
-                                    <p className="text-white font-semibold text-sm">Finanças</p>
-                                    <span className="ml-auto text-[#0cf2cd] text-xs font-bold">-12%</span>
-                                </div>
-                                <div className="flex items-end gap-[3px] h-8">
-                                    {[35, 50, 40, 65, 45, 55, 30, 48, 60, 38, 52, 44].map((h, i) => (
-                                        <div key={i} className="flex-1 rounded-sm bg-[#0cf2cd]/30" style={{ height: `${h}%` }} />
-                                    ))}
-                                </div>
-                                <div className="flex justify-between mt-2 text-[10px] text-slate-500">
-                                    <span>Jan</span><span>Fev</span><span>Mar</span>
-                                </div>
-                            </div>
-
-                            {/* Card 4 — Afazeres (small) */}
-                            <div
-                                className="absolute top-[345px] right-[115px] w-[230px] bg-white/[0.03] backdrop-blur-md border border-white/[0.05] rounded-2xl p-3.5 shadow-md transition-all duration-500 hover:bg-white/[0.06]"
-                                style={{ transform: 'rotateY(-2deg) translateZ(-10px)', animation: 'heroFloat2 9s ease-in-out infinite' }}
-                            >
-                                <div className="flex items-center gap-2.5 mb-2">
-                                    <div className="w-7 h-7 rounded-lg bg-amber-500/20 flex items-center justify-center text-sm">✅</div>
-                                    <p className="text-white font-semibold text-xs">Afazeres</p>
-                                    <span className="ml-auto text-slate-500 text-[10px]">3/5</span>
-                                </div>
-                                <div className="space-y-1.5">
-                                    {['Enviar relatório', 'Comprar presente', 'Ligar para médico'].map((task, i) => (
-                                        <div key={i} className="flex items-center gap-2 text-[11px]">
-                                            <div className={`w-3.5 h-3.5 rounded border shrink-0 flex items-center justify-center ${i === 0 ? 'border-[#0cf2cd]/40 bg-[#0cf2cd]/10 text-[#0cf2cd]' : 'border-white/15'}`}>
-                                                {i === 0 && <span className="text-[8px]">✓</span>}
+                                    {tasks.map((task) => (
+                                        <div 
+                                            key={task.id}
+                                            onClick={() => toggleTask(task.id)}
+                                            className="flex items-center gap-2.5 p-2 rounded bg-white/[0.01] hover:bg-white/[0.03] border border-white/[0.02] cursor-pointer transition-colors group"
+                                        >
+                                            <div className={`w-4 h-4 rounded border flex items-center justify-center transition-all ${task.completed ? 'bg-[#a855f7] border-[#a855f7]' : 'border-white/20 group-hover:border-[#a855f7]'}`}>
+                                                {task.completed && <CheckCircle2 className="w-3 h-3 text-white" />}
                                             </div>
-                                            <span className={i === 0 ? 'text-slate-500 line-through' : 'text-white/70'}>{task}</span>
+                                            <span className={`text-xs transition-all ${task.completed ? 'line-through text-text-dimmed opacity-60' : 'text-white'}`}>
+                                                {task.text}
+                                            </span>
                                         </div>
                                     ))}
                                 </div>
                             </div>
-                        </div>
-                    </motion.div>
-                </div>
-
-                {/* Social proof - Bottom of hero, always visible */}
-                <motion.div
-                    className="relative z-10 w-full max-w-7xl mx-auto px-6 lg:px-8 pt-6 sm:pt-4 pb-2 shrink-0"
-                    initial={{ opacity: 0, y: 20 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ duration: 0.6, delay: 0.4 }}
-                >
-                    <div className="flex flex-wrap items-center gap-3">
-                        <div className="flex -space-x-2 shrink-0">
-                            {['bg-blue-500', 'bg-purple-500', 'bg-pink-500', 'bg-orange-500'].map((bg, i) => (
-                                <div key={i} className={`w-8 h-8 ${bg} rounded-full border-2 border-gray-950 flex items-center justify-center text-[10px] font-bold text-white shadow-lg`}>
-                                    {['M', 'C', 'A', 'R'][i]}
-                                </div>
-                            ))}
-                        </div>
-                        <p className="text-slate-500 text-xs sm:text-sm">
-                            <span className="text-white font-semibold">+10.000</span> pessoas já organizam sua vida
-                        </p>
+                        </motion.div>
+                        
+                        {/* Lado Direito Invisível no Desktop */}
+                        <div className="hidden md:block w-[45%]" />
                     </div>
-                </motion.div>
-            </section>
 
-            {/* ═══════════════ COMO FUNCIONA ═══════════════ */}
-            <section id="como-funciona" className="relative py-24 sm:py-32">
-                <div className="max-w-7xl mx-auto px-6 lg:px-8">
-                    {/* Section Header */}
-                    <motion.div
-                        className="text-center mb-16 sm:mb-20"
-                        initial={{ opacity: 0, y: 30 }}
-                        whileInView={{ opacity: 1, y: 0 }}
-                        viewport={{ once: true, margin: "-100px" }}
-                        transition={{ duration: 0.6 }}
-                    >
-                        <span className="text-[#0cf2cd] text-sm font-semibold tracking-widest uppercase">Como funciona</span>
-                        <h2 className="text-3xl sm:text-4xl lg:text-5xl font-extrabold text-white mt-4 tracking-tight">
-                            Simples como mandar uma mensagem
-                        </h2>
-                        <p className="text-slate-400 text-base sm:text-lg mt-4 max-w-2xl mx-auto">
-                            Três passos para transformar a forma como você organiza sua vida financeira, agenda e tarefas.
-                        </p>
-                    </motion.div>
-
-                    {/* Steps Grid */}
-                    <div className="grid grid-cols-1 md:grid-cols-3 gap-8 relative">
-                        {/* Connector line (desktop only) */}
-                        <div className="hidden md:block absolute top-16 left-[16.6%] right-[16.6%] h-px bg-gradient-to-r from-[#0cf2cd]/0 via-[#0cf2cd]/30 to-[#0cf2cd]/0" />
-
-                        {STEPS.map((step, i) => (
-                            <motion.div
-                                key={i}
-                                className="relative text-center group"
-                                initial={{ opacity: 0, y: 30 }}
-                                whileInView={{ opacity: 1, y: 0 }}
-                                viewport={{ once: true, margin: "-50px" }}
-                                transition={{ duration: 0.5, delay: i * 0.15 }}
-                            >
-                                {/* Number */}
-                                <div className="w-14 h-14 rounded-2xl bg-[#0cf2cd]/10 border border-[#0cf2cd]/20 flex items-center justify-center mx-auto mb-6 group-hover:bg-[#0cf2cd]/20 group-hover:border-[#0cf2cd]/40 transition-all duration-300">
-                                    <span className="text-[#0cf2cd] font-bold text-lg">{step.num}</span>
-                                </div>
-                                <span className="text-4xl mb-4 block">{step.icon}</span>
-                                <h3 className="text-white font-bold text-xl mb-3">{step.title}</h3>
-                                <p className="text-slate-400 text-sm leading-relaxed max-w-xs mx-auto">{step.desc}</p>
-                            </motion.div>
-                        ))}
-                    </div>
-                </div>
-            </section>
-
-            {/* ═══════════════ BENTO GRID — RECURSOS ═══════════════ */}
-            <section id="recursos" className="relative py-24 sm:py-32">
-                {/* Background accent */}
-                <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[800px] bg-[#0cf2cd]/3 rounded-full blur-[150px] pointer-events-none" />
-
-                <div className="relative max-w-7xl mx-auto px-6 lg:px-8">
-                    <motion.div
-                        className="text-center mb-16 sm:mb-20"
-                        initial={{ opacity: 0, y: 30 }}
-                        whileInView={{ opacity: 1, y: 0 }}
-                        viewport={{ once: true, margin: "-100px" }}
-                        transition={{ duration: 0.6 }}
-                    >
-                        <span className="text-[#0cf2cd] text-sm font-semibold tracking-widest uppercase">Recursos</span>
-                        <h2 className="text-3xl sm:text-4xl lg:text-5xl font-extrabold text-white mt-4 tracking-tight">
-                            Tudo que você precisa, {' '}
-                            <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#0cf2cd] to-[#25D366]">
-                                em um só lugar
-                            </span>
-                        </h2>
-                        <p className="text-slate-400 text-base sm:text-lg mt-4 max-w-2xl mx-auto">
-                            Finanças, agenda, tarefas e lembretes. Tudo integrado ao WhatsApp com inteligência artificial.
-                        </p>
-                    </motion.div>
-
-                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                        {FEATURES_BENTO.map((f, i) => (
-                            <motion.div
-                                key={i}
-                                className={f.span || 'col-span-1'}
-                                initial={{ opacity: 0, y: 30 }}
-                                whileInView={{ opacity: 1, y: 0 }}
-                                viewport={{ once: true, margin: "-50px" }}
-                                transition={{ duration: 0.5, delay: i * 0.15 }}
-                            >
-                                <BentoCard feature={f} />
-                            </motion.div>
-                        ))}
-                    </div>
-                </div>
-            </section>
-
-            {/* ═══════════════ WHATSAPP MOCKUP ═══════════════ */}
-            <section className="relative py-24 sm:py-32 overflow-hidden">
-                <div className="max-w-7xl mx-auto px-6 lg:px-8 grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
-                    {/* Phone Mockup */}
-                    <motion.div
-                        className="relative flex justify-center"
-                        initial={{ opacity: 0, x: -40 }}
-                        whileInView={{ opacity: 1, x: 0 }}
-                        viewport={{ once: true, margin: "-100px" }}
-                        transition={{ duration: 0.8 }}
-                    >
-                        {/* Glow behind phone */}
-                        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[300px] h-[300px] bg-[#25D366]/15 rounded-full blur-[80px]" />
-
-                        <div className="relative w-[280px] sm:w-[320px]">
-                            {/* Phone Frame */}
-                            <div className="relative bg-[#121212] rounded-[2.5rem] border-[6px] border-[#2d2d2d] shadow-2xl overflow-hidden">
-                                {/* Notch */}
-                                <div className="h-7 bg-[#121212] flex justify-center relative z-20">
-                                    <div className="w-20 h-5 bg-black rounded-b-xl" />
-                                </div>
-                                {/* WhatsApp Header */}
-                                <div className="bg-[#202c33] px-4 py-3 flex items-center gap-3 border-b border-[#2a3942]">
-                                    <div className="w-8 h-8 rounded-full bg-[#0cf2cd] flex items-center justify-center text-xs font-bold text-gray-950">C</div>
-                                    <div className="flex-1">
-                                        <p className="text-white text-sm font-semibold">Controle-C 🤖</p>
-                                        <p className="text-[#8696a0] text-[10px]">online</p>
-                                    </div>
-                                </div>
-                                {/* Chat */}
-                                <div className="bg-[#0b141a] p-4 min-h-[380px] flex flex-col gap-3 relative">
-                                    <div className="absolute inset-0 bg-[#0b141a]/95 z-0" />
-                                    <div className="relative z-10 flex flex-col gap-3">
-                                        {/* Date */}
-                                        <div className="flex justify-center">
-                                            <span className="bg-[#182229] text-[#8696a0] text-[10px] px-3 py-1 rounded-lg">Hoje</span>
-                                        </div>
-                                        {/* User Audio */}
-                                        <div className="self-end max-w-[80%] bg-[#005c4b] rounded-lg rounded-tr-none p-2">
-                                            <div className="flex items-center gap-2 text-slate-300">
-                                                <span className="text-xs">▶</span>
-                                                <div className="h-1 flex-1 bg-white/30 rounded-full" />
-                                            </div>
-                                            <div className="flex justify-between text-[10px] text-[#aebac1] mt-1">
-                                                <span>0:08</span>
-                                                <div className="flex items-center gap-1">
-                                                    <span>10:42</span>
-                                                    <span className="text-[#53bdeb]">✓✓</span>
-                                                </div>
-                                            </div>
-                                        </div>
-                                        {/* Bot Response */}
-                                        <div className="max-w-[80%] bg-[#202c33] rounded-lg rounded-tl-none p-3">
-                                            <p className="text-white text-sm">Entendido! Registrei o gasto:</p>
-                                            <div className="bg-[#182229] rounded p-2 mt-2 border-l-4 border-[#0cf2cd]">
-                                                <p className="text-white font-bold text-sm">Almoço de Negócios</p>
-                                                <p className="text-[#0cf2cd] font-bold">R$ 120,00</p>
-                                                <p className="text-[#8696a0] text-xs">Categoria: Alimentação 🍽️</p>
-                                            </div>
-                                            <p className="text-white text-sm mt-2">Também adicionei ao seu Google Calendar ✅</p>
-                                            <div className="flex justify-end text-[10px] text-[#8696a0] mt-1">10:42</div>
-                                        </div>
-                                        {/* Bot Chart */}
-                                        <div className="max-w-[80%] bg-[#202c33] rounded-lg rounded-tl-none p-2">
-                                            <div className="bg-[#111b21] rounded p-3">
-                                                <p className="text-[#8696a0] text-[10px] uppercase tracking-wide font-bold mb-2">Gastos da Semana</p>
-                                                <div className="flex items-end h-12 gap-1">
-                                                    {[30, 50, 40, 80, 45, 60, 90].map((h, i) => (
-                                                        <div key={i} className={`flex-1 rounded-t-sm ${i === 6 ? 'bg-[#0cf2cd]' : 'bg-[#2a3942]'}`} style={{ height: `${h}%` }} />
-                                                    ))}
-                                                </div>
-                                            </div>
-                                            <div className="flex justify-end text-[10px] text-[#8696a0] p-1">10:43</div>
-                                        </div>
-                                    </div>
-                                </div>
-                                {/* Input */}
-                                <div className="bg-[#0b141a] p-2 flex gap-2 items-center">
-                                    <div className="bg-[#202c33] flex-1 h-10 rounded-full flex items-center px-4 gap-3">
-                                        <span className="text-[#8696a0] text-sm">Mensagem</span>
-                                    </div>
-                                    <div className="w-10 h-10 bg-[#0cf2cd] rounded-full flex items-center justify-center text-gray-950 text-lg">🎙</div>
-                                </div>
-                                {/* Home bar */}
-                                <div className="h-6 bg-[#0b141a] flex justify-center items-center">
-                                    <div className="w-28 h-1 bg-white/20 rounded-full" />
-                                </div>
-                            </div>
-                        </div>
-                    </motion.div>
-
-                    {/* Benefits Text */}
-                    <motion.div
-                        initial={{ opacity: 0, x: 40 }}
-                        whileInView={{ opacity: 1, x: 0 }}
-                        viewport={{ once: true, margin: "-100px" }}
-                        transition={{ duration: 0.8, delay: 0.2 }}
-                    >
-                        <span className="text-[#25D366] text-sm font-semibold tracking-widest uppercase">WhatsApp Nativo</span>
-                        <h2 className="text-3xl sm:text-4xl font-extrabold text-white mt-4 mb-6 tracking-tight">
-                            Sem apps novos.<br />Tudo no seu WhatsApp.
-                        </h2>
-                        <div className="space-y-6">
-                            {[
-                                { icon: '🎙️', title: 'Envie áudios', desc: 'Fale naturalmente como se estivesse conversando com um amigo.' },
-                                { icon: '📸', title: 'Envie fotos de recibos', desc: 'A IA lê o comprovante e registra o valor automaticamente.' },
-                                { icon: '⚡', title: 'Resposta instantânea', desc: 'Confirmação em segundos. Sem espera, sem travamentos.' },
-                                { icon: '🔔', title: 'Lembretes automáticos', desc: 'Receba notificações de contas, vencimentos e compromissos diretamente no chat.' },
-                            ].map((b, i) => (
-                                <div key={i} className="flex gap-4 items-start">
-                                    <div className="w-10 h-10 rounded-xl bg-[#25D366]/10 border border-[#25D366]/20 flex items-center justify-center text-xl shrink-0">
-                                        {b.icon}
-                                    </div>
-                                    <div>
-                                        <h4 className="text-white font-semibold text-base">{b.title}</h4>
-                                        <p className="text-slate-400 text-sm mt-0.5">{b.desc}</p>
-                                    </div>
-                                </div>
-                            ))}
-                        </div>
-                    </motion.div>
-                </div>
-            </section>
-
-            {/* ═══════════════ DASHBOARD SHOWCASE ═══════════════ */}
-            <section id="dashboard" className="relative py-24 sm:py-32 overflow-hidden">
-                <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[900px] h-[600px] bg-[#0cf2cd]/3 rounded-full blur-[180px] pointer-events-none" />
-
-                <div className="relative max-w-7xl mx-auto px-6 lg:px-8">
-                    <motion.div
-                        className="text-center mb-16 sm:mb-20"
-                        initial={{ opacity: 0, y: 30 }}
-                        whileInView={{ opacity: 1, y: 0 }}
-                        viewport={{ once: true, margin: "-100px" }}
-                        transition={{ duration: 0.6 }}
-                    >
-                        <span className="text-[#0cf2cd] text-sm font-semibold tracking-widest uppercase">Dashboard</span>
-                        <h2 className="text-3xl sm:text-4xl lg:text-5xl font-extrabold text-white mt-4 tracking-tight">
-                            Acompanhe tudo em{' '}
-                            <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#0cf2cd] to-[#25D366]">tempo real</span>
-                        </h2>
-                        <p className="text-slate-400 text-base sm:text-lg mt-4 max-w-2xl mx-auto">
-                            Além do WhatsApp, você tem acesso a um painel web completo para visualizar, gerenciar e exportar todos os seus dados.
-                        </p>
-                    </motion.div>
-
-                    {/* Dashboard Mock */}
-                    <motion.div
-                        className="relative rounded-2xl border border-white/10 bg-gradient-to-br from-slate-900 to-gray-950 overflow-hidden shadow-2xl shadow-black/50"
-                        initial={{ opacity: 0, scale: 0.95, y: 30 }}
-                        whileInView={{ opacity: 1, scale: 1, y: 0 }}
-                        viewport={{ once: true, margin: "-100px" }}
-                        transition={{ duration: 0.8 }}
-                    >
-                        {/* Window bar */}
-                        <div className="flex items-center gap-2 px-5 py-3 bg-slate-800/50 border-b border-white/5">
-                            <div className="flex gap-1.5">
-                                <div className="w-3 h-3 rounded-full bg-red-500/80" />
-                                <div className="w-3 h-3 rounded-full bg-yellow-500/80" />
-                                <div className="w-3 h-3 rounded-full bg-green-500/80" />
-                            </div>
-                            <div className="flex-1 flex justify-center">
-                                <div className="bg-slate-700/50 rounded-md px-4 py-1 text-[11px] text-slate-400 flex items-center gap-2">
-                                    <span>🔒</span> app.controlec.com.br/dashboard
-                                </div>
-                            </div>
-                        </div>
-
-                        {/* Dashboard Content */}
-                        <div className="grid grid-cols-1 md:grid-cols-12 gap-4 p-5">
-                            {/* Sidebar Mini */}
-                            <div className="hidden md:flex md:col-span-2 flex-col gap-3 pr-4 border-r border-white/5">
-                                <div className="w-full h-8 bg-[#0cf2cd]/10 border border-[#0cf2cd]/20 rounded-lg flex items-center justify-center text-[11px] text-[#0cf2cd] font-semibold">📊 Finanças</div>
-                                <div className="w-full h-8 bg-white/5 rounded-lg flex items-center justify-center text-[11px] text-slate-400">📋 Tarefas</div>
-                                <div className="w-full h-8 bg-white/5 rounded-lg flex items-center justify-center text-[11px] text-slate-400">📅 Agenda</div>
-                                <div className="w-full h-8 bg-white/5 rounded-lg flex items-center justify-center text-[11px] text-slate-400">🔔 Lembretes</div>
-                            </div>
-
-                            {/* Main area */}
-                            <div className="md:col-span-10 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-                                {/* Finance Card */}
-                                <div className="sm:col-span-2 bg-slate-800/40 rounded-xl p-4 border border-white/5">
-                                    <div className="flex items-center justify-between mb-3">
-                                        <h4 className="text-white text-sm font-semibold">Gastos por Categoria</h4>
-                                        <span className="text-[10px] text-slate-500 bg-white/5 px-2 py-0.5 rounded">Fev 2026</span>
-                                    </div>
-                                    <div className="grid grid-cols-4 gap-2 mb-3">
-                                        {[
-                                            { label: 'Alimentação', pct: 35, color: 'bg-[#0cf2cd]' },
-                                            { label: 'Transporte', pct: 22, color: 'bg-blue-400' },
-                                            { label: 'Lazer', pct: 18, color: 'bg-purple-400' },
-                                            { label: 'Moradia', pct: 25, color: 'bg-amber-400' },
-                                        ].map((cat, i) => (
-                                            <div key={i} className="text-center">
-                                                <div className="h-20 bg-white/5 rounded-lg flex flex-col justify-end overflow-hidden">
-                                                    <div className={`${cat.color} rounded-t-sm transition-all`} style={{ height: `${cat.pct * 2}%` }} />
-                                                </div>
-                                                <span className="text-[9px] text-slate-500 mt-1 block">{cat.label}</span>
-                                            </div>
-                                        ))}
-                                    </div>
-                                    <div className="flex items-center justify-between pt-2 border-t border-white/5">
-                                        <span className="text-slate-500 text-xs">Total do mês</span>
-                                        <span className="text-white text-sm font-bold">R$ 3.247,80</span>
-                                    </div>
-                                </div>
-
-                                {/* Reminders Card */}
-                                <div className="bg-slate-800/40 rounded-xl p-4 border border-white/5">
-                                    <h4 className="text-white text-sm font-semibold mb-3">🔔 Próximos Vencimentos</h4>
-                                    <div className="space-y-2">
-                                        {[
-                                            { label: 'Netflix', days: '2 dias', amount: 'R$ 55,90', urgent: true },
-                                            { label: 'Aluguel', days: '5 dias', amount: 'R$ 1.800', urgent: false },
-                                            { label: 'Energia', days: '8 dias', amount: 'R$ 210', urgent: false },
-                                            { label: 'Internet', days: '12 dias', amount: 'R$ 119', urgent: false },
-                                        ].map((bill, i) => (
-                                            <div key={i} className={`flex items-center gap-2 p-2 rounded-lg text-xs ${bill.urgent ? 'bg-red-500/10 border border-red-500/20' : 'bg-white/5'}`}>
-                                                <span className={`w-1.5 h-1.5 rounded-full ${bill.urgent ? 'bg-red-500' : 'bg-slate-500'}`} />
-                                                <span className="text-slate-300 flex-1">{bill.label}</span>
-                                                <span className="text-slate-500">{bill.days}</span>
-                                                <span className="text-white font-semibold">{bill.amount}</span>
-                                            </div>
-                                        ))}
-                                    </div>
-                                </div>
-
-                                {/* Kanban Card */}
-                                <div className="sm:col-span-2 bg-slate-800/40 rounded-xl p-4 border border-white/5">
-                                    <h4 className="text-white text-sm font-semibold mb-3">📋 Tarefas</h4>
-                                    <div className="grid grid-cols-3 gap-3">
-                                        {[
-                                            { title: 'A Fazer', color: 'border-slate-500/30', items: ['Comprar remédio', 'Enviar proposta'] },
-                                            { title: 'Fazendo', color: 'border-amber-500/30', items: ['Relatório mensal'] },
-                                            { title: 'Feito', color: 'border-[#0cf2cd]/30', items: ['Reunião equipe', 'Pagar conta luz'] },
-                                        ].map((col, i) => (
-                                            <div key={i} className="flex flex-col gap-1.5">
-                                                <span className="text-[10px] uppercase tracking-wider text-slate-500 font-semibold mb-1">{col.title}</span>
-                                                {col.items.map((item, j) => (
-                                                    <div key={j} className={`text-[11px] text-slate-300 p-2 bg-white/5 rounded-md border-l-2 ${col.color}`}>{item}</div>
-                                                ))}
-                                            </div>
-                                        ))}
-                                    </div>
-                                </div>
-
-                                {/* Calendar Mini */}
-                                <div className="bg-slate-800/40 rounded-xl p-4 border border-white/5">
-                                    <h4 className="text-white text-sm font-semibold mb-3">📅 Hoje</h4>
-                                    <div className="space-y-2">
-                                        {[
-                                            { time: '09:00', event: 'Daily standup', color: 'bg-blue-400' },
-                                            { time: '14:00', event: 'Almoço de negócios', color: 'bg-[#0cf2cd]' },
-                                            { time: '16:30', event: 'Review projeto', color: 'bg-purple-400' },
-                                        ].map((evt, i) => (
-                                            <div key={i} className="flex items-center gap-2">
-                                                <span className={`w-1.5 h-6 rounded-full ${evt.color}`} />
-                                                <div>
-                                                    <span className="text-slate-500 text-[10px]">{evt.time}</span>
-                                                    <p className="text-slate-300 text-xs">{evt.event}</p>
-                                                </div>
-                                            </div>
-                                        ))}
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </motion.div>
-
-                    {/* Dashboard benefits */}
-                    <div className="grid grid-cols-2 md:grid-cols-4 gap-6 mt-12">
-                        {[
-                            { icon: '📊', label: 'Gráficos de gastos por período e categoria' },
-                            { icon: '📋', label: 'Kanban de tarefas com drag & drop' },
-                            { icon: '🔔', label: 'Central de lembretes e contas recorrentes' },
-                            { icon: '📥', label: 'Exportação de relatórios em CSV e PDF' },
-                        ].map((b, i) => (
-                            <div key={i} className="text-center">
-                                <span className="text-2xl">{b.icon}</span>
-                                <p className="text-slate-400 text-xs sm:text-sm mt-2 leading-relaxed">{b.label}</p>
-                            </div>
-                        ))}
-                    </div>
-                </div>
-            </section >
-
-            <section id="precos" className="relative py-24 sm:py-32">
-                <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[600px] h-[600px] bg-[#0cf2cd]/5 rounded-full blur-[150px] pointer-events-none" />
-
-                <div className="relative max-w-7xl mx-auto px-6 lg:px-8">
-                    <motion.div
-                        className="text-center mb-16"
-                        initial={{ opacity: 0, y: 30 }}
-                        whileInView={{ opacity: 1, y: 0 }}
-                        viewport={{ once: true, margin: "-100px" }}
-                        transition={{ duration: 0.6 }}
-                    >
-                        <span className="text-[#0cf2cd] text-sm font-semibold tracking-widest uppercase">Preços</span>
-                        <h2 className="text-3xl sm:text-4xl lg:text-5xl font-extrabold text-white mt-4 tracking-tight">
-                            Escolha seu plano
-                        </h2>
-                        <p className="text-slate-400 text-base sm:text-lg mt-4 max-w-xl mx-auto">
-                            Comece gratuitamente. Cancele quando quiser. Sem surpresas.
-                        </p>
-                    </motion.div>
-
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-4xl mx-auto">
-                        {PRICING.map((plan, i) => (
-                            <motion.div
-                                key={i}
-                                initial={{ opacity: 0, y: 40 }}
-                                whileInView={{ opacity: 1, y: 0 }}
-                                viewport={{ once: true, margin: "-100px" }}
-                                transition={{ duration: 0.6, delay: i * 0.2 }}
-                                className={`relative rounded-3xl p-8 sm:p-10 transition-all duration-300 ${plan.popular
-                                    ? 'bg-gradient-to-br from-slate-900 to-slate-800 border-2 border-[#0cf2cd]/40 shadow-[0_0_40px_rgba(12,242,205,0.1)]'
-                                    : 'bg-slate-900/60 border border-white/10 hover:border-white/20'
-                                    }`
-                                }
-                            >
-                                {/* Popular badge */}
-                                {plan.popular && (
-                                    <div className="absolute -top-4 left-1/2 -translate-x-1/2 bg-[#0cf2cd] text-gray-950 text-xs font-bold px-4 py-1.5 rounded-full shadow-[0_0_20px_rgba(12,242,205,0.3)]">
-                                        {plan.badge}
-                                    </div>
-                                )}
-
-                                <h3 className="text-white font-bold text-xl mb-2">{plan.name}</h3>
-                                <div className="flex items-baseline gap-1 mb-6">
-                                    <span className="text-sm text-slate-400">R$</span>
-                                    <span className="text-5xl font-extrabold text-white">{plan.price}</span>
-                                    <span className="text-slate-400 text-sm">{plan.period}</span>
-                                </div>
-
-                                <ul className="space-y-3 mb-8">
-                                    {plan.features.map((f, j) => (
-                                        <li key={j} className="flex items-center gap-3 text-sm text-slate-300">
-                                            <span className="text-[#0cf2cd] text-base">✓</span>
-                                            {f}
-                                        </li>
-                                    ))}
-                                </ul>
-
-                                <a
-                                    href="https://pay.zouti.com.br/checkout?product_offer_id=prod_offer_ydek6nmp28nqr06wkqifds"
-                                    target="_blank"
-                                    rel="noreferrer"
-                                    className={`w-full py-4 rounded-xl font-bold text-base transition-all duration-300 cursor-pointer flex items-center justify-center ${plan.popular
-                                        ? 'bg-[#0cf2cd] hover:bg-[#1efadb] text-gray-950 shadow-[0_0_25px_rgba(12,242,205,0.25)] hover:shadow-[0_0_40px_rgba(12,242,205,0.45)]'
-                                        : 'bg-white/5 hover:bg-white/10 text-white border border-white/10 hover:border-white/20'
-                                        }`
-                                    }
-                                >
-                                    {plan.popular ? 'Assinar Plano Anual' : 'Assinar Plano Mensal'}
-                                </a>
-                            </motion.div>
-                        ))}
-                    </div>
-                </div>
-            </section>
-
-            {/* ═══════════════ DEPOIMENTOS ═══════════════ */}
-            <section className="py-24 sm:py-32">
-                <div className="max-w-7xl mx-auto px-6 lg:px-8">
-                    <motion.div
-                        className="text-center mb-16"
-                        initial={{ opacity: 0, y: 30 }}
-                        whileInView={{ opacity: 1, y: 0 }}
-                        viewport={{ once: true, margin: "-100px" }}
-                        transition={{ duration: 0.6 }}
-                    >
-                        <span className="text-[#0cf2cd] text-sm font-semibold tracking-widest uppercase">Depoimentos</span>
-                        <h2 className="text-3xl sm:text-4xl lg:text-5xl font-extrabold text-white mt-4 tracking-tight">
-                            Amado por milhares
-                        </h2>
-                    </motion.div>
-
-                    <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                        {TESTIMONIALS.map((t, i) => (
-                            <motion.div
-                                key={i}
-                                className="bg-slate-900/40 border border-white/5 rounded-2xl p-6 sm:p-8 hover:border-white/10 transition-all duration-300"
-                                initial={{ opacity: 0, y: 30 }}
-                                whileInView={{ opacity: 1, y: 0 }}
-                                viewport={{ once: true, margin: "-50px" }}
-                                transition={{ duration: 0.5, delay: i * 0.15 }}
-                            >
-                                <StarRating count={t.rating} />
-                                <p className="text-slate-300 text-sm leading-relaxed mt-4 mb-6 italic">"{t.text}"</p>
-                                <div className="flex items-center gap-3">
-                                    <div className="w-10 h-10 rounded-full bg-gradient-to-br from-[#0cf2cd] to-[#25D366] flex items-center justify-center text-gray-950 font-bold text-sm">
-                                        {t.name.charAt(0)}
-                                    </div>
-                                    <div>
-                                        <p className="text-white font-semibold text-sm">{t.name}</p>
-                                        <p className="text-slate-500 text-xs">{t.role}</p>
-                                    </div>
-                                </div>
-                            </motion.div>
-                        ))}
-                    </div>
-                </div>
-            </section>
-
-            {/* ═══════════════ FAQ ═══════════════ */}
-            <section id="faq" className="py-24 sm:py-32">
-                <div className="max-w-3xl mx-auto px-6 lg:px-8">
-                    <motion.div
-                        className="text-center mb-16"
-                        initial={{ opacity: 0, y: 30 }}
-                        whileInView={{ opacity: 1, y: 0 }}
-                        viewport={{ once: true, margin: "-100px" }}
-                        transition={{ duration: 0.6 }}
-                    >
-                        <span className="text-[#0cf2cd] text-sm font-semibold tracking-widest uppercase">FAQ</span>
-                        <h2 className="text-3xl sm:text-4xl font-extrabold text-white mt-4 tracking-tight">
-                            Perguntas Frequentes
-                        </h2>
-                    </motion.div>
-
-                    <motion.div
-                        className="border border-white/5 rounded-2xl divide-y divide-white/5 bg-slate-900/30 px-6"
-                        initial={{ opacity: 0, y: 30 }}
-                        whileInView={{ opacity: 1, y: 0 }}
-                        viewport={{ once: true, margin: "-100px" }}
-                        transition={{ duration: 0.6, delay: 0.2 }}
-                    >
-                        {FAQS.map((faq, i) => (
-                            <FAQItem key={i} q={faq.q} a={faq.a} />
-                        ))}
-                    </motion.div>
-                </div>
-            </section>
-
-            {/* ═══════════════ CTA FINAL ═══════════════ */}
-            <section className="relative py-24 sm:py-32">
-                <div className="absolute inset-0 bg-gradient-to-br from-[#0cf2cd]/5 via-transparent to-transparent pointer-events-none" />
-
-                <motion.div
-                    className="relative max-w-4xl mx-auto px-6 lg:px-8 text-center"
-                    initial={{ opacity: 0, scale: 0.95, y: 30 }}
-                    whileInView={{ opacity: 1, scale: 1, y: 0 }}
-                    viewport={{ once: true, margin: "-100px" }}
-                    transition={{ duration: 0.8 }}
-                >
-                    <h2 className="text-3xl sm:text-4xl lg:text-5xl font-extrabold text-white tracking-tight">
-                        Pronto para simplificar{' '}
-                        <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#0cf2cd] to-[#25D366]">
-                            sua vida?
-                        </span>
-                    </h2>
-                    <p className="text-slate-400 text-base sm:text-lg mt-6 max-w-xl mx-auto">
-                        Escolha seu plano e veja a diferença em 5 minutos. Sem downloads. Sem complicações.
-                    </p>
-                    <div className="mt-10 flex flex-col sm:flex-row items-center justify-center gap-4">
-                        <a href="#precos" className="inline-flex items-center gap-2 bg-[#0cf2cd] hover:bg-[#1efadb] text-gray-950 font-bold text-lg py-5 px-10 rounded-2xl shadow-[0_0_40px_rgba(12,242,205,0.3)] hover:shadow-[0_0_60px_rgba(12,242,205,0.5)] transition-all duration-300">
-                            Escolher Meu Plano →
-                        </a>
-                    </div>
-                    <p className="text-slate-600 text-xs mt-6">Cancele a qualquer momento · Sem fidelidade · LGPD compliant</p>
-                </motion.div>
-            </section>
-
-            {/* ═══════════════ FOOTER ═══════════════ */}
-            <footer className="border-t border-white/5 py-12 sm:py-16">
-                <div className="max-w-7xl mx-auto px-6 lg:px-8">
-                    <div className="grid grid-cols-2 md:grid-cols-4 gap-8 mb-12">
-                        {/* Brand */}
-                        <div className="col-span-2 md:col-span-1">
+                    {/* Card 4: Hábitos */}
+                    <div className="relative flex flex-col md:flex-row-reverse items-start md:justify-between mb-16 w-full pl-12 md:pl-0">
+                        {/* Ponto de Junção no Trilho */}
+                        <motion.div 
+                            initial={{ scale: 0.7, borderColor: "rgba(255,255,255,0.1)", boxShadow: "0 0 0px rgba(0,0,0,0)" }}
+                            whileInView={{ scale: 1.1, borderColor: "#f43f5e", boxShadow: "0 0 15px rgba(244,63,94,0.4)" }}
+                            viewport={{ once: false, margin: "-180px 0px -100px 0px" }}
+                            transition={{ type: "spring", stiffness: 100, damping: 15 }}
+                            className="absolute left-[3px] md:left-1/2 top-4 md:-translate-x-1/2 w-6 h-6 rounded-full bg-[#010307] border-2 flex items-center justify-center z-20"
+                        >
+                            <motion.span 
+                                initial={{ scale: 0, opacity: 0 }}
+                                whileInView={{ scale: 1, opacity: 1 }}
+                                viewport={{ once: false, margin: "-180px 0px -100px 0px" }}
+                                className="w-2 h-2 rounded-full bg-[#f43f5e]" 
+                            />
+                        </motion.div>
+                        
+                        {/* Card Lado Direito */}
+                        <motion.div 
+                            initial={{ opacity: 0, y: 15, scale: 0.98, filter: "blur(15px)" }}
+                            whileInView={{ opacity: 1, y: 0, scale: 1, filter: "blur(0px)" }}
+                            viewport={{ once: false, margin: "-180px 0px -100px 0px" }}
+                            transition={{ type: "spring", stiffness: 15, damping: 13, mass: 1.4 }}
+                            className="w-full md:w-[45%] bg-[#010307]/50 backdrop-blur-xl border border-white/[0.08] hover:border-[#f43f5e]/30 hover:shadow-[0_0_30px_rgba(244,63,94,0.06)] rounded-2xl p-6 transition-all duration-500 text-left"
+                        >
                             <div className="flex items-center gap-3 mb-4">
-                                <div className="w-8 h-8 rounded-lg bg-[#0cf2cd] flex items-center justify-center">
-                                    <span className="text-gray-950 font-black text-xs">C</span>
+                                <div className="w-10 h-10 rounded-xl bg-[#f43f5e]/10 border border-[#f43f5e]/20 flex items-center justify-center text-[#f43f5e]">
+                                    <Flame className="w-5 h-5 animate-pulse" />
                                 </div>
-                                <span className="font-bold text-white">Controle-C</span>
+                                <h3 className="text-xl font-bold text-white">Hábitos Consistentes</h3>
                             </div>
-                            <p className="text-slate-500 text-sm leading-relaxed">
-                                Seu assistente pessoal inteligente, direto no WhatsApp.
+                            <p className="text-text-muted text-sm leading-relaxed mb-6">
+                                Acompanhe sua disciplina diária. Envie um áudio rápido confirmando o treino ou a leitura do dia e veja seus marcadores de consistência se preencherem instantaneamente, mantendo sua chama ativa.
                             </p>
-                        </div>
-
-                        {/* Produto */}
-                        <div>
-                            <h4 className="text-white font-semibold text-sm mb-4">Produto</h4>
-                            <ul className="space-y-2.5">
-                                {['Recursos', 'Preços', 'Integrações', 'Roadmap'].map((item, i) => (
-                                    <li key={i}><a href="#" className="text-slate-500 hover:text-slate-300 text-sm transition-colors">{item}</a></li>
-                                ))}
-                            </ul>
-                        </div>
-
-                        {/* Empresa */}
-                        <div>
-                            <h4 className="text-white font-semibold text-sm mb-4">Empresa</h4>
-                            <ul className="space-y-2.5">
-                                {['Sobre', 'Blog', 'Contato', 'Carreiras'].map((item, i) => (
-                                    <li key={i}><a href="#" className="text-slate-500 hover:text-slate-300 text-sm transition-colors">{item}</a></li>
-                                ))}
-                            </ul>
-                        </div>
-
-                        {/* Legal */}
-                        <div>
-                            <h4 className="text-white font-semibold text-sm mb-4">Legal</h4>
-                            <ul className="space-y-2.5">
-                                <li><Link to="/privacy" className="text-slate-500 hover:text-slate-300 text-sm transition-colors">Privacidade</Link></li>
-                                <li><Link to="/terms" className="text-slate-500 hover:text-slate-300 text-sm transition-colors">Termos de Uso</Link></li>
-                                <li><a href="#" className="text-slate-500 hover:text-slate-300 text-sm transition-colors">LGPD</a></li>
-                                <li><a href="#" className="text-slate-500 hover:text-slate-300 text-sm transition-colors">Cookies</a></li>
-                            </ul>
-                        </div>
+                            
+                            {/* Micro-Interface Interativa de Hábitos */}
+                            <div className="bg-[#010307]/60 border border-white/[0.06] rounded-xl p-4">
+                                <div className="flex items-center justify-between text-xs text-text-dimmed mb-3">
+                                    <span>Streak Semanal de Hábitos</span>
+                                    <span className="text-[#f43f5e] font-bold text-[10px] flex items-center gap-0.5">
+                                        <Flame className="w-3.5 h-3.5 text-[#f43f5e]" /> 🔥 6 DIAS ATIVOS
+                                    </span>
+                                </div>
+                                
+                                <div className="grid grid-cols-7 gap-2.5">
+                                    {habitDays.map((h, i) => (
+                                        <div 
+                                            key={i}
+                                            onClick={() => toggleHabitDay(i)}
+                                            className="flex flex-col items-center gap-1 cursor-pointer group"
+                                        >
+                                            <span className="text-[9px] text-text-dimmed group-hover:text-white transition-colors">{h.day}</span>
+                                            <motion.div 
+                                                whileHover={{ scale: 1.1 }}
+                                                className={`w-7.5 h-7.5 rounded-lg border flex items-center justify-center text-xs font-bold transition-all ${h.done ? 'bg-[#f43f5e]/10 border-[#f43f5e] text-[#f43f5e] shadow-[0_0_10px_rgba(244,63,94,0.15)]' : 'border-white/10 text-text-dimmed hover:border-[#f43f5e]/50'}`}
+                                            >
+                                                {h.done ? "🔥" : "✓"}
+                                            </motion.div>
+                                        </div>
+                                    ))}
+                                </div>
+                            </div>
+                        </motion.div>
+                        
+                        {/* Lado Esquerdo Invisível no Desktop */}
+                        <div className="hidden md:block w-[45%]" />
                     </div>
 
-                    {/* Bottom bar */}
-                    <div className="border-t border-white/5 pt-8 flex flex-col sm:flex-row justify-between items-center gap-4">
-                        <p className="text-slate-600 text-sm">© 2026 Controle-C. Todos os direitos reservados.</p>
-                        <div className="flex items-center gap-4">
-                            {['Instagram', 'LinkedIn', 'Twitter'].map((social, i) => (
-                                <a key={i} href="#" className="text-slate-600 hover:text-slate-400 text-sm transition-colors">{social}</a>
-                            ))}
-                        </div>
-                    </div>
                 </div>
-            </footer>
-        </div >
+            </section>
+
+            {/* ── SEÇÃO: UM DIA COM O CONTROLE-C (DUAL DEVICE MOCKUP) ── */}
+            <section className="relative py-28 z-10 w-full max-w-5xl mx-auto px-6 overflow-hidden">
+                {/* Header da Seção */}
+                <div className="text-center mb-16 flex flex-col items-center">
+                    <motion.div 
+                        initial={{ opacity: 0, y: 15, scale: 0.97, filter: "blur(12px)" }}
+                        whileInView={{ opacity: 1, y: 0, scale: 1, filter: "blur(0px)" }}
+                        viewport={{ once: false, margin: "-180px 0px -100px 0px" }}
+                        transition={{ type: "spring", stiffness: 15, damping: 13, mass: 1.4 }}
+                        className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full border border-white/[0.08] bg-white/[0.02] text-xs font-semibold uppercase tracking-wider text-[#00f0ff] mb-4 backdrop-blur-md"
+                    >
+                        <Sparkle className="w-3.5 h-3.5 text-[#00f0ff]" />
+                        <span>💻 Desktop & 📱 Mobile</span>
+                    </motion.div>
+                    
+                    <motion.h2 
+                        initial={{ opacity: 0, y: 15, scale: 0.98, filter: "blur(15px)" }}
+                        whileInView={{ opacity: 1, y: 0, scale: 1, filter: "blur(0px)" }}
+                        viewport={{ once: false, margin: "-180px 0px -100px 0px" }}
+                        transition={{ type: "spring", stiffness: 15, damping: 13, mass: 1.4, delay: 0.15 }}
+                        className="text-3xl sm:text-4xl md:text-5xl font-extrabold text-white tracking-tight leading-tight mb-4 max-w-2xl premium-text-shadow"
+                    >
+                        No computador ou no celular. O controle é seu.
+                    </motion.h2>
+                    
+                    <motion.p 
+                        initial={{ opacity: 0, y: 12, scale: 0.99, filter: "blur(10px)" }}
+                        whileInView={{ opacity: 1, y: 0, scale: 1, filter: "blur(0px)" }}
+                        viewport={{ once: false, margin: "-180px 0px -100px 0px" }}
+                        transition={{ type: "spring", stiffness: 15, damping: 13, mass: 1.4, delay: 0.3 }}
+                        className="text-text-muted text-sm sm:text-base max-w-2xl leading-relaxed"
+                    >
+                        Use a tela cheia no escritório para planejar sua semana e o aplicativo mobile na rua para registros rápidos de gastos, hábitos e tarefas.
+                    </motion.p>
+                </div>
+
+                {/* Container do Dual Mockup */}
+                <div className="relative w-full max-w-4xl mx-auto flex flex-col items-center">
+                    
+                    {/* Glow de fundo extra para dar profundidade de luz */}
+                    <div className="absolute -left-12 top-1/4 w-80 h-80 rounded-full bg-[#00f0ff]/5 blur-[120px] pointer-events-none z-0" />
+                    <div className="absolute -right-12 bottom-1/4 w-80 h-80 rounded-full bg-[#ffa751]/5 blur-[120px] pointer-events-none z-0" />
+
+                    {/* MOCKUP DESKTOP (LAPTOP) */}
+                    <motion.div 
+                        initial={{ opacity: 0, y: 30, filter: "blur(15px)", scale: 0.96 }}
+                        whileInView={{ opacity: 1, y: 0, filter: "blur(0px)", scale: 1 }}
+                        viewport={{ once: false, margin: "-100px" }}
+                        transition={{ type: "spring", stiffness: 15, damping: 13, mass: 1.4 }}
+                        className="w-full md:w-[88%] mr-auto relative z-10"
+                    >
+                        {/* Tela do Laptop */}
+                        <div className="bg-[#010307] border border-white/[0.08] rounded-t-2xl shadow-2xl p-2 relative overflow-hidden">
+                            {/* Barra Superior do Navegador */}
+                            <div className="flex items-center gap-1.5 px-3 py-2 border-b border-white/[0.05] bg-white/[0.02]">
+                                <div className="w-2.5 h-2.5 rounded-full bg-[#ff5f56]" />
+                                <div className="w-2.5 h-2.5 rounded-full bg-[#ffbd2e]" />
+                                <div className="w-2.5 h-2.5 rounded-full bg-[#27c93f]" />
+                                
+                                {/* URL Bar */}
+                                <div className="flex-1 max-w-sm mx-auto flex items-center justify-center h-5 px-3 rounded bg-white/[0.03] border border-white/[0.04] text-[9px] text-text-dimmed tracking-wider">
+                                    <span className="opacity-45">app.controlec.io</span>
+                                </div>
+                            </div>
+                            
+                            {/* Conteúdo da Tela */}
+                            <div className="aspect-[1.65] w-full bg-[#030712]/98 relative overflow-hidden">
+                                <img 
+                                    src="/dashboard_desktop_v2.png" 
+                                    alt="Controle-C Desktop Dashboard" 
+                                    className="w-full h-full object-cover"
+                                />
+                            </div>
+                        </div>
+                        
+                        {/* Base Física do Laptop (Chassis) */}
+                        <div className="w-[104%] -ml-[2%] h-3 bg-gradient-to-b from-[#1e293b] to-[#0b0f19] rounded-b-xl border-t border-white/[0.15] relative z-20 shadow-[0_15px_30px_rgba(0,0,0,0.8)]" />
+                        <div className="w-[30%] mx-auto h-2 bg-[#080b12] rounded-b-lg relative z-30" />
+                    </motion.div>
+
+                    {/* MOCKUP MOBILE (SMARTPHONE COM EFEITO 3D ISOMÉTRICO E HOVER DINÂMICO) */}
+                    <motion.div 
+                        className="absolute right-4 md:-right-8 bottom-[-40px] w-[32%] z-30 hidden md:block"
+                        initial={{ y: 40, opacity: 0, rotateY: -18, rotateX: 10, rotateZ: 3 }}
+                        whileInView={{ y: 0, opacity: 1, rotateY: -18, rotateX: 10, rotateZ: 3 }}
+                        whileHover={{ y: -8, rotateY: -12, rotateX: 8, rotateZ: 1 }}
+                        viewport={{ once: false, margin: "-100px" }}
+                        transition={{ type: "spring", stiffness: 25, damping: 15, mass: 1.2 }}
+                        style={{
+                            transformStyle: 'preserve-3d',
+                            perspective: '1500px',
+                        }}
+                    >
+                        {/* Chassi do Telefone (Phone Frame) */}
+                        <div className="w-full bg-[#010307] rounded-[38px] border-[5px] border-[#1e293b]/90 p-2.5 shadow-[-20px_20px_50px_rgba(0,0,0,0.85)] overflow-hidden relative border-t-white/[0.08] border-l-white/[0.08]">
+                            
+                            {/* Dynamic Island */}
+                            <div className="absolute top-4 left-1/2 -translate-x-1/2 w-[72px] h-[18px] rounded-full bg-black z-40 border border-white/[0.05] flex items-center justify-end px-2">
+                                <div className="w-1.5 h-1.5 rounded-full bg-[#091530]" />
+                            </div>
+
+                            {/* Tela do Telefone */}
+                            <div className="rounded-[28px] overflow-hidden bg-[#030712] aspect-[547/767] w-full border border-white/[0.04] relative select-none">
+                                <img 
+                                    src="/dashboard_mobile_v2.png" 
+                                    alt="Controle-C Mobile Dashboard" 
+                                    className="w-full h-full object-cover"
+                                />
+                            </div>
+                        </div>
+                    </motion.div>
+
+                    {/* MOCKUP COMPANION COMPATÍVEL COM CELULAR (REVELADO APENAS EM MOBILE) */}
+                    <div className="w-[280px] mx-auto mt-8 block md:hidden z-20">
+                        {/* Phone Frame */}
+                        <div className="w-full bg-[#010307] rounded-[36px] border-[4px] border-[#1e293b]/90 p-2 shadow-2xl relative">
+                            
+                            {/* Dynamic Island */}
+                            <div className="absolute top-3 left-1/2 -translate-x-1/2 w-16 h-[14px] rounded-full bg-black z-40" />
+
+                            <div className="rounded-[26px] overflow-hidden bg-[#030712] aspect-[547/767] w-full border border-white/[0.04] relative">
+                                <img 
+                                    src="/dashboard_mobile_v2.png" 
+                                    alt="Controle-C Mobile Dashboard" 
+                                    className="w-full h-full object-cover"
+                                />
+                            </div>
+                        </div>
+                    </div>
+                    
+                </div>
+
+                {/* Subtag Centrada no Rodapé do Mockup */}
+                <div className="text-center mt-20 md:mt-28">
+                    <span className="text-[10px] md:text-xs text-text-dimmed/40 font-bold uppercase tracking-[0.4em] select-none block hover:text-[#00f0ff]/30 transition-colors">
+                        Um dia com o Controle-C
+                    </span>
+                </div>
+            </section>
+
+            {/* ── VIDEO DEMO MODAL ────────────────── */}
+            <AnimatePresence>
+                {showDemoModal && (
+                    <motion.div
+                        initial={{ opacity: 0 }}
+                        animate={{ opacity: 1 }}
+                        exit={{ opacity: 0 }}
+                        className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/85 backdrop-blur-lg"
+                        onClick={() => setShowDemoModal(false)}
+                    >
+                        <motion.div
+                            initial={{ scale: 0.95, y: 20, opacity: 0 }}
+                            animate={{ scale: 1, y: 0, opacity: 1 }}
+                            exit={{ scale: 0.95, y: 20, opacity: 0 }}
+                            transition={{ type: "spring", stiffness: 300, damping: 30 }}
+                            className="relative w-full max-w-4xl bg-[#010307]/80 border border-white/[0.1] rounded-2xl overflow-hidden shadow-[0_0_50px_rgba(12,242,205,0.15)]"
+                            onClick={(e) => e.stopPropagation()}
+                        >
+                            {/* Header with Title and Close Button */}
+                            <div className="flex items-center justify-between px-6 py-4 border-b border-white/[0.08] bg-white/[0.01]">
+                                <h3 className="text-white font-bold text-sm sm:text-base flex items-center gap-2">
+                                    <Sparkles className="w-4 h-4 text-accent-cyan animate-pulse" />
+                                    Vídeo Demonstrativo - Jarvis
+                                </h3>
+                                <button
+                                    onClick={() => setShowDemoModal(false)}
+                                    className="p-1.5 rounded-full bg-white/5 border border-white/[0.08] text-text-muted hover:text-white hover:bg-white/10 transition-colors"
+                                >
+                                    <X className="w-4 h-4" />
+                                </button>
+                            </div>
+
+                            {/* Video Container (aspect-video) */}
+                            <div className="aspect-video w-full bg-black">
+                                <iframe
+                                    src="https://www.youtube.com/embed/GbvdjrKxfBc?autoplay=1&rel=0&modestbranding=1&color=white"
+                                    title="Jarvis Demo Video"
+                                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                                    allowFullScreen
+                                    className="w-full h-full border-0"
+                                ></iframe>
+                            </div>
+                        </motion.div>
+                    </motion.div>
+                )}
+            </AnimatePresence>
+
+        </div>
     );
 };
 
