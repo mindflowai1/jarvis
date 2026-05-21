@@ -78,10 +78,10 @@ const Tutorials = () => {
       <header className="relative z-10 p-6 border-b border-white/5 bg-[#090e1a]/60 backdrop-blur-xl sticky top-0">
         <div className="max-w-7xl mx-auto flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <Link to="/dashboard" className="text-2xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-[#0cf2cd] to-[#25D366] tracking-wider font-['Orbitron']">
-              CONTROLE-C
+            <Link to="/dashboard" className="flex items-center">
+              <img src="/logo-controle-c.png" alt="Controle-C Logo" className="h-12 sm:h-14 w-auto object-contain" style={{ filter: 'drop-shadow(0 0 15px rgba(12, 242, 205, 0.4))' }} />
             </Link>
-            <span className="h-5 w-[1px] bg-white/10 hidden sm:inline-block" />
+            <span className="h-8 w-[1px] bg-white/10 hidden sm:inline-block" />
             <span className="text-xs text-slate-400 font-medium tracking-wider uppercase bg-white/5 px-2.5 py-1 rounded hidden sm:inline-block">
               Central de Aprendizado
             </span>
