@@ -13,6 +13,7 @@ import ResetPassword from './pages/ResetPassword'
 
 import PrivacyPolicy from './pages/PrivacyPolicy'
 import TermsOfService from './pages/TermsOfService'
+import Tutorials from './pages/Tutorials'
 
 // Componente independente para gerenciar redirecionamentos de autenticação
 function AuthRedirectHandler() {
@@ -143,6 +144,18 @@ function App() {
                         session ? (
                             <SubscriptionGuard session={session}>
                                 <Dashboard session={session} />
+                            </SubscriptionGuard>
+                        ) : (
+                            <Navigate to="/login" replace />
+                        )
+                    }
+                />
+                <Route
+                    path="/como-usar"
+                    element={
+                        session ? (
+                            <SubscriptionGuard session={session}>
+                                <Tutorials />
                             </SubscriptionGuard>
                         ) : (
                             <Navigate to="/login" replace />

@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react'
+import { Link } from 'react-router-dom'
 import { supabase } from '../supabaseClient'
 import './SettingsPage.css'
 
@@ -417,6 +418,40 @@ const Settings = ({ session }) => {
                             A integração permite que seus agendamentos sejam criados e gerenciados diretamente pela plataforma e pelo assistente IA.
                         </p>
                     )}
+                </div>
+
+                <div className="settings-card">
+                    <h3 className="section-title">Como Usar & Ajuda</h3>
+                    
+                    <div className="calendar-status-wrapper" style={{ marginBottom: '16px' }}>
+                        <div className="calendar-status-info">
+                            <div className="calendar-icon" style={{ fontSize: '28px' }}>🎥</div>
+                            <div>
+                                <h4 className="calendar-status-label">Tutoriais em Vídeo</h4>
+                                <p className="calendar-status-description">
+                                    Domine todas as ferramentas do Controle-C.
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <p className="calendar-helper-text" style={{ marginBottom: '24px' }}>
+                        Precisa de ajuda para começar? Assista ao nosso guia passo a passo em vídeo com os 6 tutoriais principais da plataforma.
+                    </p>
+
+                    <Link
+                        to="/como-usar"
+                        className="connect-calendar-btn"
+                        style={{ 
+                            textDecoration: 'none', 
+                            background: 'linear-gradient(135deg, #0cf2cd, #25d366)', 
+                            color: '#090e1a',
+                            fontWeight: '700',
+                            boxShadow: '0 4px 15px rgba(12, 242, 205, 0.2)'
+                        }}
+                    >
+                        Assistir aos Tutoriais
+                    </Link>
                 </div>
             </div>
         </div>
