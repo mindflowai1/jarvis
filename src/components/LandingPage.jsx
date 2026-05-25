@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence, useScroll, useSpring } from 'framer-motion';
-import { Sparkles, ArrowRight, Play, CheckCircle2, Shield, MessageSquare, Calendar, TrendingUp, Sparkle, Mic, Volume2, X, DollarSign, Flame, ChevronLeft, ChevronRight } from 'lucide-react';
+import { Sparkles, ArrowRight, Play, CheckCircle2, Shield, MessageSquare, Calendar, TrendingUp, Sparkle, Mic, Volume2, X, DollarSign, Flame, ChevronLeft, ChevronRight, Brain, Frown, Smile, AlertCircle, Hourglass } from 'lucide-react';
 
 const situations = [
     {
@@ -101,7 +101,6 @@ const situations = [
     }
 ];
 
-
 const LandingPage = () => {
     const containerRef = useRef(null);
     const timelineRef = useRef(null);
@@ -109,6 +108,21 @@ const LandingPage = () => {
     const [activeTab, setActiveTab] = useState(0);
     const [showDemoModal, setShowDemoModal] = useState(false);
     const [simStep, setSimStep] = useState(0); // 0: audio processing, 1: processed/revealed
+    const [cardTilt, setCardTilt] = useState({ x: 0, y: 0 });
+
+    const handleMouseMoveCard = (e) => {
+        const card = e.currentTarget;
+        const rect = card.getBoundingClientRect();
+        const x = e.clientX - rect.left - rect.width / 2;
+        const y = e.clientY - rect.top - rect.height / 2;
+        const tiltX = (y / (rect.height / 2)) * -12;
+        const tiltY = (x / (rect.width / 2)) * 12;
+        setCardTilt({ x: tiltX, y: tiltY });
+    };
+
+    const handleMouseLeaveCard = () => {
+        setCardTilt({ x: 0, y: 0 });
+    };
 
     // States and refs for interactive micro-interfaces in timeline cards
     const [activeFinanceCategory, setActiveFinanceCategory] = useState(null);
@@ -403,7 +417,7 @@ const LandingPage = () => {
                                     <div className="w-3 h-3 rounded-full bg-[#27c93f]" />
                                 </div>
                                 <div className="px-5 py-1.5 rounded-full bg-[#010307]/50 border border-white/[0.08] text-xs text-text-muted select-none">
-                                    app.jarvis.io
+                                    controle-c.com.br
                                 </div>
                                 <div className="flex items-center gap-2">
                                     <span className="w-2 h-2 rounded-full bg-[#25D366] animate-pulse" />
@@ -939,12 +953,416 @@ const LandingPage = () => {
                     </div>
                     
                 </div>
+            </section>
 
-                {/* Subtag Centrada no Rodapé do Mockup */}
-                <div className="text-center mt-20 md:mt-28">
-                    <span className="text-[10px] md:text-xs text-text-dimmed/40 font-bold uppercase tracking-[0.4em] select-none block hover:text-[#00f0ff]/30 transition-colors">
-                        Um dia com o Controle-C
-                    </span>
+            {/* ── SEÇÃO: A PSICOLOGIA DA ORDEM (QUADRO DE ANOTAÇÕES) ── */}
+            <section id="psicologia-ordem" className="relative py-20 md:py-24 z-10 w-full max-w-4xl mx-auto px-6 overflow-hidden">
+                {/* Glow de fundo sutil para atmosfera de reflexão */}
+                <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-[400px] h-[400px] rounded-full bg-white/[0.01] blur-[120px] pointer-events-none z-0" />
+
+                {/* Header da Seção */}
+                <div className="text-center mb-16 flex flex-col items-center relative z-10">
+                    <motion.div 
+                        initial={{ opacity: 0, y: 15, scale: 0.97, filter: "blur(12px)" }}
+                        whileInView={{ opacity: 1, y: 0, scale: 1, filter: "blur(0px)" }}
+                        viewport={{ once: false, margin: "-180px 0px -20px 0px" }}
+                        transition={{ type: "spring", stiffness: 15, damping: 13, mass: 1.4 }}
+                        className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full border border-white/[0.08] bg-white/[0.02] text-xs font-semibold uppercase tracking-wider text-[#a855f7] mb-4 backdrop-blur-md"
+                    >
+                        <Brain className="w-3.5 h-3.5 text-[#a855f7]" />
+                        <span>Fricção vs. Liberdade</span>
+                    </motion.div>
+                    
+                    <motion.h2 
+                        initial={{ opacity: 0, y: 15, scale: 0.98, filter: "blur(15px)" }}
+                        whileInView={{ opacity: 1, y: 0, scale: 1, filter: "blur(0px)" }}
+                        viewport={{ once: false, margin: "-180px 0px -20px 0px" }}
+                        transition={{ type: "spring", stiffness: 15, damping: 13, mass: 1.4, delay: 0.15 }}
+                        className="text-3xl sm:text-4xl md:text-5xl font-extrabold text-white tracking-tight leading-tight mb-4 premium-text-shadow"
+                    >
+                        O peso do caos. A leveza do controle.
+                    </motion.h2>
+                    
+                    <motion.p 
+                        initial={{ opacity: 0, y: 12, scale: 0.99, filter: "blur(10px)" }}
+                        whileInView={{ opacity: 1, y: 0, scale: 1, filter: "blur(0px)" }}
+                        viewport={{ once: false, margin: "-180px 0px -20px 0px" }}
+                        transition={{ type: "spring", stiffness: 15, damping: 13, mass: 1.4, delay: 0.3 }}
+                        className="text-text-muted text-sm sm:text-base max-w-xl mx-auto leading-relaxed"
+                    >
+                        Uma vida inteira de desorganização consome energia silenciosamente. Veja o contraste de delegar toda a fricção operacional para um sistema tátil.
+                    </motion.p>
+                </div>
+
+                {/* Grid dos Notepads (Quadro de Anotações) */}
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-8 relative z-10">
+                    
+                    {/* NOTEPAD CAOS (Vida sem o Controle-C) */}
+                    <motion.div 
+                        initial={{ opacity: 0, x: -20, rotate: -2, scale: 0.98 }}
+                        whileInView={{ opacity: 1, x: 0, rotate: -1.5, scale: 1 }}
+                        viewport={{ once: false, margin: "-180px 0px -20px 0px" }}
+                        transition={{ type: "spring", stiffness: 25, damping: 16, mass: 1.2 }}
+                        whileHover={{ rotate: -0.5, y: -4, transition: { duration: 0.2 } }}
+                        className="relative rounded-2xl border border-rose-500/10 bg-gradient-to-b from-[#08090a]/95 to-[#020304]/98 p-6 md:p-8 shadow-[0_15px_30px_rgba(244,63,94,0.02)] overflow-hidden group select-none"
+                    >
+                        {/* Detalhe de furos de espiral de caderno no topo */}
+                        <div className="flex gap-3 justify-center mb-6 pb-5 border-b border-white/[0.04] opacity-40">
+                            {[...Array(6)].map((_, i) => (
+                                <div key={i} className="flex flex-col items-center gap-1">
+                                    <div className="w-1.5 h-3 bg-white/[0.12] rounded-full" />
+                                    <div className="w-2 h-2 bg-black rounded-full border border-white/[0.08]" />
+                                </div>
+                            ))}
+                        </div>
+
+                        {/* Título do Bloco */}
+                        <h3 className="font-display-premium text-2xl md:text-3xl italic text-rose-400 mb-6 text-center">
+                            Vida sem o Controle-C
+                        </h3>
+
+                        {/* Lista de Sintomas */}
+                        <div className="space-y-4">
+                            <div className="flex gap-3 items-start">
+                                <span className="w-5 h-5 rounded-full bg-rose-500/15 border border-rose-500/25 text-rose-400 text-[10px] font-bold flex items-center justify-center flex-shrink-0 mt-0.5 select-none">✗</span>
+                                <div className="text-left">
+                                    <h4 className="text-white text-xs font-bold">Boletos & Finanças</h4>
+                                    <p className="text-text-muted text-[11px] mt-0.5 leading-relaxed">Gastos invisíveis e juros surpresa acumulando por preguiça de planilhas.</p>
+                                </div>
+                            </div>
+                            <div className="flex gap-3 items-start">
+                                <span className="w-5 h-5 rounded-full bg-rose-500/15 border border-rose-500/25 text-rose-400 text-[10px] font-bold flex items-center justify-center flex-shrink-0 mt-0.5 select-none">✗</span>
+                                <div className="text-left">
+                                    <h4 className="text-white text-xs font-bold">Sobrecarga Mental</h4>
+                                    <p className="text-text-muted text-[11px] mt-0.5 leading-relaxed">Deitar cansado na cama com a cabeça fervendo, tentando lembrar de tarefas.</p>
+                                </div>
+                            </div>
+                            <div className="flex gap-3 items-start">
+                                <span className="w-5 h-5 rounded-full bg-rose-500/15 border border-rose-500/25 text-rose-400 text-[10px] font-bold flex items-center justify-center flex-shrink-0 mt-0.5 select-none">✗</span>
+                                <div className="text-left">
+                                    <h4 className="text-white text-xs font-bold">Rotina Reativa</h4>
+                                    <p className="text-text-muted text-[11px] mt-0.5 leading-relaxed">Passar o dia inteiro correndo para apagar incêndios e engavetando seus sonhos.</p>
+                                </div>
+                            </div>
+                            <div className="flex gap-3 items-start">
+                                <span className="w-5 h-5 rounded-full bg-rose-500/15 border border-rose-500/25 text-rose-400 text-[10px] font-bold flex items-center justify-center flex-shrink-0 mt-0.5 select-none">✗</span>
+                                <div className="text-left">
+                                    <h4 className="text-white text-xs font-bold">Hábitos Perdidos</h4>
+                                    <p className="text-text-muted text-[11px] mt-0.5 leading-relaxed">Promessas de mudança e treinos que duram no máximo até o dia 5.</p>
+                                </div>
+                            </div>
+                        </div>
+                    </motion.div>
+
+                    {/* NOTEPAD CONTROLE (Vida com o Controle-C) */}
+                    <motion.div 
+                        initial={{ opacity: 0, x: 20, rotate: 2, scale: 0.98 }}
+                        whileInView={{ opacity: 1, x: 0, rotate: 1.5, scale: 1 }}
+                        viewport={{ once: false, margin: "-180px 0px -20px 0px" }}
+                        transition={{ type: "spring", stiffness: 25, damping: 16, mass: 1.2 }}
+                        whileHover={{ rotate: 0.5, y: -4, transition: { duration: 0.2 } }}
+                        className="relative rounded-2xl border border-emerald-500/10 bg-gradient-to-b from-[#08090a]/95 to-[#020304]/98 p-6 md:p-8 shadow-[0_15px_30px_rgba(12,242,205,0.02)] overflow-hidden group select-none"
+                    >
+                        {/* Glow verde sutil interno no caderno com controle */}
+                        <div className="absolute -right-20 -top-20 w-64 h-64 rounded-full bg-[#0cf2cd]/3 blur-[80px] pointer-events-none group-hover:bg-[#0cf2cd]/5 transition-all duration-500" />
+
+                        {/* Detalhe de furos de espiral de caderno no topo */}
+                        <div className="flex gap-3 justify-center mb-6 pb-5 border-b border-white/[0.04] opacity-40">
+                            {[...Array(6)].map((_, i) => (
+                                <div key={i} className="flex flex-col items-center gap-1">
+                                    <div className="w-1.5 h-3 bg-white/[0.12] rounded-full" />
+                                    <div className="w-2 h-2 bg-black rounded-full border border-white/[0.08]" />
+                                </div>
+                            ))}
+                        </div>
+
+                        {/* Título do Bloco */}
+                        <h3 className="font-display-premium text-2xl md:text-3xl italic text-[#0cf2cd] mb-6 text-center">
+                            Vida com o Controle-C
+                        </h3>
+
+                        {/* Lista de Melhorias */}
+                        <div className="space-y-4">
+                            <div className="flex gap-3 items-start">
+                                <span className="w-5 h-5 rounded-full bg-[#0cf2cd]/15 border border-[#0cf2cd]/25 text-[#0cf2cd] text-[10px] font-bold flex items-center justify-center flex-shrink-0 mt-0.5 select-none">✓</span>
+                                <div className="text-left">
+                                    <h4 className="text-white text-xs font-bold">Tudo no WhatsApp</h4>
+                                    <p className="text-text-muted text-[11px] mt-0.5 leading-relaxed">Envie áudios de 3 segundos para o Jarvis e registre despesas, metas e agenda.</p>
+                                </div>
+                            </div>
+                            <div className="flex gap-3 items-start">
+                                <span className="w-5 h-5 rounded-full bg-[#0cf2cd]/15 border border-[#0cf2cd]/25 text-[#0cf2cd] text-[10px] font-bold flex items-center justify-center flex-shrink-0 mt-0.5 select-none">✓</span>
+                                <div className="text-left">
+                                    <h4 className="text-white text-xs font-bold">Mente 100% Livre</h4>
+                                    <p className="text-text-muted text-[11px] mt-0.5 leading-relaxed">A paz de dormir sabendo que tudo está anotado e processado pelo Jarvis.</p>
+                                </div>
+                            </div>
+                            <div className="flex gap-3 items-start">
+                                <span className="w-5 h-5 rounded-full bg-[#0cf2cd]/15 border border-[#0cf2cd]/25 text-[#0cf2cd] text-[10px] font-bold flex items-center justify-center flex-shrink-0 mt-0.5 select-none">✓</span>
+                                <div className="text-left">
+                                    <h4 className="text-white text-xs font-bold">Foco no Essencial</h4>
+                                    <p className="text-text-muted text-[11px] mt-0.5 leading-relaxed">Suas prioridades reais e seus planos futuros no centro da sua rotina.</p>
+                                </div>
+                            </div>
+                            <div className="flex gap-3 items-start">
+                                <span className="w-5 h-5 rounded-full bg-[#0cf2cd]/15 border border-[#0cf2cd]/25 text-[#0cf2cd] text-[10px] font-bold flex items-center justify-center flex-shrink-0 mt-0.5 select-none">✓</span>
+                                <div className="text-left">
+                                    <h4 className="text-white text-xs font-bold">Hábitos que Colam</h4>
+                                    <p className="text-text-muted text-[11px] mt-0.5 leading-relaxed">Consistência diária reforçada por lembretes leves e streaks visíveis de orgulho.</p>
+                                </div>
+                            </div>
+                        </div>
+                    </motion.div>
+
+                </div>
+            </section>
+
+            {/* ── ESTILOS DE ANIMAÇÃO CIBERNÉTICA INLINE ── */}
+            <style>{`
+                @keyframes bounce-voice {
+                    0%, 100% { height: 4px; }
+                    50% { height: 18px; }
+                }
+                .voice-bar {
+                    animation: bounce-voice 1.2s ease-in-out infinite;
+                }
+                .voice-bar:nth-child(2) { animation-delay: 0.15s; }
+                .voice-bar:nth-child(3) { animation-delay: 0.3s; }
+                .voice-bar:nth-child(4) { animation-delay: 0.45s; }
+                .voice-bar:nth-child(5) { animation-delay: 0.6s; }
+
+                @keyframes wiggle-bell {
+                    0%, 100% { transform: rotate(0deg); }
+                    15% { transform: rotate(8deg); }
+                    30% { transform: rotate(-8deg); }
+                    45% { transform: rotate(6deg); }
+                    60% { transform: rotate(-6deg); }
+                    75% { transform: rotate(3deg); }
+                    90% { transform: rotate(-3deg); }
+                }
+                .wiggle-bell-animation {
+                    animation: wiggle-bell 1.5s ease-in-out infinite;
+                }
+
+                .shine-card::before {
+                    content: '';
+                    position: absolute;
+                    top: 0; left: -150%;
+                    width: 60%; height: 100%;
+                    background: linear-gradient(to right, transparent, rgba(255,255,255,0.06), transparent);
+                    transform: skewX(-25deg);
+                    transition: 0.8s ease;
+                }
+                .shine-card:hover::before {
+                    left: 150%;
+                }
+
+                @keyframes shine-btn-sweep {
+                    0% { left: -100%; }
+                    100% { left: 200%; }
+                }
+                .animate-shine-btn {
+                    position: relative;
+                    overflow: hidden;
+                }
+                .animate-shine-btn::before {
+                    content: '';
+                    position: absolute;
+                    top: 0; left: -100%;
+                    width: 50%; height: 100%;
+                    background: linear-gradient(to right, transparent, rgba(255,255,255,0.35), transparent);
+                    transform: skewX(-25deg);
+                    pointer-events: none;
+                    z-index: 1;
+                }
+                .animate-shine-btn:hover::before {
+                    animation: shine-btn-sweep 0.85s cubic-bezier(0.4, 0, 0.2, 1);
+                }
+            `}</style>
+
+            {/* ── SEÇÃO: PASSE LIVRE PARA O CONTROLE (PORTAL DE ACESSO HOLOGRÁFICO) ── */}
+            <section id="precos" className="relative py-24 md:py-28 z-10 w-full max-w-5xl mx-auto px-6 overflow-hidden">
+                {/* Atmosfera de Luz de Fundo (Tech Space Glows) */}
+                <div className="absolute right-[-10%] top-1/4 w-[400px] h-[400px] rounded-full bg-[#0cf2cd]/4 blur-[130px] pointer-events-none z-0" />
+                <div className="absolute left-[-10%] bottom-1/4 w-[400px] h-[400px] rounded-full bg-[#8b5cf6]/4 blur-[130px] pointer-events-none z-0" />
+
+                {/* ── HEADER DA SEÇÃO CENTRALIZADO NO TOPO ── */}
+                <div className="text-center mb-16 flex flex-col items-center relative z-10">
+                    <motion.div 
+                        initial={{ opacity: 0, y: 15, scale: 0.97, filter: "blur(12px)" }}
+                        whileInView={{ opacity: 1, y: 0, scale: 1, filter: "blur(0px)" }}
+                        viewport={{ once: false, margin: "-180px 0px -20px 0px" }}
+                        transition={{ type: "spring", stiffness: 15, damping: 13, mass: 1.4 }}
+                        className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full border border-white/[0.08] bg-white/[0.02] text-xs font-semibold uppercase tracking-wider text-[#0cf2cd] mb-4 backdrop-blur-md"
+                    >
+                        <Sparkles className="w-3.5 h-3.5 text-[#0cf2cd]" />
+                        <span>Controle Absoluto · Acesso Controle-C Anual</span>
+                    </motion.div>
+
+                    <motion.h2 
+                        initial={{ opacity: 0, y: 15, scale: 0.98, filter: "blur(15px)" }}
+                        whileInView={{ opacity: 1, y: 0, scale: 1, filter: "blur(0px)" }}
+                        viewport={{ once: false, margin: "-180px 0px -20px 0px" }}
+                        transition={{ type: "spring", stiffness: 15, damping: 13, mass: 1.4, delay: 0.15 }}
+                        className="text-3xl sm:text-4xl md:text-5xl font-extrabold text-white tracking-tight leading-tight mb-4 premium-text-shadow font-body-jakarta"
+                    >
+                        Sua rotina. Redesenhada.
+                    </motion.h2>
+                    
+                    <motion.p
+                        initial={{ opacity: 0, y: 12, scale: 0.99, filter: "blur(10px)" }}
+                        whileInView={{ opacity: 1, y: 0, scale: 1, filter: "blur(0px)" }}
+                        viewport={{ once: false, margin: "-180px 0px -20px 0px" }}
+                        transition={{ type: "spring", stiffness: 15, damping: 13, mass: 1.4, delay: 0.3 }}
+                        className="text-text-muted text-sm sm:text-base leading-relaxed max-w-2xl mx-auto"
+                    >
+                        O Controle-C não é apenas mais um aplicativo de tarefas. É um sistema completo e invisível que trabalha para você a partir do seu WhatsApp. Escolha o seu passe de acesso abaixo.
+                    </motion.p>
+                </div>
+
+                {/* Grid Lateral Lado a Lado (12 colunas no desktop) */}
+                <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-16 items-center relative z-10 w-full">
+                    
+                    {/* COLUNA ESQUERDA: LISTA PREMIUM DE VANTAGENS (7/12) */}
+                    <div className="lg:col-span-7 flex flex-col gap-6 text-left w-full h-full justify-center">
+                        {/* Lista Premium e Minimalista de 8 Benefícios Exclusivos (2 Colunas) */}
+                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-6 gap-y-1 w-full pr-0 lg:pr-4">
+                            
+                            {[
+                                {
+                                    highlight: "Controle de Finanças por Áudio",
+                                    desc: "Envie áudios rápidos de 3 segundos no WhatsApp para registrar gastos e despesas em débito, crédito ou dinheiro instantaneamente."
+                                },
+                                {
+                                    highlight: "Planejamento Financeiro Ativo",
+                                    desc: "Defina limites mensais de gastos e orçamentos por categorias inteligentes para economizar sem tocar em uma única planilha."
+                                },
+                                {
+                                    highlight: "Lembrete Inteligente de Contas",
+                                    desc: "Chega de juros. O Controle-C monitora e lembra você ativamente antes do vencimento dos seus boletos e despesas recorrentes."
+                                },
+                                {
+                                    highlight: "Listas de Tarefas por Projetos",
+                                    desc: "Crie listas temáticas, priorize suas tarefas diárias e organize fluxos de trabalho diretamente pelo chat."
+                                },
+                                {
+                                    highlight: "Rastreador de Hábitos & Streaks",
+                                    desc: "Consolide sua rotina de exercícios, leitura ou estudos com streaks visuais de progresso (🔥) e lembretes diários leves."
+                                },
+                                {
+                                    highlight: "Sincronização com Google Agenda",
+                                    desc: "Seus compromissos criados no WhatsApp entram automaticamente e em tempo real no seu calendário oficial da Google."
+                                },
+                                {
+                                    highlight: "Painel Web 360° Exclusivo",
+                                    desc: "Acesse uma interface web espetacular, limpa e responsiva para ver toda a sua vida organizada de forma consolidada."
+                                },
+                                {
+                                    highlight: "Toda a sua Vida Organizada",
+                                    desc: "Centralize finanças, compromissos, tarefas e hábitos em um único ecossistema invisível, prático e livre de fricção."
+                                }
+                            ].map((item, idx) => (
+                                <motion.div 
+                                    key={idx}
+                                    initial={{ opacity: 0, y: 15, scale: 0.97, filter: "blur(10px)" }}
+                                    whileInView={{ opacity: 1, y: 0, scale: 1, filter: "blur(0px)" }}
+                                    viewport={{ once: false, margin: "-180px 0px -20px 0px" }}
+                                    transition={{ type: "spring", stiffness: 15, damping: 13, mass: 1.4, delay: 0.15 + idx * 0.04 }}
+                                    className="flex items-start gap-3.5 py-3 border-b border-white/[0.03] transition-all hover:border-[#0cf2cd]/15 group cursor-default"
+                                >
+                                    <span className="w-5 h-5 rounded-full bg-[#0cf2cd]/8 border border-[#0cf2cd]/20 text-[#0cf2cd] text-[10px] font-black flex items-center justify-center flex-shrink-0 mt-0.5 group-hover:bg-[#0cf2cd]/15 group-hover:border-[#0cf2cd]/40 transition-all select-none">
+                                        ✓
+                                    </span>
+                                    <div className="text-left leading-tight">
+                                        <span className="text-white text-xs sm:text-sm font-extrabold tracking-tight group-hover:text-[#0cf2cd] transition-colors duration-200">
+                                            {item.highlight}
+                                        </span>
+                                        <p className="text-text-muted text-[10.5px] sm:text-xs leading-relaxed mt-1 group-hover:text-text-dimmed transition-colors duration-200">
+                                            {item.desc}
+                                        </p>
+                                    </div>
+                                </motion.div>
+                            ))}
+
+                        </div>
+                    </div>
+
+                    {/* COLUNA DIREITA: O PASSE DE ACESSO HOLOGRÁFICO 3D (5/12) */}
+                    <div className="lg:col-span-5 flex flex-col items-center justify-center w-full h-full relative">
+                        {/* Glow rotativo de fundo exclusivo para o card de checkout */}
+                        <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-80 h-80 rounded-full bg-[#0cf2cd]/4 blur-[100px] pointer-events-none z-0" />
+                        
+                        <motion.div
+                            initial={{ opacity: 0, y: 30, scale: 0.95, filter: "blur(15px)" }}
+                            whileInView={{ opacity: 1, y: 0, scale: 1, filter: "blur(0px)" }}
+                            viewport={{ once: false, margin: "-180px 0px -20px 0px" }}
+                            transition={{ type: "spring", stiffness: 15, damping: 13, mass: 1.4, delay: 0.35 }}
+                            className="w-full flex justify-center z-10"
+                        >
+                            <div
+                                className="w-full max-w-[350px] rounded-3xl border border-[#0cf2cd]/20 bg-gradient-to-b from-[#0a0f18]/95 to-[#030712]/98 p-8 shadow-[0_25px_60px_rgba(0,0,0,0.85),0_0_40px_rgba(12,242,205,0.06)] relative overflow-hidden flex flex-col justify-between group shine-card select-none border-t-white/[0.08] z-10"
+                            >
+                                {/* Glow de destaque interno metálico */}
+                                <div className="absolute -right-20 -top-20 w-44 h-44 rounded-full bg-[#0cf2cd]/6 blur-[80px] pointer-events-none" />
+
+                                {/* Tag de Acesso e Versão */}
+                                <div className="flex items-center justify-between mb-8 pb-4 border-b border-white/[0.04] relative z-10">
+                                    <span className="text-[9px] text-[#0cf2cd] font-bold uppercase tracking-wider bg-[#0cf2cd]/8 px-2.5 py-1 rounded-full border border-[#0cf2cd]/20 animate-pulse">
+                                        LICENÇA ANUAL COMPLETA
+                                    </span>
+                                    <span className="text-[10px] text-text-dimmed font-bold tracking-widest uppercase opacity-60">CONTROLE-C V2.0</span>
+                                </div>
+
+                                {/* Preços com Tipografia Monumental de Clímax */}
+                                <div className="text-left mb-6 relative z-10">
+                                    <p className="text-[10px] text-text-muted/60 line-through font-semibold tracking-wide uppercase mb-1">De R$ 99,90/mês</p>
+                                    <p className="text-[11px] text-text-dimmed font-bold uppercase tracking-wider mb-2.5">Por apenas</p>
+                                    
+                                    <div className="flex flex-col relative leading-none">
+                                        {/* Giant elegant Serif display block for numbers */}
+                                        <span className="text-6xl font-black text-white tracking-tighter premium-text-shadow font-display">
+                                            12x R$ 49,90
+                                        </span>
+                                    </div>
+                                    <p className="text-[10px] text-[#0cf2cd] font-semibold mt-3 select-none uppercase tracking-wider">Ou R$ 499,00 à vista (20% de desconto)</p>
+                                </div>
+
+                                <p className="text-text-muted text-[10.5px] leading-relaxed text-left mb-8 relative z-10 border-l border-white/[0.08] pl-3 italic">
+                                    Equivale a míseros R$ 1,66 por dia. Menos que um único café expresso por semana para colocar a sua mente no controle absoluto.
+                                </p>
+
+                                {/* Botão de Ignição e Disparo Cibernético (CTA Máximo) */}
+                                <div className="relative z-10 w-full mb-6">
+                                    <motion.a 
+                                        href="https://controle-c.com.br/assinar"
+                                        whileHover={{ scale: 1.025, y: -1.5 }}
+                                        whileTap={{ scale: 0.985 }}
+                                        className="animate-shine-btn bg-gradient-to-r from-[#0cf2cd] via-[#00f5d4] to-[#01c7b7] text-black font-black text-[11px] sm:text-xs md:text-[13px] tracking-widest uppercase flex items-center justify-center gap-2.5 rounded-2xl py-4 sm:py-4.5 px-6 w-full text-center transition-all duration-500 shadow-[0_0_20px_rgba(12,242,205,0.25),inset_0_1px_1px_rgba(255,255,255,0.4)] hover:shadow-[0_0_35px_rgba(12,242,205,0.5),inset_0_1px_1px_rgba(255,255,255,0.5)] cursor-pointer border border-white/20 group"
+                                    >
+                                        <span className="relative z-10">Quero organizar minha vida agora</span>
+                                        <ArrowRight className="w-4 h-4 text-black flex-shrink-0 stroke-[3] group-hover:translate-x-1.5 transition-transform duration-300 relative z-10" />
+                                    </motion.a>
+                                </div>
+
+                                {/* Selos de Segurança e Confiança Premium */}
+                                <div className="space-y-2.5 border-t border-white/[0.04] pt-5 relative z-10 text-left">
+                                    <div className="flex items-center gap-2.5 text-text-dimmed text-[9.5px] font-semibold">
+                                        <span className="text-[#0cf2cd]">✓</span>
+                                        <span>Garantia de Satisfação de 7 dias</span>
+                                    </div>
+                                    <div className="flex items-center gap-2.5 text-text-dimmed text-[9.5px] font-semibold">
+                                        <span className="text-[#0cf2cd]">✓</span>
+                                        <span>Acesso imediato e direto no seu WhatsApp</span>
+                                    </div>
+                                    <div className="flex items-center gap-2.5 text-text-dimmed text-[9.5px] font-semibold">
+                                        <span className="text-[#0cf2cd]">✓</span>
+                                        <span>Dados 100% criptografados e seguros</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </motion.div>
+                    </div>
+
                 </div>
             </section>
 
@@ -970,7 +1388,7 @@ const LandingPage = () => {
                             <div className="flex items-center justify-between px-6 py-4 border-b border-white/[0.08] bg-white/[0.01]">
                                 <h3 className="text-white font-bold text-sm sm:text-base flex items-center gap-2">
                                     <Sparkles className="w-4 h-4 text-accent-cyan animate-pulse" />
-                                    Vídeo Demonstrativo - Jarvis
+                                    Vídeo Demonstrativo - Controle-C
                                 </h3>
                                 <button
                                     onClick={() => setShowDemoModal(false)}
@@ -984,7 +1402,7 @@ const LandingPage = () => {
                             <div className="aspect-video w-full bg-black">
                                 <iframe
                                     src="https://www.youtube.com/embed/GbvdjrKxfBc?autoplay=1&rel=0&modestbranding=1&color=white"
-                                    title="Jarvis Demo Video"
+                                    title="Controle-C Demo Video"
                                     allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
                                     allowFullScreen
                                     className="w-full h-full border-0"
