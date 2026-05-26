@@ -111,6 +111,19 @@ const LandingPage = () => {
     const [cardTilt, setCardTilt] = useState({ x: 0, y: 0 });
     const [billingPeriod, setBillingPeriod] = useState('annual');
 
+    // ── Mobile Performance Guard ──
+    // Detects mobile/touch devices robustly (even if "Request Desktop Site" is active)
+    const isMobile = typeof window !== 'undefined' && (
+        /iPhone|iPad|iPod|Android/i.test(navigator.userAgent) || 
+        window.innerWidth < 1024 || 
+        ('ontouchstart' in window) || 
+        (navigator.maxTouchPoints > 0)
+    );
+    // Helper: disabled to prevent GPU overload and WebKit rendering bugs (returns empty object)
+    const fb = (px) => ({});
+    // Helper: returns viewport options (once: true and smaller margin on mobile to prevent elements staying invisible)
+    const vp = (marginStr) => isMobile ? { once: true, margin: "-20px 0px" } : { once: false, margin: marginStr };
+
     const handleMouseMoveCard = (e) => {
         const card = e.currentTarget;
         const rect = card.getBoundingClientRect();
@@ -177,16 +190,18 @@ const LandingPage = () => {
         };
     }, [activeTab]);
 
-    // Auto-cycle situations showcase every 8 seconds to automatically present all features
+    // Auto-cycle situations showcase every 8 seconds (disabled on mobile to prevent memory buildup)
     useEffect(() => {
+        if (isMobile) return;
         const cycleTimer = setInterval(() => {
             setActiveTab((prev) => (prev + 1) % situations.length);
         }, 8000);
         return () => clearInterval(cycleTimer);
-    }, []);
+    }, [isMobile]);
 
-    // High-performance cursor tracking for dynamic background glow spotlight
+    // High-performance cursor tracking for dynamic background glow spotlight (desktop only)
     useEffect(() => {
+        if (isMobile) return; // No cursor tracking on touch devices
         const container = containerRef.current;
         if (!container) return;
 
@@ -228,13 +243,13 @@ const LandingPage = () => {
     return (
         <div ref={containerRef} className="min-h-screen bg-bg-space text-text-main font-body-jakarta overflow-x-hidden relative">
             
-            {/* ── INTERACTIVE CURSOR SPOTLIGHT GLOW (Prevalece em toda a página) ── */}
-            <div 
+            {/* ── INTERACTIVE CURSOR SPOTLIGHT GLOW (Desktop only — GPU layer removed on mobile) ── */}
+            {!isMobile && <div 
                 className="absolute inset-0 pointer-events-none z-[1] mix-blend-screen"
                 style={{
                     background: 'radial-gradient(450px circle at var(--mouse-x, -999px) var(--mouse-y, -999px), rgba(6,182,212,0.18) 0%, rgba(29,78,216,0.06) 45%, transparent 80%)',
                 }}
-            />
+            />}
             
             {/* ── HERO WRAPPER (Restringe o background e glows ao Hero) ── */}
             <div className="relative overflow-hidden w-full">
@@ -442,7 +457,7 @@ const LandingPage = () => {
                                     muted
                                     loop
                                     playsInline
-                                    preload="auto"
+                                    preload={isMobile ? "metadata" : "auto"}
                                     className="w-full h-full object-cover"
                                 />
                                 
@@ -490,9 +505,9 @@ const LandingPage = () => {
                 {/* Header da Seção */}
                 <div className="text-center mb-20 flex flex-col items-center">
                     <motion.div 
-                        initial={{ opacity: 0, y: 15, scale: 0.97, filter: "blur(12px)" }}
-                        whileInView={{ opacity: 1, y: 0, scale: 1, filter: "blur(0px)" }}
-                        viewport={{ once: false, margin: "-180px 0px -100px 0px" }}
+                        initial={{ opacity: 0, y: 15, scale: 0.97, ...fb(12) }}
+                        whileInView={{ opacity: 1, y: 0, scale: 1, ...fb(0) }}
+                        viewport={vp("-180px 0px -100px 0px")}
                         transition={{ type: "spring", stiffness: 15, damping: 13, mass: 1.4 }}
                         className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full border border-white/[0.08] bg-white/[0.02] text-xs font-semibold uppercase tracking-wider text-[#ffa751] mb-4 backdrop-blur-md"
                     >
@@ -501,9 +516,9 @@ const LandingPage = () => {
                     </motion.div>
                     
                     <motion.h2 
-                        initial={{ opacity: 0, y: 15, scale: 0.98, filter: "blur(15px)" }}
-                        whileInView={{ opacity: 1, y: 0, scale: 1, filter: "blur(0px)" }}
-                        viewport={{ once: false, margin: "-180px 0px -100px 0px" }}
+                        initial={{ opacity: 0, y: 15, scale: 0.98, ...fb(15) }}
+                        whileInView={{ opacity: 1, y: 0, scale: 1, ...fb(0) }}
+                        viewport={vp("-180px 0px -100px 0px")}
                         transition={{ type: "spring", stiffness: 15, damping: 13, mass: 1.4, delay: 0.15 }}
                         className="text-3xl sm:text-4xl md:text-5xl font-extrabold text-white tracking-tight leading-tight mb-4 max-w-2xl premium-text-shadow"
                     >
@@ -511,9 +526,9 @@ const LandingPage = () => {
                     </motion.h2>
                     
                     <motion.p 
-                        initial={{ opacity: 0, y: 12, scale: 0.99, filter: "blur(10px)" }}
-                        whileInView={{ opacity: 1, y: 0, scale: 1, filter: "blur(0px)" }}
-                        viewport={{ once: false, margin: "-180px 0px -100px 0px" }}
+                        initial={{ opacity: 0, y: 12, scale: 0.99, ...fb(10) }}
+                        whileInView={{ opacity: 1, y: 0, scale: 1, ...fb(0) }}
+                        viewport={vp("-180px 0px -100px 0px")}
                         transition={{ type: "spring", stiffness: 15, damping: 13, mass: 1.4, delay: 0.3 }}
                         className="text-text-muted text-sm sm:text-base max-w-xl leading-relaxed"
                     >
@@ -542,23 +557,23 @@ const LandingPage = () => {
                         <motion.div 
                             initial={{ scale: 0.7, borderColor: "rgba(255,255,255,0.1)", boxShadow: "0 0 0px rgba(0,0,0,0)" }}
                             whileInView={{ scale: 1.1, borderColor: "#ffa751", boxShadow: "0 0 15px rgba(250,167,81,0.4)" }}
-                            viewport={{ once: false, margin: "-180px 0px -100px 0px" }}
+                            viewport={vp("-180px 0px -100px 0px")}
                             transition={{ type: "spring", stiffness: 100, damping: 15 }}
                             className="absolute left-[3px] md:left-1/2 top-4 md:-translate-x-1/2 w-6 h-6 rounded-full bg-[#010307] border-2 flex items-center justify-center z-20"
                         >
                             <motion.span 
                                 initial={{ scale: 0, opacity: 0 }}
                                 whileInView={{ scale: 1, opacity: 1 }}
-                                viewport={{ once: false, margin: "-180px 0px -100px 0px" }}
+                                viewport={vp("-180px 0px -100px 0px")}
                                 className="w-2 h-2 rounded-full bg-[#ffa751]" 
                             />
                         </motion.div>
                         
                         {/* Card Lado Esquerdo */}
                         <motion.div 
-                            initial={{ opacity: 0, y: 15, scale: 0.98, filter: "blur(15px)" }}
-                            whileInView={{ opacity: 1, y: 0, scale: 1, filter: "blur(0px)" }}
-                            viewport={{ once: false, margin: "-180px 0px -100px 0px" }}
+                            initial={{ opacity: 0, y: 15, scale: 0.98, ...fb(15) }}
+                            whileInView={{ opacity: 1, y: 0, scale: 1, ...fb(0) }}
+                            viewport={vp("-180px 0px -100px 0px")}
                             transition={{ type: "spring", stiffness: 15, damping: 13, mass: 1.4 }}
                             className="w-full md:w-[45%] bg-[#010307]/50 backdrop-blur-xl border border-white/[0.08] hover:border-[#ffa751]/30 hover:shadow-[0_0_30px_rgba(250,167,81,0.06)] rounded-2xl p-6 transition-all duration-500 text-left"
                         >
@@ -615,23 +630,23 @@ const LandingPage = () => {
                         <motion.div 
                             initial={{ scale: 0.7, borderColor: "rgba(255,255,255,0.1)", boxShadow: "0 0 0px rgba(0,0,0,0)" }}
                             whileInView={{ scale: 1.1, borderColor: "#00f0ff", boxShadow: "0 0 15px rgba(0,240,255,0.4)" }}
-                            viewport={{ once: false, margin: "-180px 0px -100px 0px" }}
+                            viewport={vp("-180px 0px -100px 0px")}
                             transition={{ type: "spring", stiffness: 100, damping: 15 }}
                             className="absolute left-[3px] md:left-1/2 top-4 md:-translate-x-1/2 w-6 h-6 rounded-full bg-[#010307] border-2 flex items-center justify-center z-20"
                         >
                             <motion.span 
                                 initial={{ scale: 0, opacity: 0 }}
                                 whileInView={{ scale: 1, opacity: 1 }}
-                                viewport={{ once: false, margin: "-180px 0px -100px 0px" }}
+                                viewport={vp("-180px 0px -100px 0px")}
                                 className="w-2 h-2 rounded-full bg-[#00f0ff]" 
                             />
                         </motion.div>
                         
                         {/* Card Lado Direito */}
                         <motion.div 
-                            initial={{ opacity: 0, y: 15, scale: 0.98, filter: "blur(15px)" }}
-                            whileInView={{ opacity: 1, y: 0, scale: 1, filter: "blur(0px)" }}
-                            viewport={{ once: false, margin: "-180px 0px -100px 0px" }}
+                            initial={{ opacity: 0, y: 15, scale: 0.98, ...fb(15) }}
+                            whileInView={{ opacity: 1, y: 0, scale: 1, ...fb(0) }}
+                            viewport={vp("-180px 0px -100px 0px")}
                             transition={{ type: "spring", stiffness: 15, damping: 13, mass: 1.4 }}
                             className="w-full md:w-[45%] bg-[#010307]/50 backdrop-blur-xl border border-white/[0.08] hover:border-[#00f0ff]/30 hover:shadow-[0_0_30px_rgba(0,240,255,0.06)] rounded-2xl p-6 transition-all duration-500 text-left"
                         >
@@ -692,23 +707,23 @@ const LandingPage = () => {
                         <motion.div 
                             initial={{ scale: 0.7, borderColor: "rgba(255,255,255,0.1)", boxShadow: "0 0 0px rgba(0,0,0,0)" }}
                             whileInView={{ scale: 1.1, borderColor: "#a855f7", boxShadow: "0 0 15px rgba(168,85,247,0.4)" }}
-                            viewport={{ once: false, margin: "-180px 0px -100px 0px" }}
+                            viewport={vp("-180px 0px -100px 0px")}
                             transition={{ type: "spring", stiffness: 100, damping: 15 }}
                             className="absolute left-[3px] md:left-1/2 top-4 md:-translate-x-1/2 w-6 h-6 rounded-full bg-[#010307] border-2 flex items-center justify-center z-20"
                         >
                             <motion.span 
                                 initial={{ scale: 0, opacity: 0 }}
                                 whileInView={{ scale: 1, opacity: 1 }}
-                                viewport={{ once: false, margin: "-180px 0px -100px 0px" }}
+                                viewport={vp("-180px 0px -100px 0px")}
                                 className="w-2 h-2 rounded-full bg-[#a855f7]" 
                             />
                         </motion.div>
                         
                         {/* Card Lado Esquerdo */}
                         <motion.div 
-                            initial={{ opacity: 0, y: 15, scale: 0.98, filter: "blur(15px)" }}
-                            whileInView={{ opacity: 1, y: 0, scale: 1, filter: "blur(0px)" }}
-                            viewport={{ once: false, margin: "-180px 0px -100px 0px" }}
+                            initial={{ opacity: 0, y: 15, scale: 0.98, ...fb(15) }}
+                            whileInView={{ opacity: 1, y: 0, scale: 1, ...fb(0) }}
+                            viewport={vp("-180px 0px -100px 0px")}
                             transition={{ type: "spring", stiffness: 15, damping: 13, mass: 1.4 }}
                             className="w-full md:w-[45%] bg-[#010307]/50 backdrop-blur-xl border border-white/[0.08] hover:border-[#a855f7]/30 hover:shadow-[0_0_30px_rgba(168,85,247,0.06)] rounded-2xl p-6 transition-all duration-500 text-left"
                         >
@@ -757,23 +772,23 @@ const LandingPage = () => {
                         <motion.div 
                             initial={{ scale: 0.7, borderColor: "rgba(255,255,255,0.1)", boxShadow: "0 0 0px rgba(0,0,0,0)" }}
                             whileInView={{ scale: 1.1, borderColor: "#f43f5e", boxShadow: "0 0 15px rgba(244,63,94,0.4)" }}
-                            viewport={{ once: false, margin: "-180px 0px -100px 0px" }}
+                            viewport={vp("-180px 0px -100px 0px")}
                             transition={{ type: "spring", stiffness: 100, damping: 15 }}
                             className="absolute left-[3px] md:left-1/2 top-4 md:-translate-x-1/2 w-6 h-6 rounded-full bg-[#010307] border-2 flex items-center justify-center z-20"
                         >
                             <motion.span 
                                 initial={{ scale: 0, opacity: 0 }}
                                 whileInView={{ scale: 1, opacity: 1 }}
-                                viewport={{ once: false, margin: "-180px 0px -100px 0px" }}
+                                viewport={vp("-180px 0px -100px 0px")}
                                 className="w-2 h-2 rounded-full bg-[#f43f5e]" 
                             />
                         </motion.div>
                         
                         {/* Card Lado Direito */}
                         <motion.div 
-                            initial={{ opacity: 0, y: 15, scale: 0.98, filter: "blur(15px)" }}
-                            whileInView={{ opacity: 1, y: 0, scale: 1, filter: "blur(0px)" }}
-                            viewport={{ once: false, margin: "-180px 0px -100px 0px" }}
+                            initial={{ opacity: 0, y: 15, scale: 0.98, ...fb(15) }}
+                            whileInView={{ opacity: 1, y: 0, scale: 1, ...fb(0) }}
+                            viewport={vp("-180px 0px -100px 0px")}
                             transition={{ type: "spring", stiffness: 15, damping: 13, mass: 1.4 }}
                             className="w-full md:w-[45%] bg-[#010307]/50 backdrop-blur-xl border border-white/[0.08] hover:border-[#f43f5e]/30 hover:shadow-[0_0_30px_rgba(244,63,94,0.06)] rounded-2xl p-6 transition-all duration-500 text-left"
                         >
@@ -828,9 +843,9 @@ const LandingPage = () => {
                 {/* Header da Seção */}
                 <div className="text-center mb-16 flex flex-col items-center">
                     <motion.div 
-                        initial={{ opacity: 0, y: 15, scale: 0.97, filter: "blur(12px)" }}
-                        whileInView={{ opacity: 1, y: 0, scale: 1, filter: "blur(0px)" }}
-                        viewport={{ once: false, margin: "-180px 0px -100px 0px" }}
+                        initial={{ opacity: 0, y: 15, scale: 0.97, ...fb(12) }}
+                        whileInView={{ opacity: 1, y: 0, scale: 1, ...fb(0) }}
+                        viewport={vp("-180px 0px -100px 0px")}
                         transition={{ type: "spring", stiffness: 15, damping: 13, mass: 1.4 }}
                         className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full border border-white/[0.08] bg-white/[0.02] text-xs font-semibold uppercase tracking-wider text-[#00f0ff] mb-4 backdrop-blur-md"
                     >
@@ -839,9 +854,9 @@ const LandingPage = () => {
                     </motion.div>
                     
                     <motion.h2 
-                        initial={{ opacity: 0, y: 15, scale: 0.98, filter: "blur(15px)" }}
-                        whileInView={{ opacity: 1, y: 0, scale: 1, filter: "blur(0px)" }}
-                        viewport={{ once: false, margin: "-180px 0px -100px 0px" }}
+                        initial={{ opacity: 0, y: 15, scale: 0.98, ...fb(15) }}
+                        whileInView={{ opacity: 1, y: 0, scale: 1, ...fb(0) }}
+                        viewport={vp("-180px 0px -100px 0px")}
                         transition={{ type: "spring", stiffness: 15, damping: 13, mass: 1.4, delay: 0.15 }}
                         className="text-3xl sm:text-4xl md:text-5xl font-extrabold text-white tracking-tight leading-tight mb-4 max-w-2xl premium-text-shadow"
                     >
@@ -849,9 +864,9 @@ const LandingPage = () => {
                     </motion.h2>
                     
                     <motion.p 
-                        initial={{ opacity: 0, y: 12, scale: 0.99, filter: "blur(10px)" }}
-                        whileInView={{ opacity: 1, y: 0, scale: 1, filter: "blur(0px)" }}
-                        viewport={{ once: false, margin: "-180px 0px -100px 0px" }}
+                        initial={{ opacity: 0, y: 12, scale: 0.99, ...fb(10) }}
+                        whileInView={{ opacity: 1, y: 0, scale: 1, ...fb(0) }}
+                        viewport={vp("-180px 0px -100px 0px")}
                         transition={{ type: "spring", stiffness: 15, damping: 13, mass: 1.4, delay: 0.3 }}
                         className="text-text-muted text-sm sm:text-base max-w-2xl leading-relaxed"
                     >
@@ -868,9 +883,9 @@ const LandingPage = () => {
 
                     {/* MOCKUP DESKTOP (LAPTOP) */}
                     <motion.div 
-                        initial={{ opacity: 0, y: 30, filter: "blur(15px)", scale: 0.96 }}
-                        whileInView={{ opacity: 1, y: 0, filter: "blur(0px)", scale: 1 }}
-                        viewport={{ once: false, margin: "-100px" }}
+                        initial={{ opacity: 0, y: 30, ...fb(15), scale: 0.96 }}
+                        whileInView={{ opacity: 1, y: 0, ...fb(0), scale: 1 }}
+                        viewport={vp("-100px")}
                         transition={{ type: "spring", stiffness: 15, damping: 13, mass: 1.4 }}
                         className="w-full md:w-[88%] mr-auto relative z-10"
                     >
@@ -909,7 +924,7 @@ const LandingPage = () => {
                         initial={{ y: 40, opacity: 0, rotateY: -18, rotateX: 10, rotateZ: 3 }}
                         whileInView={{ y: 0, opacity: 1, rotateY: -18, rotateX: 10, rotateZ: 3 }}
                         whileHover={{ y: -8, rotateY: -12, rotateX: 8, rotateZ: 1 }}
-                        viewport={{ once: false, margin: "-100px" }}
+                        viewport={vp("-100px")}
                         transition={{ type: "spring", stiffness: 25, damping: 15, mass: 1.2 }}
                         style={{
                             transformStyle: 'preserve-3d',
@@ -964,9 +979,9 @@ const LandingPage = () => {
                 {/* Header da Seção */}
                 <div className="text-center mb-16 flex flex-col items-center relative z-10">
                     <motion.div 
-                        initial={{ opacity: 0, y: 15, scale: 0.97, filter: "blur(12px)" }}
-                        whileInView={{ opacity: 1, y: 0, scale: 1, filter: "blur(0px)" }}
-                        viewport={{ once: false, margin: "-180px 0px -20px 0px" }}
+                        initial={{ opacity: 0, y: 15, scale: 0.97, ...fb(12) }}
+                        whileInView={{ opacity: 1, y: 0, scale: 1, ...fb(0) }}
+                        viewport={vp("-180px 0px -20px 0px")}
                         transition={{ type: "spring", stiffness: 15, damping: 13, mass: 1.4 }}
                         className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full border border-white/[0.08] bg-white/[0.02] text-xs font-semibold uppercase tracking-wider text-[#a855f7] mb-4 backdrop-blur-md"
                     >
@@ -975,9 +990,9 @@ const LandingPage = () => {
                     </motion.div>
                     
                     <motion.h2 
-                        initial={{ opacity: 0, y: 15, scale: 0.98, filter: "blur(15px)" }}
-                        whileInView={{ opacity: 1, y: 0, scale: 1, filter: "blur(0px)" }}
-                        viewport={{ once: false, margin: "-180px 0px -20px 0px" }}
+                        initial={{ opacity: 0, y: 15, scale: 0.98, ...fb(15) }}
+                        whileInView={{ opacity: 1, y: 0, scale: 1, ...fb(0) }}
+                        viewport={vp("-180px 0px -20px 0px")}
                         transition={{ type: "spring", stiffness: 15, damping: 13, mass: 1.4, delay: 0.15 }}
                         className="text-3xl sm:text-4xl md:text-5xl font-extrabold text-white tracking-tight leading-tight mb-4 premium-text-shadow"
                     >
@@ -985,9 +1000,9 @@ const LandingPage = () => {
                     </motion.h2>
                     
                     <motion.p 
-                        initial={{ opacity: 0, y: 12, scale: 0.99, filter: "blur(10px)" }}
-                        whileInView={{ opacity: 1, y: 0, scale: 1, filter: "blur(0px)" }}
-                        viewport={{ once: false, margin: "-180px 0px -20px 0px" }}
+                        initial={{ opacity: 0, y: 12, scale: 0.99, ...fb(10) }}
+                        whileInView={{ opacity: 1, y: 0, scale: 1, ...fb(0) }}
+                        viewport={vp("-180px 0px -20px 0px")}
                         transition={{ type: "spring", stiffness: 15, damping: 13, mass: 1.4, delay: 0.3 }}
                         className="text-text-muted text-sm sm:text-base max-w-xl mx-auto leading-relaxed"
                     >
@@ -1002,7 +1017,7 @@ const LandingPage = () => {
                     <motion.div 
                         initial={{ opacity: 0, x: -20, rotate: -2, scale: 0.98 }}
                         whileInView={{ opacity: 1, x: 0, rotate: -1.5, scale: 1 }}
-                        viewport={{ once: false, margin: "-180px 0px -20px 0px" }}
+                        viewport={vp("-180px 0px -20px 0px")}
                         transition={{ type: "spring", stiffness: 25, damping: 16, mass: 1.2 }}
                         whileHover={{ rotate: -0.5, y: -4, transition: { duration: 0.2 } }}
                         className="relative rounded-2xl border border-rose-500/10 bg-gradient-to-b from-[#08090a]/95 to-[#020304]/98 p-6 md:p-8 shadow-[0_15px_30px_rgba(244,63,94,0.02)] overflow-hidden group select-none"
@@ -1059,7 +1074,7 @@ const LandingPage = () => {
                     <motion.div 
                         initial={{ opacity: 0, x: 20, rotate: 2, scale: 0.98 }}
                         whileInView={{ opacity: 1, x: 0, rotate: 1.5, scale: 1 }}
-                        viewport={{ once: false, margin: "-180px 0px -20px 0px" }}
+                        viewport={vp("-180px 0px -20px 0px")}
                         transition={{ type: "spring", stiffness: 25, damping: 16, mass: 1.2 }}
                         whileHover={{ rotate: 0.5, y: -4, transition: { duration: 0.2 } }}
                         className="relative rounded-2xl border border-emerald-500/10 bg-gradient-to-b from-[#08090a]/95 to-[#020304]/98 p-6 md:p-8 shadow-[0_15px_30px_rgba(12,242,205,0.02)] overflow-hidden group select-none"
@@ -1190,9 +1205,9 @@ const LandingPage = () => {
                 {/* ── HEADER DA SEÇÃO CENTRALIZADO NO TOPO ── */}
                 <div className="text-center mb-16 flex flex-col items-center relative z-10">
                     <motion.div 
-                        initial={{ opacity: 0, y: 15, scale: 0.97, filter: "blur(12px)" }}
-                        whileInView={{ opacity: 1, y: 0, scale: 1, filter: "blur(0px)" }}
-                        viewport={{ once: false, margin: "-180px 0px -20px 0px" }}
+                        initial={{ opacity: 0, y: 15, scale: 0.97, ...fb(12) }}
+                        whileInView={{ opacity: 1, y: 0, scale: 1, ...fb(0) }}
+                        viewport={vp("-180px 0px -20px 0px")}
                         transition={{ type: "spring", stiffness: 15, damping: 13, mass: 1.4 }}
                         className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full border border-white/[0.08] bg-white/[0.02] text-xs font-semibold uppercase tracking-wider text-[#0cf2cd] mb-4 backdrop-blur-md"
                     >
@@ -1201,9 +1216,9 @@ const LandingPage = () => {
                     </motion.div>
 
                     <motion.h2 
-                        initial={{ opacity: 0, y: 15, scale: 0.98, filter: "blur(15px)" }}
-                        whileInView={{ opacity: 1, y: 0, scale: 1, filter: "blur(0px)" }}
-                        viewport={{ once: false, margin: "-180px 0px -20px 0px" }}
+                        initial={{ opacity: 0, y: 15, scale: 0.98, ...fb(15) }}
+                        whileInView={{ opacity: 1, y: 0, scale: 1, ...fb(0) }}
+                        viewport={vp("-180px 0px -20px 0px")}
                         transition={{ type: "spring", stiffness: 15, damping: 13, mass: 1.4, delay: 0.15 }}
                         className="text-3xl sm:text-4xl md:text-5xl font-extrabold text-white tracking-tight leading-tight mb-4 premium-text-shadow font-body-jakarta"
                     >
@@ -1211,9 +1226,9 @@ const LandingPage = () => {
                     </motion.h2>
                     
                     <motion.p
-                        initial={{ opacity: 0, y: 12, scale: 0.99, filter: "blur(10px)" }}
-                        whileInView={{ opacity: 1, y: 0, scale: 1, filter: "blur(0px)" }}
-                        viewport={{ once: false, margin: "-180px 0px -20px 0px" }}
+                        initial={{ opacity: 0, y: 12, scale: 0.99, ...fb(10) }}
+                        whileInView={{ opacity: 1, y: 0, scale: 1, ...fb(0) }}
+                        viewport={vp("-180px 0px -20px 0px")}
                         transition={{ type: "spring", stiffness: 15, damping: 13, mass: 1.4, delay: 0.3 }}
                         className="text-text-muted text-sm sm:text-base leading-relaxed max-w-2xl mx-auto"
                     >
@@ -1265,9 +1280,9 @@ const LandingPage = () => {
                             ].map((item, idx) => (
                                 <motion.div 
                                     key={idx}
-                                    initial={{ opacity: 0, y: 15, scale: 0.97, filter: "blur(10px)" }}
-                                    whileInView={{ opacity: 1, y: 0, scale: 1, filter: "blur(0px)" }}
-                                    viewport={{ once: false, margin: "-180px 0px -20px 0px" }}
+                                    initial={{ opacity: 0, y: 15, scale: 0.97, ...fb(10) }}
+                                    whileInView={{ opacity: 1, y: 0, scale: 1, ...fb(0) }}
+                                    viewport={vp("-180px 0px -20px 0px")}
                                     transition={{ type: "spring", stiffness: 15, damping: 13, mass: 1.4, delay: 0.15 + idx * 0.04 }}
                                     className="flex items-start gap-3.5 py-3 border-b border-white/[0.03] transition-all hover:border-[#0cf2cd]/15 group cursor-default"
                                 >
@@ -1294,9 +1309,9 @@ const LandingPage = () => {
                         <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-80 h-80 rounded-full bg-[#0cf2cd]/4 blur-[100px] pointer-events-none z-0" />
                         
                         <motion.div
-                            initial={{ opacity: 0, y: 30, scale: 0.95, filter: "blur(15px)" }}
-                            whileInView={{ opacity: 1, y: 0, scale: 1, filter: "blur(0px)" }}
-                            viewport={{ once: false, margin: "-180px 0px -20px 0px" }}
+                            initial={{ opacity: 0, y: 30, scale: 0.95, ...fb(15) }}
+                            whileInView={{ opacity: 1, y: 0, scale: 1, ...fb(0) }}
+                            viewport={vp("-180px 0px -20px 0px")}
                             transition={{ type: "spring", stiffness: 15, damping: 13, mass: 1.4, delay: 0.35 }}
                             className="w-full flex justify-center z-10"
                         >

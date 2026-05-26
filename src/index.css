@@ -1160,4 +1160,43 @@
             border-color 0.1s ease,
             background-color 0.1s ease;
     }
+}
+
+/* ── Mobile Performance Guard ──────────────────────────────────────────────────
+   Kills GPU-intensive CSS animations on mobile to prevent WebKit/Blink crashes.
+   Affects: animated background blobs, column slides, nebula hue-rotate cycle,
+   and heavy backdrop-blur layers. Desktop remains fully untouched.
+   ──────────────────────────────────────────────────────────────────────────── */
+@media (max-width: 768px) {
+    /* Disable backdrop-filter entirely on mobile to prevent WebKit/Blink bug where 
+       animating transform layers blur the entire container and all its children/text. */
+    .backdrop-blur-3xl,
+    .backdrop-blur-2xl,
+    .backdrop-blur-xl,
+    .backdrop-blur-lg,
+    .backdrop-blur-md,
+    .backdrop-blur-sm,
+    .backdrop-blur {
+        -webkit-backdrop-filter: none !important;
+        backdrop-filter: none !important;
+    }
+
+    /* Fallback solid backgrounds for glass containers on mobile so they remain extremely premium and readable */
+    .bg-\[\#010307\]\/50,
+    .bg-\[\#010307\]\/60 {
+        background-color: rgba(1, 3, 7, 0.94) !important;
+    }
+}
+
+/* Also respect prefers-reduced-motion for accessibility */
+@media (prefers-reduced-motion: reduce) {
+    .animate-liquid-fast-1,
+    .animate-liquid-fast-2,
+    .animate-liquid-fast-3,
+    .animate-col-slide-hyper-1,
+    .animate-col-slide-hyper-2,
+    .animate-col-slide-hyper-3,
+    .animate-nebula-cycle {
+        animation: none !important;
+    }
 }
