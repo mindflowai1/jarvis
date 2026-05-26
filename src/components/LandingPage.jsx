@@ -109,6 +109,7 @@ const LandingPage = () => {
     const [showDemoModal, setShowDemoModal] = useState(false);
     const [simStep, setSimStep] = useState(0); // 0: audio processing, 1: processed/revealed
     const [cardTilt, setCardTilt] = useState({ x: 0, y: 0 });
+    const [billingPeriod, setBillingPeriod] = useState('annual');
 
     const handleMouseMoveCard = (e) => {
         const card = e.currentTarget;
@@ -1086,15 +1087,15 @@ const LandingPage = () => {
                             <div className="flex gap-3 items-start">
                                 <span className="w-5 h-5 rounded-full bg-[#0cf2cd]/15 border border-[#0cf2cd]/25 text-[#0cf2cd] text-[10px] font-bold flex items-center justify-center flex-shrink-0 mt-0.5 select-none">✓</span>
                                 <div className="text-left">
-                                    <h4 className="text-white text-xs font-bold">Tudo no WhatsApp</h4>
-                                    <p className="text-text-muted text-[11px] mt-0.5 leading-relaxed">Envie áudios de 3 segundos para o Jarvis e registre despesas, metas e agenda.</p>
+                                    <h4 className="text-white text-xs font-bold">Finanças Organizadas</h4>
+                                    <p className="text-text-muted text-[11px] mt-0.5 leading-relaxed">Controle total de suas despesas e orçamentos diários de forma automática, prática e 100% livre de planilhas complexas.</p>
                                 </div>
                             </div>
                             <div className="flex gap-3 items-start">
                                 <span className="w-5 h-5 rounded-full bg-[#0cf2cd]/15 border border-[#0cf2cd]/25 text-[#0cf2cd] text-[10px] font-bold flex items-center justify-center flex-shrink-0 mt-0.5 select-none">✓</span>
                                 <div className="text-left">
                                     <h4 className="text-white text-xs font-bold">Mente 100% Livre</h4>
-                                    <p className="text-text-muted text-[11px] mt-0.5 leading-relaxed">A paz de dormir sabendo que tudo está anotado e processado pelo Jarvis.</p>
+                                    <p className="text-text-muted text-[11px] mt-0.5 leading-relaxed">A paz de dormir sabendo que tudo está anotado e processado pelo Controle-C.</p>
                                 </div>
                             </div>
                             <div className="flex gap-3 items-start">
@@ -1306,35 +1307,74 @@ const LandingPage = () => {
                                 <div className="absolute -right-20 -top-20 w-44 h-44 rounded-full bg-[#0cf2cd]/6 blur-[80px] pointer-events-none" />
 
                                 {/* Tag de Acesso e Versão */}
-                                <div className="flex items-center justify-between mb-8 pb-4 border-b border-white/[0.04] relative z-10">
+                                <div className="flex items-center justify-between mb-6 pb-4 border-b border-white/[0.04] relative z-10">
                                     <span className="text-[9px] text-[#0cf2cd] font-bold uppercase tracking-wider bg-[#0cf2cd]/8 px-2.5 py-1 rounded-full border border-[#0cf2cd]/20 animate-pulse">
-                                        LICENÇA ANUAL COMPLETA
+                                        {billingPeriod === 'annual' ? 'LICENÇA ANUAL COMPLETA' : 'ASSINATURA MENSAL'}
                                     </span>
                                     <span className="text-[10px] text-text-dimmed font-bold tracking-widest uppercase opacity-60">CONTROLE-C V2.0</span>
                                 </div>
 
+                                {/* Seletor de Planos (Mensal vs Anual) */}
+                                <div className="relative z-10 mb-8 w-full p-1 bg-white/[0.01] border border-white/[0.06] rounded-xl flex items-center justify-between backdrop-blur-md">
+                                    <button
+                                        onClick={() => setBillingPeriod('monthly')}
+                                        className={`flex-1 py-2 px-3 text-center rounded-lg text-xs font-bold transition-all duration-300 ${billingPeriod === 'monthly' ? 'bg-[#0cf2cd] text-black shadow-[0_0_15px_rgba(12,242,205,0.25)]' : 'text-text-muted hover:text-white'}`}
+                                    >
+                                        Mensal
+                                    </button>
+                                    <button
+                                        onClick={() => setBillingPeriod('annual')}
+                                        className={`flex-1 py-2 px-3 text-center rounded-lg text-xs font-bold transition-all duration-300 relative ${billingPeriod === 'annual' ? 'bg-[#0cf2cd] text-black shadow-[0_0_15px_rgba(12,242,205,0.25)]' : 'text-text-muted hover:text-white'}`}
+                                    >
+                                        Anual
+                                        <span className="absolute -top-2.5 -right-1 bg-purple-600 text-white text-[7.5px] font-black px-1.5 py-0.5 rounded-full uppercase tracking-wider animate-pulse">
+                                            37% OFF
+                                        </span>
+                                    </button>
+                                </div>
+
                                 {/* Preços com Tipografia Monumental de Clímax */}
                                 <div className="text-left mb-6 relative z-10">
-                                    <p className="text-[10px] text-text-muted/60 line-through font-semibold tracking-wide uppercase mb-1">De R$ 99,90/mês</p>
-                                    <p className="text-[11px] text-text-dimmed font-bold uppercase tracking-wider mb-2.5">Por apenas</p>
-                                    
-                                    <div className="flex flex-col relative leading-none">
-                                        {/* Giant elegant Serif display block for numbers */}
-                                        <span className="text-6xl font-black text-white tracking-tighter premium-text-shadow font-display">
-                                            12x R$ 49,90
-                                        </span>
-                                    </div>
-                                    <p className="text-[10px] text-[#0cf2cd] font-semibold mt-3 select-none uppercase tracking-wider">Ou R$ 499,00 à vista (20% de desconto)</p>
+                                    {billingPeriod === 'annual' ? (
+                                        <>
+                                            <p className="text-[10px] text-text-muted/60 line-through font-semibold tracking-wide uppercase mb-1">De R$ 99,90/mês</p>
+                                            <p className="text-[11px] text-text-dimmed font-bold uppercase tracking-wider mb-2.5">Por apenas</p>
+                                            
+                                            <div className="flex flex-col relative leading-none">
+                                                {/* Giant elegant Serif display block for numbers */}
+                                                <span className="text-5xl sm:text-6xl font-black text-white tracking-tighter premium-text-shadow font-display">
+                                                    12x <span className="text-[26px] sm:text-[34px] font-extrabold tracking-normal">R$</span> 61,69
+                                                </span>
+                                            </div>
+                                            <p className="text-[10px] text-[#0cf2cd] font-semibold mt-3 select-none uppercase tracking-wider">Ou R$ 600,00 à vista (Economize 37%)</p>
+                                        </>
+                                    ) : (
+                                        <>
+                                            <p className="text-[10px] text-text-muted/60 line-through font-semibold tracking-wide uppercase mb-1 opacity-0">De R$ 99,90/mês</p>
+                                            <p className="text-[11px] text-text-dimmed font-bold uppercase tracking-wider mb-2.5">Por apenas</p>
+                                            
+                                            <div className="flex flex-col relative leading-none">
+                                                {/* Giant elegant Serif display block for numbers */}
+                                                <span className="text-5xl sm:text-6xl font-black text-white tracking-tighter premium-text-shadow font-display">
+                                                    <span className="text-[26px] sm:text-[34px] font-extrabold tracking-normal">R$</span> 80,00<span className="text-xs text-text-muted tracking-normal font-medium"> /mês</span>
+                                                </span>
+                                            </div>
+                                            <p className="text-[10px] text-[#0cf2cd] font-semibold mt-3 select-none uppercase tracking-wider">Sem fidelidade · Cancele quando quiser</p>
+                                        </>
+                                    )}
                                 </div>
 
                                 <p className="text-text-muted text-[10.5px] leading-relaxed text-left mb-8 relative z-10 border-l border-white/[0.08] pl-3 italic">
-                                    Equivale a míseros R$ 1,66 por dia. Menos que um único café expresso por semana para colocar a sua mente no controle absoluto.
+                                    {billingPeriod === 'annual' 
+                                        ? "Equivale a míseros R$ 1,66 por dia. Menos que um único café expresso por semana para colocar a sua mente no controle absoluto."
+                                        : "Equivale a R$ 2,66 por dia. Menos que um refrigerante por semana para colocar toda a sua vida organizada de forma imediata."
+                                    }
                                 </p>
 
                                 {/* Botão de Ignição e Disparo Cibernético (CTA Máximo) */}
                                 <div className="relative z-10 w-full mb-6">
                                     <motion.a 
-                                        href="https://controle-c.com.br/assinar"
+                                        href={billingPeriod === 'annual' ? "https://pay.zouti.com.br/checkout?product_offer_id=prod_offer_ydek6nmp28nqr06wkqifds" : "https://pay.zouti.com.br/checkout?product_offer_id=prod_offer_ynkqy38q0c15pcg9sgvz1u"}
                                         whileHover={{ scale: 1.025, y: -1.5 }}
                                         whileTap={{ scale: 0.985 }}
                                         className="animate-shine-btn bg-gradient-to-r from-[#0cf2cd] via-[#00f5d4] to-[#01c7b7] text-black font-black text-[11px] sm:text-xs md:text-[13px] tracking-widest uppercase flex items-center justify-center gap-2.5 rounded-2xl py-4 sm:py-4.5 px-6 w-full text-center transition-all duration-500 shadow-[0_0_20px_rgba(12,242,205,0.25),inset_0_1px_1px_rgba(255,255,255,0.4)] hover:shadow-[0_0_35px_rgba(12,242,205,0.5),inset_0_1px_1px_rgba(255,255,255,0.5)] cursor-pointer border border-white/20 group"
