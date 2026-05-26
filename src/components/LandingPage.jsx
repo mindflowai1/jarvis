@@ -884,7 +884,7 @@ const LandingPage = () => {
                                 
                                 {/* URL Bar */}
                                 <div className="flex-1 max-w-sm mx-auto flex items-center justify-center h-5 px-3 rounded bg-white/[0.03] border border-white/[0.04] text-[9px] text-text-dimmed tracking-wider">
-                                    <span className="opacity-45">app.controlec.io</span>
+                                    <span className="opacity-45">controle-c.com.br</span>
                                 </div>
                             </div>
                             
