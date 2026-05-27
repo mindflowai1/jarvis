@@ -144,7 +144,7 @@ const CalendarAgenda = ({ session }) => {
             const { error } = await supabase.auth.signInWithOAuth({
                 provider: 'google',
                 options: {
-                    redirectTo: `${window.location.origin}/dashboard?tab=agenda`,
+                    redirectTo: `${window.location.origin}/?tab=agenda`,
                     scopes: 'https://www.googleapis.com/auth/calendar',
                     queryParams: {
                         access_type: 'offline',

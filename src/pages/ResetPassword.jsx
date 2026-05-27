@@ -53,9 +53,9 @@ const ResetPassword = () => {
             if (error) throw error
 
             setSuccess(true)
-            // Redireciona para o dashboard após sucesso
+            // Redireciona para o painel principal após sucesso
             setTimeout(() => {
-                navigate('/dashboard', { replace: true })
+                navigate('/', { replace: true })
             }, 3000)
         } catch (err) {
             console.error('Reset password error:', err)

@@ -46,14 +46,14 @@ const AdminDashboard = ({ session }) => {
                 .single()
 
             if (!profile?.is_admin) {
-                navigate('/dashboard')
+                navigate('/')
                 return
             }
 
             fetchUsers()
         } catch (error) {
             console.error('Erro:', error)
-            navigate('/dashboard')
+            navigate('/')
         }
     }
 
@@ -227,7 +227,7 @@ const AdminDashboard = ({ session }) => {
                     {/* ... outros botões ... */}
                 </nav>
 
-                <button onClick={() => navigate('/dashboard')} className="admin-nav-item admin-back-btn">
+                <button onClick={() => navigate('/')} className="admin-nav-item admin-back-btn">
                     <ChevronLeft size={20} />
                     <span>Voltar ao App</span>
                 </button>

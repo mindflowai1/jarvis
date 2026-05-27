@@ -78,7 +78,7 @@ const Tutorials = () => {
       <header className="relative z-10 p-6 border-b border-white/5 bg-[#090e1a]/60 backdrop-blur-xl sticky top-0">
         <div className="max-w-7xl mx-auto flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <Link to="/dashboard" className="flex items-center">
+            <Link to="/" className="flex items-center">
               <img src="/logo-controle-c.png" alt="Controle-C Logo" className="h-12 sm:h-14 w-auto object-contain" style={{ filter: 'drop-shadow(0 0 15px rgba(12, 242, 205, 0.4))' }} />
             </Link>
             <span className="h-8 w-[1px] bg-white/10 hidden sm:inline-block" />
@@ -88,7 +88,7 @@ const Tutorials = () => {
           </div>
 
           <button 
-            onClick={() => navigate('/dashboard?tab=settings')}
+            onClick={() => navigate('/?tab=settings')}
             className="flex items-center gap-2 px-4 py-2 rounded-xl bg-white/5 hover:bg-white/10 border border-white/10 hover:border-white/20 text-slate-300 hover:text-white transition-all duration-200 text-sm font-semibold group cursor-pointer"
           >
             <ArrowLeft className="w-4 h-4 transition-transform group-hover:-translate-x-1" />

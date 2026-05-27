@@ -23,7 +23,7 @@ function AuthRedirectHandler() {
     useEffect(() => {
         // Verifica se aterrissamos na raiz com um hash de convite ou recuperacao
         if (window.location.hash && window.location.hash.includes('type=invite')) {
-            navigate('/dashboard', { replace: true });
+            navigate('/', { replace: true });
         }
         if (window.location.hash && window.location.hash.includes('type=recovery')) {
             navigate('/reset-password', { replace: true });
@@ -33,7 +33,7 @@ function AuthRedirectHandler() {
         const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
             if (event === 'SIGNED_IN') {
                 if (location.pathname === '/' || location.pathname === '/login') {
-                    navigate('/dashboard', { replace: true });
+                    navigate('/', { replace: true });
                 }
             } else if (event === 'PASSWORD_RECOVERY') {
                  navigate('/reset-password', { replace: true });
@@ -44,6 +44,12 @@ function AuthRedirectHandler() {
     }, [navigate, location.pathname]);
 
     return null;
+}
+
+// Componente de redirecionamento para manter compatibilidade com links antigos do /dashboard
+function DashboardRedirect() {
+    const location = useLocation();
+    return <Navigate to={`/${location.search}`} replace />;
 }
 
 function App() {
@@ -109,10 +115,21 @@ function App() {
         <BrowserRouter>
             <AuthRedirectHandler />
             <Routes>
-                <Route path="/" element={<LandingPage />} />
+                <Route
+                    path="/"
+                    element={
+                        session ? (
+                            <SubscriptionGuard session={session}>
+                                <Dashboard session={session} />
+                            </SubscriptionGuard>
+                        ) : (
+                            <Navigate to="/login" replace />
+                        )
+                    }
+                />
                 <Route
                     path="/login"
-                    element={!session ? <Login /> : <Navigate to="/dashboard" replace />}
+                    element={!session ? <Login /> : <Navigate to="/" replace />}
                 />
                 <Route
                     path="/access-denied"
@@ -140,15 +157,7 @@ function App() {
                 
                 <Route
                     path="/dashboard"
-                    element={
-                        session ? (
-                            <SubscriptionGuard session={session}>
-                                <Dashboard session={session} />
-                            </SubscriptionGuard>
-                        ) : (
-                            <Navigate to="/login" replace />
-                        )
-                    }
+                    element={<DashboardRedirect />}
                 />
                 <Route
                     path="/como-usar"
