@@ -9,10 +9,16 @@ const RecurringReminders = ({ isOpen, onClose }) => {
     const [editingId, setEditingId] = useState(null)
     const [formData, setFormData] = useState({ summary: '', due_day: 1, amount: '' })
     const [isAdding, setIsAdding] = useState(false)
+    const [showDayPicker, setShowDayPicker] = useState(false)
 
     useEffect(() => {
         if (isOpen) {
             loadReminders()
+        } else {
+            setShowDayPicker(false)
+            setIsAdding(false)
+            setEditingId(null)
+            setFormData({ summary: '', due_day: 1, amount: '' })
         }
     }, [isOpen])
 
@@ -39,6 +45,7 @@ const RecurringReminders = ({ isOpen, onClose }) => {
 
         try {
             const { data: { user } } = await supabase.auth.getUser()
+            const dueDayVal = parseInt(formData.due_day) || 1
 
             if (editingId) {
                 // Update
@@ -46,7 +53,7 @@ const RecurringReminders = ({ isOpen, onClose }) => {
                     .from('recurring_reminders')
                     .update({
                         summary: formData.summary,
-                        due_day: formData.due_day,
+                        due_day: dueDayVal,
                         amount: formData.amount ? parseFloat(formData.amount) : null
                     })
                     .eq('id', editingId)
@@ -59,7 +66,7 @@ const RecurringReminders = ({ isOpen, onClose }) => {
                     .insert({
                         user_id: user.id,
                         summary: formData.summary,
-                        due_day: formData.due_day,
+                        due_day: dueDayVal,
                         amount: formData.amount ? parseFloat(formData.amount) : null
                     })
 
@@ -103,6 +110,7 @@ const RecurringReminders = ({ isOpen, onClose }) => {
         setFormData({ summary: '', due_day: 1, amount: '' })
         setEditingId(null)
         setIsAdding(false)
+        setShowDayPicker(false)
     }
 
     return (
@@ -178,18 +186,70 @@ const RecurringReminders = ({ isOpen, onClose }) => {
                                             </div>
                                         </div>
 
-                                        <div className="form-group day-group">
-                                            <label>Vence todo dia:</label>
-                                            <div className="day-selector">
-                                                <input
-                                                    type="number"
-                                                    min="1"
-                                                    max="31"
-                                                    value={formData.due_day}
-                                                    onChange={(e) => setFormData({ ...formData, due_day: parseInt(e.target.value) || 1 })}
-                                                />
-                                            </div>
-                                        </div>
+                                         <div className="form-group day-group">
+                                             <label>Vence todo dia:</label>
+                                             <div className="day-selector-container">
+                                                 <div className="day-input-wrapper">
+                                                     <input
+                                                         type="number"
+                                                         min="1"
+                                                         max="31"
+                                                         value={formData.due_day === '' ? '' : formData.due_day}
+                                                         onChange={(e) => {
+                                                             const val = e.target.value;
+                                                             if (val === '') {
+                                                                 setFormData({ ...formData, due_day: '' });
+                                                             } else {
+                                                                 const num = parseInt(val, 10);
+                                                                 if (!isNaN(num) && num >= 1 && num <= 31) {
+                                                                     setFormData({ ...formData, due_day: num });
+                                                                 } else if (!isNaN(num) && num > 31) {
+                                                                     setFormData({ ...formData, due_day: 31 });
+                                                                 }
+                                                             }
+                                                         }}
+                                                         onFocus={() => setShowDayPicker(true)}
+                                                         placeholder="Dia"
+                                                     />
+                                                     <button
+                                                         type="button"
+                                                         className="dropdown-toggle-btn"
+                                                         onClick={() => setShowDayPicker(!showDayPicker)}
+                                                     >
+                                                         <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" className={`chevron-icon ${showDayPicker ? 'open' : ''}`}>
+                                                             <path strokeLinecap="round" strokeLinejoin="round" d="M19.5 8.25l-7.5 7.5-7.5-7.5" />
+                                                         </svg>
+                                                     </button>
+                                                 </div>
+                                                 {showDayPicker && (
+                                                     <>
+                                                         <div className="day-picker-overlay" onClick={() => setShowDayPicker(false)} />
+                                                         <div className="day-list-popover">
+                                                             <div className="day-list-scrollable">
+                                                                 {Array.from({ length: 31 }, (_, i) => i + 1).map((day) => (
+                                                                     <button
+                                                                         key={day}
+                                                                         type="button"
+                                                                         className={`day-list-item ${formData.due_day === day ? 'active' : ''}`}
+                                                                         onClick={() => {
+                                                                             setFormData({ ...formData, due_day: day });
+                                                                             setShowDayPicker(false);
+                                                                         }}
+                                                                     >
+                                                                         <span>{day}</span>
+                                                                         {formData.due_day === day && (
+                                                                             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2.5} stroke="currentColor" className="check-icon">
+                                                                                 <path strokeLinecap="round" strokeLinejoin="round" d="M4.5 12.75l6 6 9-13.5" />
+                                                                             </svg>
+                                                                         )}
+                                                                     </button>
+                                                                 ))}
+                                                             </div>
+                                                         </div>
+                                                     </>
+                                                 )}
+                                             </div>
+                                         </div>
                                         <div className="form-actions">
                                             <button className="cancel-btn" onClick={cancelEdit}>Cancelar</button>
                                             <button className="save-btn" onClick={handleSave}>

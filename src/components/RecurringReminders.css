@@ -213,11 +213,16 @@
     border: 1px solid rgba(148, 163, 184, 0.1);
 }
 
-.day-selector input[type="number"] {
-    width: 70px;
+.day-selector-container {
+    position: relative;
+    display: inline-block;
+}
+
+.day-selector-container input[type="number"] {
+    width: 80px;
     background: rgba(59, 130, 246, 0.1);
     border: 1px solid rgba(59, 130, 246, 0.3);
-    padding: 8px;
+    padding: 10px;
     border-radius: 8px;
     color: #60a5fa;
     font-size: 16px;
@@ -227,10 +232,170 @@
     transition: all 0.2s;
 }
 
-.day-selector input[type="number"]:focus {
-    background: rgba(59, 130, 246, 0.2);
+.day-selector-container input[type="number"]:focus {
+    outline: none;
+}
+
+.day-input-wrapper {
+    display: flex;
+    align-items: center;
+    background: rgba(15, 23, 42, 0.6);
+    border: 1px solid rgba(148, 163, 184, 0.2);
+    border-radius: 8px;
+    overflow: hidden;
+    transition: all 0.2s;
+}
+
+.day-input-wrapper:focus-within {
     border-color: #3b82f6;
-    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.2);
+    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+}
+
+.day-input-wrapper input[type="number"] {
+    width: 60px;
+    background: transparent;
+    border: none;
+    padding: 10px 0 10px 14px;
+    color: #60a5fa;
+    font-size: 16px;
+    font-weight: 700;
+    text-align: center;
+    outline: none;
+}
+
+/* Hide standard HTML5 number input spinners */
+.day-input-wrapper input[type="number"]::-webkit-inner-spin-button,
+.day-input-wrapper input[type="number"]::-webkit-outer-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+}
+.day-input-wrapper input[type="number"] {
+    -moz-appearance: textfield;
+}
+
+.dropdown-toggle-btn {
+    background: transparent;
+    border: none;
+    height: 38px;
+    padding: 0 12px;
+    cursor: pointer;
+    color: #64748b;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s;
+    border-left: 1px solid rgba(148, 163, 184, 0.1);
+}
+
+.dropdown-toggle-btn:hover {
+    color: #e2e8f0;
+    background: rgba(255, 255, 255, 0.02);
+}
+
+.chevron-icon {
+    width: 16px;
+    height: 16px;
+    transition: transform 0.2s ease;
+}
+
+.chevron-icon.open {
+    transform: rotate(180deg);
+}
+
+.day-picker-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    z-index: 1010;
+    background: transparent;
+}
+
+.day-list-popover {
+    position: absolute;
+    bottom: calc(100% + 8px);
+    right: 0;
+    width: 100px;
+    background: #0f172a;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 10px;
+    box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.5), 0 8px 10px -6px rgba(0, 0, 0, 0.5);
+    z-index: 1011;
+    overflow: hidden;
+    animation: fadeInScale 0.15s ease-out;
+}
+
+@keyframes fadeInScale {
+    from {
+        opacity: 0;
+        transform: scale(0.95) translateY(5px);
+    }
+    to {
+        opacity: 1;
+        transform: scale(1) translateY(0);
+    }
+}
+
+.day-list-scrollable {
+    max-height: 200px;
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+    padding: 6px;
+}
+
+/* Custom Scrollbar for the list */
+.day-list-scrollable::-webkit-scrollbar {
+    width: 6px;
+}
+
+.day-list-scrollable::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+.day-list-scrollable::-webkit-scrollbar-thumb {
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 3px;
+}
+
+.day-list-scrollable::-webkit-scrollbar-thumb:hover {
+    background: rgba(255, 255, 255, 0.2);
+}
+
+.day-list-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    width: 100%;
+    padding: 8px 12px;
+    background: transparent;
+    border: none;
+    border-radius: 6px;
+    color: #cbd5e1;
+    font-size: 13px;
+    font-weight: 500;
+    text-align: left;
+    cursor: pointer;
+    transition: all 0.15s;
+}
+
+.day-list-item:hover {
+    background: rgba(59, 130, 246, 0.1);
+    color: #60a5fa;
+}
+
+.day-list-item.active {
+    background: rgba(59, 130, 246, 0.2);
+    color: #60a5fa;
+    font-weight: 700;
+}
+
+.day-list-item .check-icon {
+    width: 14px;
+    height: 14px;
+    color: #60a5fa;
+    flex-shrink: 0;
 }
 
 .reminder-amount-badge {
