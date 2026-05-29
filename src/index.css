@@ -1084,81 +1084,59 @@
         cursor: none !important;
     }
 
-    /* Core Styles for Custom Cursor Elements */
-    .custom-cursor-dot {
+    /* Core Styles for Minimalist Glass Lens Cursor */
+    .minimal-cursor {
+        position: fixed;
+        top: 0;
+        left: 0;
         width: 8px;
         height: 8px;
+        margin: -4px 0 0 -4px; /* Centers the 8x8 dot exactly on mouse coordinates */
         background-color: #00f0ff; /* Electric Cyan */
         border-radius: 50%;
-        position: fixed;
-        top: 0;
-        left: 0;
+        pointer-events: none;
         z-index: 999999;
-        pointer-events: none;
-        margin: -4px 0 0 -4px; /* Centers the dot on translate coordinates */
         opacity: 0;
-        transition: opacity 0.2s ease, width 0.2s ease, height 0.2s ease, background-color 0.3s ease;
         box-shadow: 0 0 10px rgba(0, 240, 255, 0.8), 0 0 20px rgba(0, 240, 255, 0.4);
+        border: 0px solid transparent;
         will-change: transform;
-    }
-
-    .custom-cursor-ring {
-        width: 36px;
-        height: 36px;
-        border: 1.5px solid rgba(0, 240, 255, 0.45); /* Translúcido Cyan */
-        border-radius: 50%;
-        position: fixed;
-        top: 0;
-        left: 0;
-        z-index: 999998;
-        pointer-events: none;
-        margin: -18px 0 0 -18px; /* Centers the ring on translate coordinates */
-        opacity: 0;
-        box-shadow: 0 0 15px rgba(0, 240, 255, 0.15);
         transition: 
-            opacity 0.2s ease, 
-            width 0.25s cubic-bezier(0.25, 1, 0.5, 1), 
-            height 0.25s cubic-bezier(0.25, 1, 0.5, 1), 
-            border-color 0.3s ease, 
+            opacity 0.25s ease,
+            width 0.28s cubic-bezier(0.25, 1, 0.5, 1),
+            height 0.28s cubic-bezier(0.25, 1, 0.5, 1),
+            margin 0.28s cubic-bezier(0.25, 1, 0.5, 1),
             background-color 0.3s ease,
-            margin 0.25s cubic-bezier(0.25, 1, 0.5, 1);
-        will-change: transform;
+            border-color 0.3s ease,
+            border-width 0.28s ease,
+            box-shadow 0.3s ease;
     }
 
-    /* Hovering interactive elements: expand and glow in cyan/gold fusion */
-    .custom-cursor-ring.cursor-hovered {
-        width: 48px;
-        height: 48px;
-        margin: -24px 0 0 -24px;
-        border-color: rgba(255, 167, 81, 0.8); /* Elegant Gold #ffa751 */
-        background-color: rgba(0, 240, 255, 0.05); /* Very light cyan hue filling */
-        box-shadow: 
-            0 0 20px rgba(255, 167, 81, 0.4),
-            inset 0 0 10px rgba(0, 240, 255, 0.2);
+    /* Interactive: Hovering Clickables (Expands into Gold Glassmorphic Lens) */
+    .minimal-cursor.cursor-hovered {
+        width: 32px;
+        height: 32px;
+        margin: -16px 0 0 -16px;
+        background-color: rgba(255, 167, 81, 0.08); /* Translucent Gold inside */
+        border: 1.5px solid #ffa751; /* Sharp Gold border */
+        box-shadow: 0 0 15px rgba(255, 167, 81, 0.4);
     }
 
-    .custom-cursor-dot.dot-hovered {
-        width: 6px;
-        height: 6px;
-        margin: -3px 0 0 -3px;
-        background-color: #ffa751; /* Elegant Gold */
-        box-shadow: 0 0 12px rgba(255, 167, 81, 1);
-    }
-
-    /* Clicking dynamic state: contracts the ring tightly around the dot */
-    .custom-cursor-ring.cursor-clicked {
-        width: 18px;
-        height: 18px;
-        margin: -9px 0 0 -9px;
-        border-color: #00f0ff;
-        background-color: rgba(0, 240, 255, 0.2);
-        box-shadow: 0 0 12px rgba(0, 240, 255, 0.6);
+    /* Interactive: Clicking Press (MouseDown confirmation) */
+    .minimal-cursor.cursor-clicked {
+        width: 12px;
+        height: 12px;
+        margin: -6px 0 0 -6px;
+        background-color: rgba(0, 240, 255, 0.2); /* Solid-ish Cyan inside */
+        border: 2px solid #00f0ff; /* Sharp Cyan border */
+        box-shadow: 0 0 15px rgba(0, 240, 255, 0.8);
         transition: 
-            width 0.1s cubic-bezier(0.1, 0.8, 0.3, 1), 
-            height 0.1s cubic-bezier(0.1, 0.8, 0.3, 1), 
+            width 0.1s cubic-bezier(0.1, 0.8, 0.3, 1),
+            height 0.1s cubic-bezier(0.1, 0.8, 0.3, 1),
             margin 0.1s cubic-bezier(0.1, 0.8, 0.3, 1),
+            background-color 0.1s ease,
             border-color 0.1s ease,
-            background-color 0.1s ease;
+            border-width 0.1s ease,
+            box-shadow 0.1s ease;
     }
 }
 

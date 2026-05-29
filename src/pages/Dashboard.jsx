@@ -314,8 +314,7 @@ const Dashboard = ({ session }) => {
 
 // Custom Tech Cursor Component for maximum performance and premium visuals
 const CustomCursor = () => {
-    const dotRef = useRef(null);
-    const ringRef = useRef(null);
+    const cursorRef = useRef(null);
     const rafId = useRef(null);
 
     useEffect(() => {
@@ -325,17 +324,12 @@ const CustomCursor = () => {
                         (navigator.maxTouchPoints > 0);
         if (isTouch) return;
 
-        const dot = dotRef.current;
-        const ring = ringRef.current;
-        if (!dot || !ring) return;
+        const cursor = cursorRef.current;
+        if (!cursor) return;
 
         let mouseX = 0;
         let mouseY = 0;
-        let ringX = 0;
-        let ringY = 0;
         let visible = false;
-
-        const lerp = (start, end, amt) => (1 - amt) * start + amt * end;
 
         const handleMouseMove = (e) => {
             mouseX = e.clientX;
@@ -343,22 +337,16 @@ const CustomCursor = () => {
 
             if (!visible) {
                 visible = true;
-                dot.style.opacity = '1';
-                ring.style.opacity = '1';
-                ringX = mouseX;
-                ringY = mouseY;
+                cursor.style.opacity = '1';
             }
-
-            // Direct-to-DOM GPU translation for dot (centers via negative CSS margin)
-            dot.style.transform = `translate3d(${mouseX}px, ${mouseY}px, 0)`;
         };
 
         const handleMouseDown = () => {
-            ring.classList.add('cursor-clicked');
+            cursor.classList.add('cursor-clicked');
         };
 
         const handleMouseUp = () => {
-            ring.classList.remove('cursor-clicked');
+            cursor.classList.remove('cursor-clicked');
         };
 
         const handleMouseOver = (e) => {
@@ -367,8 +355,7 @@ const CustomCursor = () => {
             const isClickable = target.closest('a, button, [role="button"], input, select, textarea, [onclick], .clickable') ||
                                 (window.getComputedStyle(target).cursor === 'pointer');
             if (isClickable) {
-                ring.classList.add('cursor-hovered');
-                dot.classList.add('dot-hovered');
+                cursor.classList.add('cursor-hovered');
             }
         };
 
@@ -378,20 +365,17 @@ const CustomCursor = () => {
             const isClickable = target.closest('a, button, [role="button"], input, select, textarea, [onclick], .clickable') ||
                                 (window.getComputedStyle(target).cursor === 'pointer');
             if (isClickable) {
-                ring.classList.remove('cursor-hovered');
-                dot.classList.remove('dot-hovered');
+                cursor.classList.remove('cursor-hovered');
             }
         };
 
         const handleMouseLeaveWindow = () => {
-            dot.style.opacity = '0';
-            ring.style.opacity = '0';
+            cursor.style.opacity = '0';
         };
 
         const handleMouseEnterWindow = () => {
             if (visible) {
-                dot.style.opacity = '1';
-                ring.style.opacity = '1';
+                cursor.style.opacity = '1';
             }
         };
 
@@ -403,21 +387,20 @@ const CustomCursor = () => {
         document.addEventListener('mouseleave', handleMouseLeaveWindow);
         document.addEventListener('mouseenter', handleMouseEnterWindow);
 
-        // LERP loop for trailing ring
+        // High-frequency animation frame loop for absolute responsiveness (zero lag)
         let active = true;
-        const updateRing = () => {
+        const updatePosition = () => {
             if (!active) return;
 
             if (visible) {
-                ringX = lerp(ringX, mouseX, 0.15);
-                ringY = lerp(ringY, mouseY, 0.15);
-                ring.style.transform = `translate3d(${ringX}px, ${ringY}px, 0)`;
+                // Instantly apply mouseX and mouseY positioned per browser paint frame
+                cursor.style.transform = `translate3d(${mouseX}px, ${mouseY}px, 0)`;
             }
 
-            rafId.current = requestAnimationFrame(updateRing);
+            rafId.current = requestAnimationFrame(updatePosition);
         };
 
-        rafId.current = requestAnimationFrame(updateRing);
+        rafId.current = requestAnimationFrame(updatePosition);
 
         return () => {
             active = false;
@@ -433,10 +416,7 @@ const CustomCursor = () => {
     }, []);
 
     return (
-        <>
-            <div ref={dotRef} className="custom-cursor-dot" />
-            <div ref={ringRef} className="custom-cursor-ring" />
-        </>
+        <div ref={cursorRef} className="minimal-cursor" />
     );
 };
 
