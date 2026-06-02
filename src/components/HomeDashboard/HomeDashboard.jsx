@@ -41,6 +41,7 @@ const HomeDashboard = ({ session, userName, onNavigate }) => {
 
     const [greeting, setGreeting] = useState('')
     const [time, setTime] = useState(new Date())
+    const currentMonthName = time.toLocaleDateString('pt-BR', { month: 'long' })
 
     useEffect(() => {
         const timer = setInterval(() => setTime(new Date()), 1000)
@@ -101,7 +102,7 @@ const HomeDashboard = ({ session, userName, onNavigate }) => {
                         <motion.div initial={{ opacity: 0, x: -20 }} animate={{ opacity: 1, x: 0 }}>
                             <span className="hd-tag">{greeting}, {displayName}</span>
                             <div className="hd-balance-header">
-                                <small>Saldo Disponível</small>
+                                <small>Saldo do Mês ({currentMonthName})</small>
                                 <h2><AnimatedValue value={stats.balance} /></h2>
                             </div>
                         </motion.div>
