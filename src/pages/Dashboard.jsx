@@ -114,7 +114,6 @@ const Dashboard = ({ session }) => {
 
     return (
         <div className="dashboard-container">
-            <CustomCursor />
             {showPhoneModal && (
                 <PhoneNumberModal
                     session={session}
@@ -311,114 +310,6 @@ const Dashboard = ({ session }) => {
         </div>
     )
 }
-
-// Custom Tech Cursor Component for maximum performance and premium visuals
-const CustomCursor = () => {
-    const cursorRef = useRef(null);
-    const rafId = useRef(null);
-
-    useEffect(() => {
-        // Detect mobile/tablet/touch screens
-        const isTouch = window.matchMedia('(pointer: coarse)').matches || 
-                        ('ontouchstart' in window) || 
-                        (navigator.maxTouchPoints > 0);
-        if (isTouch) return;
-
-        const cursor = cursorRef.current;
-        if (!cursor) return;
-
-        let mouseX = 0;
-        let mouseY = 0;
-        let visible = false;
-
-        const handleMouseMove = (e) => {
-            mouseX = e.clientX;
-            mouseY = e.clientY;
-
-            if (!visible) {
-                visible = true;
-                cursor.style.opacity = '1';
-            }
-        };
-
-        const handleMouseDown = () => {
-            cursor.classList.add('cursor-clicked');
-        };
-
-        const handleMouseUp = () => {
-            cursor.classList.remove('cursor-clicked');
-        };
-
-        const handleMouseOver = (e) => {
-            const target = e.target;
-            if (!target) return;
-            const isClickable = target.closest('a, button, [role="button"], input, select, textarea, [onclick], .clickable') ||
-                                (window.getComputedStyle(target).cursor === 'pointer');
-            if (isClickable) {
-                cursor.classList.add('cursor-hovered');
-            }
-        };
-
-        const handleMouseOut = (e) => {
-            const target = e.target;
-            if (!target) return;
-            const isClickable = target.closest('a, button, [role="button"], input, select, textarea, [onclick], .clickable') ||
-                                (window.getComputedStyle(target).cursor === 'pointer');
-            if (isClickable) {
-                cursor.classList.remove('cursor-hovered');
-            }
-        };
-
-        const handleMouseLeaveWindow = () => {
-            cursor.style.opacity = '0';
-        };
-
-        const handleMouseEnterWindow = () => {
-            if (visible) {
-                cursor.style.opacity = '1';
-            }
-        };
-
-        window.addEventListener('mousemove', handleMouseMove, { passive: true });
-        window.addEventListener('mousedown', handleMouseDown);
-        window.addEventListener('mouseup', handleMouseUp);
-        window.addEventListener('mouseover', handleMouseOver);
-        window.addEventListener('mouseout', handleMouseOut);
-        document.addEventListener('mouseleave', handleMouseLeaveWindow);
-        document.addEventListener('mouseenter', handleMouseEnterWindow);
-
-        // High-frequency animation frame loop for absolute responsiveness (zero lag)
-        let active = true;
-        const updatePosition = () => {
-            if (!active) return;
-
-            if (visible) {
-                // Instantly apply mouseX and mouseY positioned per browser paint frame
-                cursor.style.transform = `translate3d(${mouseX}px, ${mouseY}px, 0)`;
-            }
-
-            rafId.current = requestAnimationFrame(updatePosition);
-        };
-
-        rafId.current = requestAnimationFrame(updatePosition);
-
-        return () => {
-            active = false;
-            if (rafId.current) cancelAnimationFrame(rafId.current);
-            window.removeEventListener('mousemove', handleMouseMove);
-            window.removeEventListener('mousedown', handleMouseDown);
-            window.removeEventListener('mouseup', handleMouseUp);
-            window.removeEventListener('mouseover', handleMouseOver);
-            window.removeEventListener('mouseout', handleMouseOut);
-            document.removeEventListener('mouseleave', handleMouseLeaveWindow);
-            document.removeEventListener('mouseenter', handleMouseEnterWindow);
-        };
-    }, []);
-
-    return (
-        <div ref={cursorRef} className="minimal-cursor" />
-    );
-};
 
 export default Dashboard
 
